@@ -17,7 +17,7 @@ import { toast } from 'sonner';
 import { Boundary } from '@/components/internal/boundary';
 import { Button } from '@/components/ui/button';
 import { DotSeparator } from '@/components/ui/dot-separator';
-import { FlightOverlay, PlanePath } from '@/components/ui/flight-overlay';
+import { PlanePath, useFlightOverlay } from '@/components/ui/flight-overlay';
 import { Input } from '@/components/ui/input';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Spinner } from '@/components/ui/spinner';
@@ -26,6 +26,7 @@ import { cn, formatPrice } from '@/lib/utils';
 import { confirmBooking, holdSeat } from '../booking-actions';
 import { createBookingHref } from '../utils/search-params';
 import { nextBookingStep, previousBookingStep } from '../utils/steps';
+import type { ConfirmBookingState } from '../booking-actions';
 import type { BookingDraft, BookingStep } from '../types/booking';
 
 const titles: Record<BookingStep, { eyebrow: string; title: string }> = {
@@ -57,7 +58,18 @@ export function BookingStepForm({
   steps: BookingStep[];
 }) {
   const router = useRouter();
-  const [confirmState, confirmAction, confirming] = useActionState(confirmBooking, null);
+  const overlay = useFlightOverlay();
+  const [confirmState, confirmAction, confirming] = useActionState(
+    async (state: ConfirmBookingState, formData: FormData) => {
+      overlay.show('Confirming your booking');
+      try {
+        return await confirmBooking(state, formData);
+      } finally {
+        overlay.hide();
+      }
+    },
+    null,
+  );
   useLeaveGuard(confirming);
   const [optimisticDraft, updateOptimisticDraft] = useOptimistic(draft, (current, patch: Partial<BookingDraft>) => ({
     ...current,
@@ -198,7 +210,6 @@ export function BookingStepForm({
           )}
         </div>
       </form>
-      <FlightOverlay label="Confirming your booking" open={confirming} />
     </Boundary>
   );
 }
