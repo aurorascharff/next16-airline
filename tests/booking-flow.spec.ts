@@ -47,6 +47,7 @@ test.describe('Booking flow (/book/[flightId]/[step])', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Review your journey' })).toBeVisible();
     await expect(page.getByTestId('trip-total')).toHaveText('€395');
 
+    await page.getByLabel('Passenger name').fill('Test Traveler');
     await page.getByTestId('booking-confirm').filter({ visible: true }).click();
     await page.waitForURL(url => url.pathname.startsWith('/trips/') && url.searchParams.get('confirmed') === '1');
     await expect(page.getByTestId('trip-confirmed')).toBeVisible();

@@ -20,6 +20,7 @@ export default function TripPage({ params, searchParams }: PageProps<'/trips/[bo
   const query = Promise.all([params, searchParams]).then(([{ bookingId }, values]) => ({
     bookingId,
     confirmed: values.confirmed === '1',
+    reference: typeof values.ref === 'string' ? values.ref : '',
   }));
 
   return (
@@ -34,28 +35,28 @@ export default function TripPage({ params, searchParams }: PageProps<'/trips/[bo
         <div className="border-divider dark:border-divider-dark shadow-soft overflow-hidden rounded-2xl border bg-white dark:bg-black">
           <div className="bg-card dark:bg-card-dark flex flex-col p-7 sm:p-10">
             <AnimatedSuspense fallback={<TripHeaderSkeleton />}>
-              {query.then(({ bookingId, confirmed }) => (
-                <TripHeader bookingId={bookingId} confirmed={confirmed} />
+              {query.then(({ bookingId, confirmed, reference }) => (
+                <TripHeader bookingId={bookingId} confirmed={confirmed} reference={reference} />
               ))}
             </AnimatedSuspense>
           </div>
           <div className="p-7 sm:p-10">
             <AnimatedSuspense fallback={<TripRouteSkeleton />}>
-              {query.then(({ bookingId }) => (
-                <TripRoute bookingId={bookingId} />
+              {query.then(({ bookingId, reference }) => (
+                <TripRoute bookingId={bookingId} reference={reference} />
               ))}
             </AnimatedSuspense>
             <div className="border-divider dark:border-divider-dark mt-8 border-t pt-8">
               <AnimatedSuspense fallback={<TripSummarySkeleton />}>
-                {query.then(({ bookingId }) => (
-                  <TripSummary bookingId={bookingId} />
+                {query.then(({ bookingId, reference }) => (
+                  <TripSummary bookingId={bookingId} reference={reference} />
                 ))}
               </AnimatedSuspense>
             </div>
             <div className="border-divider dark:border-divider-dark mt-8 border-t pt-6">
               <AnimatedSuspense fallback={<TripReceiptSkeleton />}>
-                {query.then(({ bookingId }) => (
-                  <TripReceipt bookingId={bookingId} />
+                {query.then(({ bookingId, reference }) => (
+                  <TripReceipt bookingId={bookingId} reference={reference} />
                 ))}
               </AnimatedSuspense>
             </div>

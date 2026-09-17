@@ -24,4 +24,13 @@ test.describe('Trips page (/trips)', () => {
     await page.goto('/trips/trip-traveler-amsterdam');
     await expect(page.getByRole('heading', { level: 1, name: 'That journey does not exist.' })).toBeVisible();
   });
+
+  test('a booking can be retrieved by reference and last name', async ({ page }) => {
+    await page.goto('/trips');
+    await page.getByLabel('Booking reference').fill('way318');
+    await page.getByLabel('Passenger last name').fill('Nordmann');
+    await page.getByRole('button', { name: 'Find booking' }).click();
+    await page.waitForURL(url => url.pathname === '/trips/trip-traveler-amsterdam');
+    await expect(page.getByRole('heading', { level: 1, name: 'See you in Amsterdam.' })).toBeVisible();
+  });
 });

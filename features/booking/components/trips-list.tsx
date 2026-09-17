@@ -32,7 +32,7 @@ export async function TripsList() {
             <div className="p-5 sm:p-6">
               <div className="flex items-center justify-between gap-4">
                 <span className="flex items-center gap-2 text-sm font-semibold">
-                  <WaypointMark className="text-accent size-5" /> Waypoint
+                  <WaypointMark className="text-accent size-5" /> {booking.passenger}
                 </span>
                 <span className="text-muted text-xs font-semibold tracking-wide uppercase">
                   {booking.flight.flightNumber}

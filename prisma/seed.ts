@@ -11,10 +11,7 @@ const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString: normalizeDatabaseUrl(process.env.DATABASE_URL!) }),
 });
 
-const users = [
-  { email: 'demo@example.com', id: 'demo', name: 'demo@example.com' },
-  { email: 'traveler@example.com', id: 'traveler', name: 'traveler@example.com' },
-];
+const users = [{ id: 'demo' }, { id: 'traveler' }];
 
 const airports = [
   {
@@ -173,6 +170,7 @@ async function main() {
       extras: { connect: [{ id: 'wp-21-lounge' }] },
       flightId: 'wp-21',
       id: 'trip-default-barcelona',
+      passenger: 'Kari Nordmann',
       reference: 'WAY204',
       seatId: 'wp-21-10A',
       total: 263 + 34 + 28 + 32,
@@ -187,6 +185,7 @@ async function main() {
       extras: { connect: [{ id: 'wp-71-fast-track' }] },
       flightId: 'wp-71',
       id: 'trip-default-lisbon',
+      passenger: 'Kari Nordmann',
       reference: 'WAY731',
       seatId: 'wp-71-10C',
       total: 259 + 28 + 12,
@@ -201,6 +200,7 @@ async function main() {
       date: '2026-10-05',
       flightId: 'wp-61',
       id: 'trip-traveler-amsterdam',
+      passenger: 'Ola Nordmann',
       reference: 'WAY318',
       total: 118,
       userId: 'traveler',

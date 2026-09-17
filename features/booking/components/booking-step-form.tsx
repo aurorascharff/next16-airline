@@ -16,6 +16,7 @@ import { startTransition, useActionState, useOptimistic, useRef, useState } from
 import { toast } from 'sonner';
 import { Boundary } from '@/components/internal/boundary';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Spinner } from '@/components/ui/spinner';
 import type { Extra, Flight, FlightOffer } from '@/features/flight/types/flight';
@@ -177,7 +178,19 @@ function ConfirmTripForm({
   const [state, formAction] = useActionState(confirmBooking, null);
 
   return (
-    <form action={formAction} className="flex flex-col items-end gap-2">
+    <form action={formAction} className="flex flex-col items-end gap-3 sm:flex-row sm:items-start">
+      <label className="grid gap-1.5 text-xs font-semibold">
+        Passenger name
+        <Input
+          aria-describedby={state?.error ? 'confirm-error' : undefined}
+          aria-invalid={state?.error ? true : undefined}
+          autoComplete="name"
+          className="w-56"
+          name="passenger"
+          placeholder="Full name as on passport"
+          required
+        />
+      </label>
       <input name="flightId" type="hidden" value={flightId} />
       <input name="date" type="hidden" value={date} />
       <input name="fare" type="hidden" value={fare} />
@@ -185,21 +198,16 @@ function ConfirmTripForm({
       <input name="carryOn" type="hidden" value={draft.carryOn ? '1' : '0'} />
       <input name="seat" type="hidden" value={draft.seat} />
       <input name="extras" type="hidden" value={draft.extras.join(',')} />
-      <Button
-        aria-describedby={state?.error ? 'confirm-error' : undefined}
-        aria-invalid={state?.error ? true : undefined}
-        data-testid="booking-confirm"
-        size="lg"
-        type="submit"
-        variant="accent"
-      >
-        Confirm trip <ArrowRight className="size-4" />
-      </Button>
-      {state?.error && (
-        <p className="text-danger text-xs" id="confirm-error" role="alert">
-          {state.error}
-        </p>
-      )}
+      <div className="flex flex-col items-end gap-2 sm:pt-[22px]">
+        <Button data-testid="booking-confirm" size="lg" type="submit" variant="accent">
+          Confirm trip <ArrowRight className="size-4" />
+        </Button>
+        {state?.error && (
+          <p className="text-danger text-xs" id="confirm-error" role="alert">
+            {state.error}
+          </p>
+        )}
+      </div>
     </form>
   );
 }

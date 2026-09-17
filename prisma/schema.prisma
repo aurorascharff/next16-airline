@@ -8,9 +8,7 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String
+  id        String   @id
   createdAt DateTime @default(now())
 
   bookings  Booking[]
@@ -103,6 +101,7 @@ model Booking {
   userId    String?
   flightId  String
   date      String
+  passenger String
   cabin     String
   bags      Int
   carryOn   Boolean

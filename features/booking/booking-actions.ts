@@ -4,7 +4,7 @@ import { updateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { flightTags } from '@/features/flight/flight-cache';
-import { verifyAuth } from '@/features/user/user-queries';
+import { verifySession } from '@/features/user/user-queries';
 import { prisma } from '@/lib/db';
 import { bookingTags } from './booking-cache';
 
@@ -22,6 +22,7 @@ const confirmSchema = z.object({
   extras: z.string(),
   fare: z.enum(['Basic', 'Flex']),
   flightId: z.string().min(1),
+  passenger: z.string().trim().min(2, 'Enter the passenger name.').max(80),
   seat: z.string(),
 });
 
@@ -31,9 +32,11 @@ function createReference() {
 }
 
 export async function confirmBooking(_state: ConfirmBookingState, formData: FormData): Promise<ConfirmBookingState> {
-  const user = await verifyAuth();
+  const sessionId = await verifySession();
+  await ensureTraveler(sessionId);
   const parsed = confirmSchema.safeParse(Object.fromEntries(formData));
-  if (!parsed.success) return { error: 'Your selections could not be read. Go back and try again.', ok: false };
+  if (!parsed.success)
+    return { error: parsed.error.issues[0].message ?? 'Your selections could not be read.', ok: false };
   const input = parsed.data;
 
   const flight = await prisma.flight.findUnique({
@@ -47,7 +50,7 @@ export async function confirmBooking(_state: ConfirmBookingState, formData: Form
   if (input.seat && !seat) return { error: 'Choose a seat on this flight.', ok: false };
   if (seat?.status === 'occupied') return { error: `Seat ${seat.label} is already taken.`, ok: false };
   if (seat) {
-    const conflict = await seatConflict(flight.id, input.date, seat.id, user.id);
+    const conflict = await seatConflict(flight.id, input.date, seat.id, sessionId);
     if (conflict) return { error: `Seat ${seat.label} ${conflict}. Pick another one.`, ok: false };
   }
 
@@ -67,16 +70,17 @@ export async function confirmBooking(_state: ConfirmBookingState, formData: Form
       date: input.date,
       extras: { connect: extras.map(extra => ({ id: extra.id })) },
       flightId: flight.id,
+      passenger: input.passenger,
       reference: createReference(),
       seatId: seat?.id,
       total,
-      userId: user.id,
+      userId: sessionId,
     },
     select: { id: true },
   });
 
-  await prisma.seatHold.deleteMany({ where: { date: input.date, flightId: flight.id, userId: user.id } });
-  updateTag(bookingTags.user(user.id));
+  await prisma.seatHold.deleteMany({ where: { date: input.date, flightId: flight.id, userId: sessionId } });
+  updateTag(bookingTags.user(sessionId));
   updateTag(flightTags.offer(flight.id));
   redirect(`/trips/${booking.id}?confirmed=1`);
 }
@@ -95,34 +99,68 @@ async function seatConflict(flightId: string, date: string, seatId: string, user
 }
 
 export async function holdSeat(flightId: string, date: string, seatId: string) {
-  const user = await verifyAuth();
+  const sessionId = await verifySession();
+  await ensureTraveler(sessionId);
   const seat = await prisma.seat.findFirst({ where: { flightId, id: seatId } });
   if (!seat || seat.status === 'occupied') return { error: 'That seat is not available.', ok: false as const };
 
-  const conflict = await seatConflict(flightId, date, seatId, user.id);
+  const conflict = await seatConflict(flightId, date, seatId, sessionId);
   if (conflict) return { error: `Seat ${seat.label} ${conflict}.`, ok: false as const };
 
   const expiresAt = new Date(Date.now() + SEAT_HOLD_MINUTES * 60_000);
   await prisma.$transaction([
     prisma.seatHold.deleteMany({
-      where: { OR: [{ date, flightId, userId: user.id }, { expiresAt: { lte: new Date() } }] },
+      where: { OR: [{ date, flightId, userId: sessionId }, { expiresAt: { lte: new Date() } }] },
     }),
-    prisma.seatHold.create({ data: { date, expiresAt, flightId, seatId, userId: user.id } }),
+    prisma.seatHold.create({ data: { date, expiresAt, flightId, seatId, userId: sessionId } }),
   ]);
   updateTag(flightTags.offer(flightId));
   return { expiresAt: expiresAt.toISOString(), ok: true as const };
 }
 
+export type FindBookingState = { ok: false; error: string } | null;
+
+const findSchema = z.object({
+  lastName: z.string().trim().min(2, 'Enter the passenger last name.'),
+  reference: z
+    .string()
+    .trim()
+    .toUpperCase()
+    .regex(/^WAY[A-Z0-9]{3}$/, 'References look like WAY204.'),
+});
+
+export async function findBooking(_prev: FindBookingState, formData: FormData): Promise<FindBookingState> {
+  await verifySession();
+  const parsed = findSchema.safeParse({ lastName: formData.get('lastName'), reference: formData.get('reference') });
+  if (!parsed.success) return { error: parsed.error.issues[0].message, ok: false };
+
+  const booking = await prisma.booking.findUnique({
+    select: { id: true, passenger: true, reference: true },
+    where: { reference: parsed.data.reference },
+  });
+  const lastName = booking?.passenger.trim().split(/\s+/).at(-1)?.toLowerCase();
+  if (!booking || lastName !== parsed.data.lastName.toLowerCase()) {
+    return { error: 'No booking matches that reference and last name.', ok: false };
+  }
+
+  redirect(`/trips/${booking.id}?ref=${booking.reference}`);
+}
+
 export async function cancelBooking(bookingId: string) {
-  const user = await verifyAuth();
+  const sessionId = await verifySession();
+  await ensureTraveler(sessionId);
   const booking = await prisma.booking.findUnique({
     select: { flightId: true, userId: true },
     where: { id: bookingId },
   });
-  if (!booking || booking.userId !== user.id) return { error: 'That trip could not be found.', ok: false as const };
+  if (!booking || booking.userId !== sessionId) return { error: 'That trip could not be found.', ok: false as const };
 
   await prisma.booking.delete({ where: { id: bookingId } });
-  updateTag(bookingTags.user(user.id));
+  updateTag(bookingTags.user(sessionId));
   updateTag(flightTags.offer(booking.flightId));
   return { ok: true as const };
+}
+
+async function ensureTraveler(sessionId: string) {
+  await prisma.user.upsert({ create: { id: sessionId }, update: {}, where: { id: sessionId } });
 }

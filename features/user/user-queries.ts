@@ -2,24 +2,18 @@ import 'server-only';
 
 import { cacheLife, cacheTag } from 'next/cache';
 import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
-import { prisma } from '@/lib/db';
 import { SESSION_COOKIE } from './user-session';
 
-export type CurrentUser = { email: string; id: string; name: string };
-
-export async function getCurrentUser(): Promise<CurrentUser | null> {
+export async function getSessionId(): Promise<string | null> {
   'use cache: private';
   cacheLife({ stale: Infinity });
-  cacheTag('current-user');
+  cacheTag('session');
 
-  const id = (await cookies()).get(SESSION_COOKIE)?.value;
-  if (!id) return null;
-  return prisma.user.findUnique({ select: { email: true, id: true, name: true }, where: { id } });
+  return (await cookies()).get(SESSION_COOKIE)?.value ?? null;
 }
 
-export async function verifyAuth(): Promise<CurrentUser> {
-  const user = await getCurrentUser();
-  if (!user) redirect('/login');
-  return user;
+export async function verifySession(): Promise<string> {
+  const sessionId = await getSessionId();
+  if (!sessionId) throw new Error('No session');
+  return sessionId;
 }

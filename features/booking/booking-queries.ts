@@ -3,7 +3,7 @@ import 'server-only';
 import { cacheLife, cacheTag } from 'next/cache';
 import { notFound } from 'next/navigation';
 import { isSlowEnabled } from '@/features/demo/demo-queries';
-import { verifyAuth } from '@/features/user/user-queries';
+import { verifySession } from '@/features/user/user-queries';
 import { prisma } from '@/lib/db';
 import { delay } from '@/lib/utils';
 import { bookingTags } from './booking-cache';
@@ -16,8 +16,8 @@ const bookingInclude = {
 } as const;
 
 export async function getBookings() {
-  const [user, slow] = await Promise.all([verifyAuth(), isSlowEnabled()]);
-  return getBookingsForUser(user.id, slow);
+  const [sessionId, slow] = await Promise.all([verifySession(), isSlowEnabled()]);
+  return getBookingsForUser(sessionId, slow);
 }
 
 async function getBookingsForUser(userId: string, slow: boolean): Promise<Booking[]> {
@@ -38,18 +38,19 @@ export async function getNextBooking() {
   return bookings[0] ?? null;
 }
 
-export async function getBooking(id: string) {
-  const [user, slow] = await Promise.all([verifyAuth(), isSlowEnabled()]);
-  return getBookingForUser(id, user.id, slow);
+export async function getBooking(id: string, reference = '') {
+  const [sessionId, slow] = await Promise.all([verifySession(), isSlowEnabled()]);
+  return getBookingForUser(id, sessionId, reference, slow);
 }
 
-async function getBookingForUser(id: string, userId: string, slow: boolean): Promise<Booking> {
+async function getBookingForUser(id: string, userId: string, reference: string, slow: boolean): Promise<Booking> {
   'use cache';
   cacheLife('hours');
   cacheTag(bookingTags.user(userId), bookingTags.detail(id));
 
   await delay(600, slow);
   const booking = await prisma.booking.findUnique({ include: bookingInclude, where: { id } });
-  if (!booking || (booking.userId !== null && booking.userId !== userId)) notFound();
+  const allowed = booking && (booking.userId === null || booking.userId === userId || booking.reference === reference);
+  if (!booking || !allowed) notFound();
   return booking;
 }

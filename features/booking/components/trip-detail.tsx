@@ -5,8 +5,16 @@ import { formatDate, formatPrice } from '@/lib/utils';
 import { getBooking } from '../booking-queries';
 import { CancelTripButton } from './cancel-trip-button';
 
-export async function TripHeader({ bookingId, confirmed }: { bookingId: string; confirmed: boolean }) {
-  const booking = await getBooking(bookingId);
+export async function TripHeader({
+  bookingId,
+  confirmed,
+  reference,
+}: {
+  bookingId: string;
+  confirmed: boolean;
+  reference: string;
+}) {
+  const booking = await getBooking(bookingId, reference);
 
   return (
     <>
@@ -23,7 +31,8 @@ export async function TripHeader({ bookingId, confirmed }: { bookingId: string; 
         See you in {booking.flight.destination.city}.
       </h1>
       <p className="text-muted mt-3 text-sm">
-        Booking reference <span className="font-semibold text-black dark:text-white">{booking.reference}</span>
+        {booking.passenger} · Booking reference{' '}
+        <span className="font-semibold text-black dark:text-white">{booking.reference}</span>
       </p>
     </>
   );
@@ -39,8 +48,8 @@ export function TripHeaderSkeleton() {
   );
 }
 
-export async function TripRoute({ bookingId }: { bookingId: string }) {
-  const { flight } = await getBooking(bookingId);
+export async function TripRoute({ bookingId, reference }: { bookingId: string; reference: string }) {
+  const { flight } = await getBooking(bookingId, reference);
 
   return (
     <div className="grid gap-6 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
@@ -89,8 +98,8 @@ export function TripRouteSkeleton() {
   );
 }
 
-export async function TripSummary({ bookingId }: { bookingId: string }) {
-  const booking = await getBooking(bookingId);
+export async function TripSummary({ bookingId, reference }: { bookingId: string; reference: string }) {
+  const booking = await getBooking(bookingId, reference);
 
   return (
     <div className="grid gap-4 sm:grid-cols-4">
@@ -120,8 +129,8 @@ export function TripSummarySkeleton() {
   );
 }
 
-export async function TripReceipt({ bookingId }: { bookingId: string }) {
-  const booking = await getBooking(bookingId);
+export async function TripReceipt({ bookingId, reference }: { bookingId: string; reference: string }) {
+  const booking = await getBooking(bookingId, reference);
   const { flight } = booking;
   const rows = [
     { label: `${booking.cabin} fare`, value: booking.cabin === 'Flex' ? flight.flexFare : flight.basicFare },

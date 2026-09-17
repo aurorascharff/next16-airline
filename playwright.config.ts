@@ -9,7 +9,7 @@ export const signedInState = {
       domain: 'localhost',
       expires: -1,
       httpOnly: true,
-      name: 'waypoint-user',
+      name: 'waypoint-session',
       path: '/',
       sameSite: 'Lax' as const,
       secure: false,
