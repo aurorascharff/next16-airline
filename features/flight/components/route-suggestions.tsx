@@ -47,7 +47,7 @@ export function RouteSuggestionsSkeleton() {
     <div>
       <div className="mb-4">
         <Skeleton className="my-[3px] h-3.5 w-28" />
-        <Skeleton className="my-1.5 mt-1 h-5 w-64" />
+        <Skeleton className="mt-[10px] mb-1.5 h-5 w-64" />
       </div>
       <div className="grid gap-3 sm:grid-cols-3">
         {Array.from({ length: 3 }).map((_, index) => (
@@ -57,7 +57,7 @@ export function RouteSuggestionsSkeleton() {
           >
             <div>
               <Skeleton className="my-0.5 h-3 w-24" />
-              <Skeleton className="my-1.5 mt-3 h-4 w-40" />
+              <Skeleton className="mt-[18px] mb-1.5 h-4 w-40" />
             </div>
             <div className="flex items-center justify-between">
               <Skeleton className="my-[3px] h-3.5 w-20" />

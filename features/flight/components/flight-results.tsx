@@ -91,7 +91,7 @@ export function FlightResultsSkeleton() {
       <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
         <div>
           <Skeleton className="my-[3px] h-3.5 w-24" />
-          <Skeleton className="my-1.5 mt-1 h-5 w-56" />
+          <Skeleton className="mt-[10px] mb-1.5 h-5 w-56" />
         </div>
         <Skeleton className="my-[3px] h-3.5 w-16" />
       </div>
@@ -104,7 +104,7 @@ export function FlightResultsSkeleton() {
             <div className="flex items-center gap-4">
               <div>
                 <Skeleton className="my-1.5 h-5 w-16" />
-                <Skeleton className="my-0.5 mt-1 h-3 w-8" />
+                <Skeleton className="mt-[6px] mb-0.5 h-3 w-8" />
               </div>
               <div className="flex flex-1 flex-col items-center gap-1">
                 <Skeleton className="my-0.5 h-3 w-12" />
@@ -113,13 +113,13 @@ export function FlightResultsSkeleton() {
               </div>
               <div className="flex flex-col items-end">
                 <Skeleton className="my-1.5 h-5 w-16" />
-                <Skeleton className="my-0.5 mt-1 h-3 w-8" />
+                <Skeleton className="mt-[6px] mb-0.5 h-3 w-8" />
               </div>
             </div>
             <div className="border-divider dark:border-divider-dark flex items-center justify-between gap-5 border-t pt-4 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-6">
               <div>
                 <Skeleton className="my-0.5 h-3 w-44" />
-                <Skeleton className="my-1.5 mt-1 h-4 w-14" />
+                <Skeleton className="mt-[10px] mb-1.5 h-4 w-14" />
               </div>
               <Skeleton className="skeleton-subtle h-9 w-20 rounded-full" />
             </div>

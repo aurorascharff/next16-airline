@@ -125,15 +125,15 @@ export function TripDetailSkeleton() {
       <div className="border-divider dark:border-divider-dark shadow-soft overflow-hidden rounded-2xl border bg-white dark:bg-black">
         <div className="bg-card dark:bg-card-dark p-7 sm:p-10">
           <Skeleton className="my-[3px] h-3.5 w-32" />
-          <Skeleton className="my-2 mt-4 h-6 w-80" />
-          <Skeleton className="my-[3px] mt-3 h-3.5 w-48" />
+          <Skeleton className="mt-[24px] mb-2 h-8 w-80" />
+          <Skeleton className="mt-[15px] mb-[3px] h-3.5 w-48" />
         </div>
         <div className="p-7 sm:p-10">
           <div className="grid gap-6 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
             <div>
               <Skeleton className="my-[3px] h-3.5 w-12" />
-              <Skeleton className="my-3 mt-1 h-6 w-28" />
-              <Skeleton className="my-1 mt-2 h-4 w-14" />
+              <Skeleton className="mt-[16px] mb-3 h-6 w-28" />
+              <Skeleton className="mt-[12px] mb-1 h-4 w-14" />
             </div>
             <div className="flex flex-col items-center gap-1 sm:w-56">
               <Skeleton className="my-0.5 h-3 w-12" />
@@ -142,8 +142,8 @@ export function TripDetailSkeleton() {
             </div>
             <div className="flex flex-col sm:items-end">
               <Skeleton className="my-[3px] h-3.5 w-16" />
-              <Skeleton className="my-3 mt-1 h-6 w-28" />
-              <Skeleton className="my-1 mt-2 h-4 w-14" />
+              <Skeleton className="mt-[16px] mb-3 h-6 w-28" />
+              <Skeleton className="mt-[12px] mb-1 h-4 w-14" />
             </div>
           </div>
           <div className="border-divider dark:border-divider-dark mt-8 grid gap-4 border-t pt-8 sm:grid-cols-4">

@@ -44,10 +44,10 @@ export function DestinationGridSkeleton() {
           className="border-divider dark:border-divider-dark shadow-soft flex flex-col justify-between gap-8 rounded-2xl border bg-white p-5 dark:bg-black"
           key={index}
         >
-          <div>
+          <div className="flex flex-col">
             <Skeleton className="my-0.5 h-3 w-24" />
-            <Skeleton className="my-1.5 mt-3 h-5 w-36" />
-            <Skeleton className="my-[3px] mt-1 h-3.5 w-full" />
+            <Skeleton className="mt-[18px] mb-1.5 h-5 w-36" />
+            <Skeleton className="mt-[9px] mb-[5px] h-3.5 w-full" />
           </div>
           <div className="flex items-center justify-between">
             <Skeleton className="my-[3px] h-3.5 w-20" />

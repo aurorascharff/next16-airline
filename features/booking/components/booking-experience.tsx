@@ -139,7 +139,7 @@ export function BookingExperienceSkeleton() {
         <div className="border-divider dark:border-divider-dark shadow-soft overflow-hidden rounded-2xl border bg-white dark:bg-black">
           <div className="p-5 sm:p-6">
             <Skeleton className="my-[3px] h-3.5 w-28" />
-            <Skeleton className="my-1.5 mt-1.5 h-5 w-72" />
+            <Skeleton className="mt-[12px] mb-1.5 h-6 w-72" />
             <div className="mt-6 space-y-6">
               <div>
                 <Skeleton className="my-[3px] mb-3 h-3.5 w-32" />
@@ -148,7 +148,7 @@ export function BookingExperienceSkeleton() {
                     <div className="border-divider dark:border-divider-dark rounded-xl border p-4" key={index}>
                       <Skeleton className="mb-4 size-5" />
                       <Skeleton className="my-1 h-4 w-16" />
-                      <Skeleton className="my-0.5 mt-1 h-3 w-24" />
+                      <Skeleton className="mt-[6px] mb-0.5 h-3 w-24" />
                     </div>
                   ))}
                 </div>
@@ -157,7 +157,7 @@ export function BookingExperienceSkeleton() {
                 <Skeleton className="skeleton-subtle size-11 rounded-lg" />
                 <div className="flex-1">
                   <Skeleton className="my-1 h-4 w-24" />
-                  <Skeleton className="my-0.5 mt-1 h-3 w-48" />
+                  <Skeleton className="mt-[6px] mb-0.5 h-3 w-48" />
                 </div>
                 <Skeleton className="skeleton-subtle size-6 rounded-full" />
               </div>
@@ -166,7 +166,7 @@ export function BookingExperienceSkeleton() {
           <div className="border-divider bg-card/60 dark:border-divider-dark dark:bg-card-dark/45 flex flex-col gap-4 border-t p-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <div>
               <Skeleton className="my-0.5 h-3 w-16" />
-              <Skeleton className="my-1.5 mt-1 h-4 w-16" />
+              <Skeleton className="mt-[10px] mb-1.5 h-4 w-16" />
             </div>
             <div className="flex items-center gap-3">
               <Skeleton className="skeleton-subtle h-11 w-24 rounded-full" />
@@ -183,12 +183,12 @@ export function BookingExperienceSkeleton() {
             <div className="mt-5 flex items-center gap-3">
               <div>
                 <Skeleton className="my-1.5 h-5 w-14" />
-                <Skeleton className="my-0.5 mt-1 h-3 w-10" />
+                <Skeleton className="mt-[6px] mb-0.5 h-3 w-10" />
               </div>
               <Skeleton className="h-px flex-1" />
               <div className="flex flex-col items-end">
                 <Skeleton className="my-1.5 h-5 w-14" />
-                <Skeleton className="my-0.5 mt-1 h-3 w-10" />
+                <Skeleton className="mt-[6px] mb-0.5 h-3 w-10" />
               </div>
             </div>
           </div>
@@ -198,7 +198,7 @@ export function BookingExperienceSkeleton() {
                 <Skeleton className="mt-0.5 size-4" />
                 <div>
                   <Skeleton className="my-[3px] h-3.5 w-24" />
-                  <Skeleton className="my-0.5 mt-0.5 h-3 w-32" />
+                  <Skeleton className="mt-[4px] mb-0.5 h-3 w-32" />
                 </div>
               </div>
             ))}
