@@ -1,8 +1,7 @@
-import { CalendarDays, Clock3, Plane } from 'lucide-react';
+import { Clock3, MapPin, Plane } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getFlight, getFlightOffer } from '@/features/flight/flight-queries';
-import { formatDate } from '@/lib/utils';
 import { createBookingHref } from '../utils/search-params';
 import { getAvailableSteps, nextBookingStep } from '../utils/steps';
 import { BookingStepForm } from './booking-step-form';
@@ -15,19 +14,26 @@ export async function BookingStepPanel({
   fare,
   flightId,
   step,
+  urlSteps,
 }: {
   date: string;
   draft: BookingDraft;
   fare: Fare;
   flightId: string;
   step: BookingStep;
+  urlSteps?: BookingStep[];
 }) {
   const [flight, offer] = await Promise.all([getFlight(flightId), getFlightOffer(flightId, date, fare)]);
   const steps = getAvailableSteps(offer);
 
+  // The offer decides which steps exist; write that into the URL once so the progress bar
+  // (URL-only) reflects it and prefetched links carry it forward.
   if (!steps.includes(step)) {
     const fallback = nextBookingStep(steps, step === 'seats' ? 'baggage' : 'seats') ?? 'review';
     redirect(createBookingHref(flightId, fallback, draft, date, fare, steps));
+  }
+  if ((urlSteps ?? []).join(',') !== steps.join(',')) {
+    redirect(createBookingHref(flightId, step, draft, date, fare, steps));
   }
 
   return <BookingStepForm date={date} draft={draft} flight={flight} offer={offer} step={step} steps={steps} />;
@@ -38,14 +44,10 @@ export function BookingStepSkeleton() {
     <div className="border-divider dark:border-divider-dark shadow-soft overflow-hidden rounded-2xl border bg-white dark:bg-black">
       <div className="p-5 sm:p-6">
         <Skeleton className="my-0.5 h-3.5 w-16" />
-        <Skeleton className="mt-1.5 mb-0.5 h-8 w-56" />
-        <div className="mt-6 grid gap-3 sm:grid-cols-3">
+        <Skeleton className="mt-1.5 mb-0.5 h-8 w-48" />
+        <div className="mt-6 space-y-3">
           {Array.from({ length: 3 }).map((_, index) => (
-            <div className="border-divider dark:border-divider-dark flex flex-col rounded-xl border p-4" key={index}>
-              <Skeleton className="mb-4 size-5" />
-              <Skeleton className="my-0.5 h-5 w-16" />
-              <Skeleton className="mt-[5px] mb-0.5 h-3 w-24" />
-            </div>
+            <Skeleton className="skeleton-subtle h-16 rounded-xl" key={index} />
           ))}
         </div>
       </div>
@@ -63,7 +65,7 @@ export function BookingStepSkeleton() {
   );
 }
 
-export async function FlightSummary({ date, flightId }: { date: string; flightId: string }) {
+export async function FlightSummary({ flightId }: { flightId: string }) {
   const flight = await getFlight(flightId);
 
   return (
@@ -90,19 +92,19 @@ export async function FlightSummary({ date, flightId }: { date: string; flightId
       </div>
       <div className="space-y-4 p-5">
         <div className="flex items-start gap-3">
-          <CalendarDays className="text-accent mt-0.5 size-4" />
+          <MapPin className="text-accent mt-0.5 size-4" />
           <div>
-            <p className="text-sm font-semibold">{formatDate(date)}</p>
-            <p className="text-muted mt-0.5 text-xs">
+            <p className="text-sm font-semibold">
               {flight.origin.city} to {flight.destination.city}
             </p>
+            <p className="text-muted mt-0.5 text-xs">Direct</p>
           </div>
         </div>
         <div className="flex items-start gap-3">
           <Clock3 className="text-accent mt-0.5 size-4" />
           <div>
             <p className="text-sm font-semibold">{flight.duration}</p>
-            <p className="text-muted mt-0.5 text-xs">Direct</p>
+            <p className="text-muted mt-0.5 text-xs">Flight time</p>
           </div>
         </div>
       </div>

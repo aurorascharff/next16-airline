@@ -26,7 +26,7 @@ async function getDestinationsCached(slow: boolean) {
   'use cache';
   cacheLife('max');
 
-  await delay(900, slow);
+  await delay(1200, slow);
   const airports = await prisma.airport.findMany({
     include: { arrivals: { orderBy: { basicFare: 'asc' }, select: { basicFare: true }, take: 1 } },
     orderBy: { city: 'asc' },

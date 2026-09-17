@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { cacheLife, cacheTag } from 'next/cache';
+import { cacheLife, cacheTag, io } from 'next/cache';
 import { notFound } from 'next/navigation';
 import type { Fare } from '@/features/booking/utils/search-params';
 import { isSlowEnabled } from '@/features/demo/demo-queries';
@@ -37,7 +37,7 @@ async function searchFlightsCached(from: string, to: string, slow: boolean) {
   'use cache';
   cacheLife('max');
 
-  await delay(700, slow);
+  await delay(1000, slow);
   return prisma.flight.findMany({
     include: flightInclude,
     orderBy: { departureTime: 'asc' },
@@ -85,7 +85,7 @@ async function getFlightCached(id: string, slow: boolean) {
   'use cache';
   cacheLife('max');
 
-  await delay(400, slow);
+  await delay(700, slow);
   const flight = await prisma.flight.findUnique({ include: { destination: true, origin: true }, where: { id } });
   if (!flight) notFound();
   return flight;
@@ -98,6 +98,7 @@ export async function getFlightOffer(flightId: string, date: string, fare: Fare)
   ]);
   if (fare !== 'Flex') return offer;
 
+  await io();
   const holds = await prisma.seatHold.findMany({
     select: { expiresAt: true, seatId: true, userId: true },
     where: { date, expiresAt: { gt: new Date() }, flightId },
@@ -119,7 +120,7 @@ async function getFlightOfferCached(flightId: string, date: string, fare: Fare, 
   cacheLife('hours');
   cacheTag(flightTags.offer(flightId));
 
-  await delay(1300, slow);
+  await delay(2200, slow);
   const [flight, bookings] = await Promise.all([
     prisma.flight.findUnique({
       include: {

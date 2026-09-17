@@ -7,6 +7,8 @@ import { flightTags } from '@/features/flight/flight-cache';
 import { verifySession } from '@/features/user/user-queries';
 import { prisma } from '@/lib/db';
 import { bookingTags } from './booking-cache';
+import { createBookingHref, parseSteps } from './utils/search-params';
+import type { BookingDraft } from './types/booking';
 
 const SEAT_HOLD_MINUTES = 10;
 
@@ -24,6 +26,7 @@ const confirmSchema = z.object({
   flightId: z.string().min(1),
   passenger: z.string().trim().min(2, 'Enter the passenger name.').max(80),
   seat: z.string(),
+  steps: z.string().default(''),
 });
 
 function createReference() {
@@ -50,7 +53,17 @@ export async function confirmBooking(_state: ConfirmBookingState, formData: Form
   if (input.seat && !seat) return { error: 'Choose a seat on this flight.', ok: false };
   if (seat) {
     const conflict = await seatConflict(flight.id, input.date, seat.id, sessionId);
-    if (conflict) return { error: `Seat ${seat.label} ${conflict}. Pick another one.`, ok: false };
+    if (conflict) {
+      updateTag(flightTags.offer(flight.id));
+      const steps = parseSteps(input.steps);
+      const draft: BookingDraft = {
+        bags: input.bags,
+        carryOn: input.carryOn === '1',
+        extras: input.extras.split(',').filter(Boolean),
+        seat: '',
+      };
+      redirect(createBookingHref(flight.id, 'seats', draft, input.date, input.fare, steps));
+    }
   }
   const bookedCount = await prisma.booking.count({ where: { date: input.date, flightId: flight.id } });
   if (bookedCount >= flight.seats.length) return { error: 'This flight is sold out on that date.', ok: false };

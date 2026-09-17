@@ -11,8 +11,8 @@ import {
   ShieldCheck,
   Sparkles,
 } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { startTransition, useActionState, useEffect, useOptimistic, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import { startTransition, useActionState, useOptimistic, useRef } from 'react';
 import { toast } from 'sonner';
 import { Boundary } from '@/components/internal/boundary';
 import { Button } from '@/components/ui/button';
@@ -92,14 +92,6 @@ export function BookingStepForm({
     });
   }
 
-  const searchParams = useSearchParams();
-  useEffect(() => {
-    if (searchParams.get('steps') !== steps.join(',')) {
-      router.replace(createBookingHref(flight.id, step, optimisticDraft, date, offer.fare, steps), { scroll: false });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [steps, step]);
-
   const nextStep = nextBookingStep(steps, step);
   const previousStep = previousBookingStep(steps, step);
   const canContinue = step !== 'seats' || Boolean(optimisticDraft.seat);
@@ -129,7 +121,14 @@ export function BookingStepForm({
             )}
             {step === 'extras' && <ExtraOptions draft={optimisticDraft} offer={offer} updateDraft={updateDraft} />}
             {step === 'review' && (
-              <Review date={date} draft={optimisticDraft} error={confirmState?.error} flight={flight} offer={offer} />
+              <Review
+                date={date}
+                draft={optimisticDraft}
+                error={confirmState?.error}
+                flight={flight}
+                offer={offer}
+                steps={steps}
+              />
             )}
           </div>
         </div>
@@ -367,12 +366,14 @@ function Review({
   error,
   flight,
   offer,
+  steps,
 }: {
   date: string;
   draft: BookingDraft;
   error?: string;
   flight: Flight;
   offer: FlightOffer;
+  steps: BookingStep[];
 }) {
   const selectedSeat = offer.seats.find(seat => seat.id === draft.seat);
   const selectedExtras = offer.extras.filter(extra => draft.extras.includes(extra.id));
@@ -387,25 +388,17 @@ function Review({
 
   return (
     <div className="space-y-6">
+      {error && (
+        <p className="border-danger/30 bg-danger/10 text-danger rounded-xl border px-4 py-3 text-sm" role="alert">
+          {error}
+        </p>
+      )}
       <fieldset className="grid gap-1.5">
         <legend className="mb-3 text-sm font-semibold">Passenger</legend>
         <label className="text-muted text-xs font-medium" htmlFor="confirm-passenger">
           Full name as on passport
         </label>
-        <Input
-          aria-describedby={error ? 'confirm-error' : undefined}
-          aria-invalid={error ? true : undefined}
-          autoComplete="name"
-          className="max-w-md"
-          id="confirm-passenger"
-          name="passenger"
-          required
-        />
-        {error && (
-          <p className="text-danger text-xs" id="confirm-error" role="alert">
-            {error}
-          </p>
-        )}
+        <Input autoComplete="name" className="max-w-md" id="confirm-passenger" name="passenger" required />
       </fieldset>
       <input name="flightId" type="hidden" value={flight.id} />
       <input name="date" type="hidden" value={date} />
@@ -414,6 +407,7 @@ function Review({
       <input name="carryOn" type="hidden" value={draft.carryOn ? '1' : '0'} />
       <input name="seat" type="hidden" value={draft.seat} />
       <input name="extras" type="hidden" value={draft.extras.join(',')} />
+      <input name="steps" type="hidden" value={steps.join(',')} />
       <div>
         <p className="mb-3 text-sm font-semibold">Price</p>
         {rows.map(row => (

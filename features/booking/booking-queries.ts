@@ -25,7 +25,7 @@ async function getBookingsForUser(userId: string, slow: boolean): Promise<Bookin
   cacheLife('hours');
   cacheTag(bookingTags.user(userId));
 
-  await delay(800, slow);
+  await delay(1100, slow);
   return prisma.booking.findMany({
     include: bookingInclude,
     orderBy: [{ date: 'asc' }, { createdAt: 'asc' }],
@@ -48,7 +48,7 @@ async function getBookingForUser(id: string, userId: string, reference: string, 
   cacheLife('hours');
   cacheTag(bookingTags.user(userId), bookingTags.detail(id));
 
-  await delay(600, slow);
+  await delay(900, slow);
   const booking = await prisma.booking.findUnique({ include: bookingInclude, where: { id } });
   const allowed = booking && (booking.userId === null || booking.userId === userId || booking.reference === reference);
   if (!booking || !allowed) notFound();

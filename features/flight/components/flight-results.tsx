@@ -155,8 +155,8 @@ export function FlightResultsSkeleton() {
             </div>
             <div className="border-divider dark:border-divider-dark grid grid-cols-2 gap-3 border-t pt-4 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-6">
               <Skeleton className="col-span-2 my-0.5 h-3 w-20" />
-              <Skeleton className="skeleton-subtle h-[3.75rem] rounded-xl" />
-              <Skeleton className="skeleton-subtle h-[3.75rem] rounded-xl" />
+              <Skeleton className="skeleton-subtle h-[4.75rem] rounded-xl" />
+              <Skeleton className="skeleton-subtle h-[4.75rem] rounded-xl" />
             </div>
           </div>
         ))}
