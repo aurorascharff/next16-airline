@@ -2,16 +2,7 @@
 
 import { ArrowLeft, ArrowRight, BriefcaseBusiness, Check, Leaf, Luggage, ShieldCheck, Sparkles } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import {
-  addTransitionType,
-  startTransition,
-  Suspense,
-  use,
-  useActionState,
-  useEffect,
-  useOptimistic,
-  useRef,
-} from 'react';
+import { startTransition, Suspense, use, useActionState, useEffect, useOptimistic, useRef } from 'react';
 import { toast } from 'sonner';
 import { Boundary } from '@/components/internal/boundary';
 import { Button } from '@/components/ui/button';
@@ -61,7 +52,6 @@ export function BookingStepForm({
   const showOverlay = useFlightOverlay();
   const [confirmState, confirmAction, confirming] = useActionState(
     async (state: ConfirmBookingState, formData: FormData) => {
-      addTransitionType('booking-confirmed');
       showOverlay('Confirming your booking');
       return confirmBooking(state, formData);
     },
