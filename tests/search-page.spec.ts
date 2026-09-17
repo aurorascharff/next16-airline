@@ -4,9 +4,9 @@ import { expect, test } from '@playwright/test';
 test.describe('Search page (/search)', () => {
   test('searching a route lists its flights', async ({ page }) => {
     await page.goto('/');
-    await page.getByLabel('From').filter({ visible: true }).selectOption('CPH');
-    await page.getByLabel('To').filter({ visible: true }).selectOption('AMS');
-    await page.getByLabel('Departure').filter({ visible: true }).fill('2026-11-12');
+    await page.getByLabel('From', { exact: true }).filter({ visible: true }).selectOption('CPH');
+    await page.getByLabel('To', { exact: true }).filter({ visible: true }).selectOption('AMS');
+    await page.getByLabel('Departure', { exact: true }).filter({ visible: true }).fill('2026-11-12');
     await page.getByRole('button', { name: 'Search flights' }).filter({ visible: true }).click();
 
     await page.waitForURL(url => url.pathname === '/search' && url.searchParams.get('to') === 'AMS');
@@ -21,7 +21,7 @@ test.describe('Search page (/search)', () => {
     await expect(page.getByTestId('route-suggestion')).toHaveCount(3);
     await page.getByTestId('route-suggestion').filter({ hasText: 'Lisbon' }).click();
     await page.waitForURL(url => url.searchParams.get('to') === 'LIS');
-    await expect(page.getByLabel('To').filter({ visible: true }).last()).toHaveValue('LIS');
+    await expect(page.getByLabel('To', { exact: true }).filter({ visible: true }).last()).toHaveValue('LIS');
     await expect(page.getByRole('heading', { level: 2, name: 'CPH to LIS' })).toBeVisible();
   });
 
