@@ -25,6 +25,14 @@ export function parseAirportCode(value: string | string[] | undefined) {
   return code && /^[A-Z]{3}$/.test(code) ? code : '';
 }
 
+export const FARES = ['Flex', 'Basic'] as const;
+export type Fare = (typeof FARES)[number];
+
+export function parseFare(value: string | string[] | undefined): Fare | '' {
+  const fare = Array.isArray(value) ? value[0] : value;
+  return FARES.includes(fare as Fare) ? (fare as Fare) : '';
+}
+
 export function parseBookingDraft(params: SearchParams): BookingDraft {
   const bags = Number(read(params, 'bags'));
   const extras = (read(params, 'extras') ?? '')
@@ -54,8 +62,9 @@ export function createBookingHref(flightId: string, step: BookingStep, draft: Bo
   return `/book/${flightId}/${step}?${toBookingSearchParams(draft, date)}` as Route;
 }
 
-export function createSearchHref(from: string, to: string, date = '') {
+export function createSearchHref(from: string, to: string, date = '', fare = '') {
   const params = new URLSearchParams({ from, to });
   if (date) params.set('date', date);
+  if (fare) params.set('fare', fare);
   return `/search?${params}` as Route;
 }

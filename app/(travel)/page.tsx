@@ -6,11 +6,7 @@ import { FlightSearchForm, FlightSearchFormSkeleton } from '@/features/flight/co
 
 export default function HomePage() {
   return (
-    <main className="relative isolate mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
-      <div
-        aria-hidden
-        className="bg-accent/10 pointer-events-none absolute top-0 left-1/2 -z-10 h-72 w-[36rem] -translate-x-1/2 -translate-y-1/3 rounded-full blur-3xl"
-      />
+    <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
       <section className="mx-auto max-w-3xl text-center">
         <p className="text-accent text-sm font-semibold">Fly Waypoint</p>
         <h1 className="mt-3 text-4xl font-semibold tracking-tight text-balance sm:text-5xl">Where to next?</h1>

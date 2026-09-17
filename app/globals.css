@@ -10,9 +10,9 @@
   --color-surface-dark: #121212;
   --color-surface: #fafafa;
 
-  --color-accent: #4f46e5;
-  --color-accent-hover: #4338ca;
-  --color-accent-fade: #4f46e522;
+  --color-accent: #2563eb;
+  --color-accent-hover: #1d4ed8;
+  --color-accent-fade: #2563eb22;
   --color-success: #0fa958;
   --color-danger: #e54848;
   --color-warning: #f5a524;
@@ -34,9 +34,9 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 .dark {
-  --color-accent: #6366f1;
-  --color-accent-hover: #4f46e5;
-  --color-accent-fade: #6366f122;
+  --color-accent: #3b82f6;
+  --color-accent-hover: #2563eb;
+  --color-accent-fade: #3b82f622;
 }
 
 @layer base {

@@ -15,11 +15,11 @@ const flightInclude = {
   origin: true,
 } as const;
 
-export async function searchFlights(from: string, to: string) {
-  return searchFlightsCached(from, to, await isSlowEnabled());
+export async function searchFlights(from: string, to: string, fare = '') {
+  return searchFlightsCached(from, to, fare, await isSlowEnabled());
 }
 
-async function searchFlightsCached(from: string, to: string, slow: boolean) {
+async function searchFlightsCached(from: string, to: string, fare: string, slow: boolean) {
   'use cache';
   cacheLife('hours');
   cacheTag(flightTags.all, flightTags.route(from, to));
@@ -28,7 +28,7 @@ async function searchFlightsCached(from: string, to: string, slow: boolean) {
   return prisma.flight.findMany({
     include: flightInclude,
     orderBy: { departureTime: 'asc' },
-    where: { destinationCode: to, originCode: from },
+    where: { destinationCode: to, originCode: from, ...(fare ? { cabin: fare } : {}) },
   });
 }
 

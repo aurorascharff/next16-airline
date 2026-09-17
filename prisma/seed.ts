@@ -124,6 +124,7 @@ function flightData(route: Route, index: 0 | 1) {
     arrivalTime: time(departs + route.minutes),
     bagPrice: 34,
     baseFare: route.fares[index],
+    cabin: index === 0 ? 'Flex' : 'Basic',
     departureTime: time(departs),
     destinationCode: route.destination,
     duration: durationLabel(route.minutes),
