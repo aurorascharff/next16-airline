@@ -1,8 +1,7 @@
-import { LogOut } from 'lucide-react';
-import { IconButton } from '@/components/ui/icon-button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { signOut } from '../user-actions';
 import { getCurrentUser } from '../user-queries';
+import { LogOutButton } from './log-out-button';
 
 export async function CurrentUser() {
   const user = await getCurrentUser();
@@ -17,9 +16,7 @@ export async function CurrentUser() {
         {user.email.charAt(0)}
       </span>
       <form action={signOut}>
-        <IconButton label="Sign out" size="sm" type="submit">
-          <LogOut className="size-4" />
-        </IconButton>
+        <LogOutButton />
       </form>
     </div>
   );

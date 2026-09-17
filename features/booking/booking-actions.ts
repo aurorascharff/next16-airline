@@ -87,5 +87,5 @@ export async function cancelBooking(bookingId: string) {
   await prisma.booking.delete({ where: { id: bookingId } });
   updateTag(`bookings:${user.id}`);
   updateTag(`flight-offer:${booking.flightId}`);
-  redirect('/trips');
+  return { ok: true as const };
 }

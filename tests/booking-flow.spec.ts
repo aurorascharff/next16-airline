@@ -54,6 +54,7 @@ test.describe('Booking flow (/book/[flightId]/[step])', () => {
 
     await page.getByTestId('trip-card').filter({ hasText: 'Thu 3 Dec' }).click();
     await page.getByRole('button', { name: 'Cancel trip' }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Cancel trip' }).click();
     await page.waitForURL(url => url.pathname === '/trips');
     await expect(page.getByTestId('trip-card')).toHaveCount(2);
   });

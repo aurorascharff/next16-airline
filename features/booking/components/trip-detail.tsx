@@ -97,7 +97,7 @@ export async function TripDetail({ bookingId, confirmed }: { bookingId: string; 
               Book another flight
             </PrefetchLink>
             {booking.userId ? (
-              <CancelTripButton bookingId={booking.id} />
+              <CancelTripButton bookingId={booking.id} destination={flight.destination.city} />
             ) : (
               <p className="text-muted text-sm">Demo trip · cannot be cancelled</p>
             )}
