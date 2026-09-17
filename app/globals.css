@@ -118,6 +118,12 @@
   border-radius: var(--radius-sm);
 }
 
+/* Large placeholder blocks: keep the tint, drop the sweep so the page doesn't shimmer everywhere. */
+.skeleton-animation.skeleton-subtle {
+  background-image: none;
+  animation: none;
+}
+
 @keyframes skeleton-sweep {
   0% {
     background-position: 150% 0;

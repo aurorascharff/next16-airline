@@ -2,7 +2,8 @@ import { ArrowLeft } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { AnimatedSuspense } from '@/components/ui/animated-suspense';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
-import { isBookingStep, parseBookingDraft, parseDate } from '@/features/booking/booking-search-params';
+import { parseBookingDraft, parseDate } from '@/features/booking/booking-search-params';
+import { isBookingStep } from '@/features/booking/booking-steps';
 import { BookingExperience, BookingExperienceSkeleton } from '@/features/booking/components/booking-experience';
 import type { Metadata } from 'next';
 

@@ -1,8 +1,6 @@
 import type { BookingDraft, BookingStep } from './types/booking';
 import type { Route } from 'next';
 
-export const BOOKING_STEPS: BookingStep[] = ['baggage', 'seats', 'extras', 'review'];
-
 export const DEFAULT_BOOKING_DRAFT: BookingDraft = {
   bags: 0,
   carryOn: true,
@@ -15,10 +13,6 @@ type SearchParams = Record<string, string | string[] | undefined>;
 function read(params: SearchParams, key: string) {
   const value = params[key];
   return Array.isArray(value) ? value[0] : value;
-}
-
-export function isBookingStep(value: string): value is BookingStep {
-  return BOOKING_STEPS.includes(value as BookingStep);
 }
 
 export function parseDate(value: string | string[] | undefined) {
@@ -64,12 +58,4 @@ export function createSearchHref(from: string, to: string, date = '') {
   const params = new URLSearchParams({ from, to });
   if (date) params.set('date', date);
   return `/search?${params}` as Route;
-}
-
-export function nextBookingStep(step: BookingStep) {
-  return BOOKING_STEPS[BOOKING_STEPS.indexOf(step) + 1];
-}
-
-export function previousBookingStep(step: BookingStep) {
-  return BOOKING_STEPS[BOOKING_STEPS.indexOf(step) - 1];
 }

@@ -19,7 +19,8 @@ import { PrefetchLink } from '@/components/ui/prefetch-link';
 import type { Extra, Flight, FlightOffer } from '@/features/flight/types/flight';
 import { cn, formatPrice } from '@/lib/utils';
 import { confirmBooking } from '../booking-actions';
-import { createBookingHref, nextBookingStep, previousBookingStep } from '../booking-search-params';
+import { createBookingHref } from '../booking-search-params';
+import { nextBookingStep, previousBookingStep } from '../booking-steps';
 import type { ConfirmBookingState } from '../booking-actions';
 import type { BookingDraft, BookingStep } from '../types/booking';
 
@@ -40,12 +41,14 @@ export function BookingStepForm({
   flight,
   offer,
   step,
+  steps,
 }: {
   date: string;
   draft: BookingDraft;
   flight: Flight;
   offer: FlightOffer;
   step: BookingStep;
+  steps: BookingStep[];
 }) {
   const router = useRouter();
   const [optimisticDraft, updateOptimisticDraft] = useOptimistic(draft, (current, patch: Partial<BookingDraft>) => ({
@@ -63,8 +66,8 @@ export function BookingStepForm({
     });
   }
 
-  const nextStep = nextBookingStep(step);
-  const previousStep = previousBookingStep(step);
+  const nextStep = nextBookingStep(steps, step);
+  const previousStep = previousBookingStep(steps, step);
   const canContinue = step !== 'seats' || Boolean(optimisticDraft.seat);
   const total = calculateTotal(offer, optimisticDraft);
 

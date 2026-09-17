@@ -8,6 +8,12 @@ import { delay } from '@/lib/utils';
 import { toSeat } from './types/flight';
 import type { FlightOffer } from './types/flight';
 
+const flightInclude = {
+  _count: { select: { extras: true, seats: true } },
+  destination: true,
+  origin: true,
+} as const;
+
 export async function searchFlights(from: string, to: string) {
   return searchFlightsCached(from, to, await isSlowEnabled());
 }
@@ -19,24 +25,64 @@ async function searchFlightsCached(from: string, to: string, slow: boolean) {
 
   await delay(700, slow);
   return prisma.flight.findMany({
-    include: { destination: true, origin: true },
+    include: flightInclude,
     orderBy: { departureTime: 'asc' },
     where: { destinationCode: to, originCode: from },
   });
 }
 
+// Cheapest flight to each destination from this hub, for the search page before a route is chosen.
+export async function getRoutesFrom(originCode: string) {
+  return getRoutesFromCached(originCode, await isSlowEnabled());
+}
+
+async function getRoutesFromCached(originCode: string, slow: boolean) {
+  'use cache';
+  cacheLife('days');
+  cacheTag('flights', `flights-from:${originCode}`);
+
+  await delay(500, slow);
+  const flights = await prisma.flight.findMany({
+    include: { destination: true },
+    orderBy: [{ destinationCode: 'asc' }, { baseFare: 'asc' }],
+    where: { originCode },
+  });
+
+  const byDestination = new Map<
+    string,
+    { count: number; destination: (typeof flights)[number]['destination']; fromFare: number }
+  >();
+  for (const flight of flights) {
+    const entry = byDestination.get(flight.destinationCode);
+    if (entry) entry.count += 1;
+    else
+      byDestination.set(flight.destinationCode, {
+        count: 1,
+        destination: flight.destination,
+        fromFare: flight.baseFare,
+      });
+  }
+  return [...byDestination.values()];
+}
+
 export async function getFlight(id: string) {
+  return getFlightCached(id, await isSlowEnabled());
+}
+
+async function getFlightCached(id: string, slow: boolean) {
   'use cache';
   cacheLife('hours');
   cacheTag('flights', `flight:${id}`);
 
+  await delay(400, slow);
   const flight = await prisma.flight.findUnique({ include: { destination: true, origin: true }, where: { id } });
   if (!flight) notFound();
   return flight;
 }
 
-// The offer is the "provider" call the demo slows down. It is shared by every step of a
-// booking, so one cached entry serves baggage, seats, extras, and review.
+// The offer is the "provider" call the demo slows down: the seat map and ancillaries for one
+// flight on one date. It is fetched once and shared by every step, so deciding whether a step
+// exists (does this flight have a seat map?) and rendering that step use the same cached entry.
 export async function getFlightOffer(flightId: string, date: string) {
   return getFlightOfferCached(flightId, date, await isSlowEnabled());
 }

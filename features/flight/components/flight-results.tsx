@@ -1,4 +1,4 @@
-import { Plane } from 'lucide-react';
+import { Armchair, Plane, Sparkles } from 'lucide-react';
 import { buttonClasses } from '@/components/ui/button-classes';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
@@ -58,8 +58,18 @@ export async function FlightResults({ date, from, to }: { date: string; from: st
             </div>
             <div className="border-divider dark:border-divider-dark flex items-center justify-between gap-5 border-t pt-4 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-6">
               <div>
-                <p className="text-muted text-xs font-medium">{flight.cabin} · cabin bag included</p>
-                <p className="text-xl font-semibold tabular-nums">{formatPrice(flight.baseFare)}</p>
+                <p className="text-muted flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium">
+                  <span>{flight.cabin} · cabin bag included</span>
+                  <span className="flex items-center gap-1">
+                    <Armchair className="size-3.5" /> {flight._count.seats > 0 ? 'Choose your seat' : 'Seat at gate'}
+                  </span>
+                  {flight._count.extras > 0 && (
+                    <span className="flex items-center gap-1">
+                      <Sparkles className="size-3.5" /> Extras
+                    </span>
+                  )}
+                </p>
+                <p className="mt-1 text-xl font-semibold tabular-nums">{formatPrice(flight.baseFare)}</p>
               </div>
               <PrefetchLink
                 className={buttonClasses()}
@@ -78,10 +88,43 @@ export async function FlightResults({ date, from, to }: { date: string; from: st
 export function FlightResultsSkeleton() {
   return (
     <div>
-      <Skeleton className="mb-4 h-14 w-56" />
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
+        <div>
+          <Skeleton className="h-5 w-24" />
+          <Skeleton className="mt-1 h-8 w-56" />
+        </div>
+        <Skeleton className="h-5 w-16" />
+      </div>
       <div className="grid gap-3">
-        <Skeleton className="h-32 rounded-2xl" />
-        <Skeleton className="h-32 rounded-2xl" />
+        {Array.from({ length: 2 }).map((_, index) => (
+          <div
+            className="border-divider dark:border-divider-dark grid gap-5 rounded-2xl border bg-white p-5 sm:grid-cols-[1fr_auto] sm:items-center dark:bg-black"
+            key={index}
+          >
+            <div className="flex items-center gap-4">
+              <div>
+                <Skeleton className="h-8 w-16" />
+                <Skeleton className="mt-1 h-4 w-8" />
+              </div>
+              <div className="flex flex-1 flex-col items-center gap-1">
+                <Skeleton className="h-4 w-12" />
+                <Skeleton className="skeleton-subtle h-px w-full" />
+                <Skeleton className="h-4 w-24" />
+              </div>
+              <div className="flex flex-col items-end">
+                <Skeleton className="h-8 w-16" />
+                <Skeleton className="mt-1 h-4 w-8" />
+              </div>
+            </div>
+            <div className="border-divider dark:border-divider-dark flex items-center justify-between gap-5 border-t pt-4 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-6">
+              <div>
+                <Skeleton className="h-4 w-44" />
+                <Skeleton className="mt-1 h-7 w-14" />
+              </div>
+              <Skeleton className="h-9 w-20 rounded-full" />
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

@@ -15,6 +15,16 @@ test.describe('Search page (/search)', () => {
     await expect(page.getByText('Thu 12 Nov')).toBeVisible();
   });
 
+  test('without a destination the page lists routes from the chosen hub', async ({ page }) => {
+    await page.goto('/search?from=CPH');
+    await expect(page.getByRole('heading', { level: 2, name: 'Where Waypoint flies from CPH' })).toBeVisible();
+    await expect(page.getByTestId('route-suggestion')).toHaveCount(3);
+    await page.getByTestId('route-suggestion').filter({ hasText: 'Lisbon' }).click();
+    await page.waitForURL(url => url.searchParams.get('to') === 'LIS');
+    await expect(page.getByLabel('To')).toHaveValue('LIS');
+    await expect(page.getByRole('heading', { level: 2, name: 'Copenhagen to Lisbon' })).toBeVisible();
+  });
+
   test('selecting a flight navigates instantly into the booking flow', async ({ page }) => {
     await page.goto('/search?from=OSL&to=BCN&date=2026-11-12');
     await expect(page.getByTestId('flight-result')).toHaveCount(2);

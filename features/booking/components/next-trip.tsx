@@ -6,7 +6,27 @@ import { getNextBooking } from '../booking-queries';
 
 export async function NextTrip() {
   const booking = await getNextBooking();
-  if (!booking) return null;
+
+  // Same shape as the trip card so the home page never shifts between the two states.
+  if (!booking) {
+    return (
+      <PrefetchLink
+        className="border-divider hover:border-accent/40 dark:border-divider-dark group flex items-center gap-4 rounded-2xl border bg-white p-4 transition-colors sm:p-5 dark:bg-black"
+        data-testid="no-trip"
+        href="/search"
+      >
+        <span className="bg-card text-muted dark:bg-card-dark grid size-11 shrink-0 place-items-center rounded-lg">
+          <Plane className="size-5" />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="text-muted block text-xs font-semibold tracking-wide uppercase">Your next trip</span>
+          <span className="mt-1 block truncate text-base font-semibold">Nothing booked yet</span>
+          <span className="text-muted block text-sm">Search a route below and your trip will show up here.</span>
+        </span>
+        <ArrowRight className="text-muted group-hover:text-accent size-4 shrink-0 transition-colors" />
+      </PrefetchLink>
+    );
+  }
 
   return (
     <PrefetchLink
@@ -32,5 +52,15 @@ export async function NextTrip() {
 }
 
 export function NextTripSkeleton() {
-  return <Skeleton className="h-[5.75rem] rounded-2xl" />;
+  return (
+    <div className="border-divider dark:border-divider-dark flex items-center gap-4 rounded-2xl border bg-white p-4 sm:p-5 dark:bg-black">
+      <Skeleton className="skeleton-subtle size-11 shrink-0 rounded-lg" />
+      <div className="min-w-0 flex-1">
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="mt-1 h-6 w-48" />
+        <Skeleton className="h-5 w-64" />
+      </div>
+      <Skeleton className="size-4 shrink-0" />
+    </div>
+  );
 }

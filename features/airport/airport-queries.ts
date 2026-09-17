@@ -2,27 +2,36 @@ import 'server-only';
 
 import { cacheLife, cacheTag } from 'next/cache';
 import { notFound } from 'next/navigation';
+import { isSlowEnabled } from '@/components/demo/demo-slow';
 import { prisma } from '@/lib/db';
+import { delay } from '@/lib/utils';
 
+// Every read goes through an uncached wrapper that reads the demo's Delays toggle and
+// passes it into the cached twin, so cached functions never touch request data.
 export async function getAirports() {
+  return getAirportsCached(await isSlowEnabled());
+}
+
+async function getAirportsCached(slow: boolean) {
   'use cache';
   cacheLife('days');
   cacheTag('airports');
 
+  await delay(400, slow);
   return prisma.airport.findMany({ orderBy: { city: 'asc' } });
-}
-
-export async function getHubs() {
-  const airports = await getAirports();
-  return airports.filter(airport => airport.hub);
 }
 
 // Destinations with their lowest fare, for the home page grid.
 export async function getDestinations() {
+  return getDestinationsCached(await isSlowEnabled());
+}
+
+async function getDestinationsCached(slow: boolean) {
   'use cache';
   cacheLife('days');
   cacheTag('airports', 'flights');
 
+  await delay(900, slow);
   const airports = await prisma.airport.findMany({
     include: { arrivals: { orderBy: { baseFare: 'asc' }, select: { baseFare: true }, take: 1 } },
     orderBy: { city: 'asc' },
@@ -33,10 +42,15 @@ export async function getDestinations() {
 }
 
 export async function getAirport(slug: string) {
+  return getAirportCached(slug, await isSlowEnabled());
+}
+
+async function getAirportCached(slug: string, slow: boolean) {
   'use cache';
   cacheLife('days');
   cacheTag('airports', `airport:${slug}`);
 
+  await delay(600, slow);
   const airport = await prisma.airport.findUnique({ where: { slug } });
   if (!airport) notFound();
   return airport;
@@ -44,10 +58,15 @@ export async function getAirport(slug: string) {
 
 // Cheapest flight from each hub to this destination, for the explore page.
 export async function getRoutesTo(destinationCode: string) {
+  return getRoutesToCached(destinationCode, await isSlowEnabled());
+}
+
+async function getRoutesToCached(destinationCode: string, slow: boolean) {
   'use cache';
   cacheLife('days');
   cacheTag('flights', `flights-to:${destinationCode}`);
 
+  await delay(800, slow);
   const flights = await prisma.flight.findMany({
     include: { origin: true },
     orderBy: [{ originCode: 'asc' }, { baseFare: 'asc' }],

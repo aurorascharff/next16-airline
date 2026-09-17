@@ -1,8 +1,10 @@
 import { CalendarDays, Check, Clock3, Plane } from 'lucide-react';
+import { redirect } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getFlight, getFlightOffer } from '@/features/flight/flight-queries';
 import { formatDate } from '@/lib/utils';
-import { BOOKING_STEPS } from '../booking-search-params';
+import { createBookingHref } from '../booking-search-params';
+import { getAvailableSteps, nextBookingStep } from '../booking-steps';
 import { BookingStepForm } from './booking-step-form';
 import type { BookingDraft, BookingStep } from '../types/booking';
 
@@ -25,12 +27,23 @@ export async function BookingExperience({
   step: BookingStep;
 }) {
   const [flight, offer] = await Promise.all([getFlight(flightId), getFlightOffer(flightId, date)]);
-  const activeIndex = BOOKING_STEPS.indexOf(step);
+  const steps = getAvailableSteps(offer);
+
+  // A flight without a seat map or extras has no such step: skip forward to the next one.
+  if (!steps.includes(step)) {
+    const fallback = nextBookingStep(steps, step === 'seats' ? 'baggage' : 'seats') ?? 'review';
+    redirect(createBookingHref(flightId, fallback, draft, date));
+  }
+  const activeIndex = steps.indexOf(step);
 
   return (
     <div data-testid="booking-experience">
-      <ol aria-label="Booking progress" className="mb-5 grid grid-cols-4 gap-2">
-        {BOOKING_STEPS.map((item, index) => {
+      <ol
+        aria-label="Booking progress"
+        className="mb-5 grid gap-2"
+        style={{ gridTemplateColumns: `repeat(${steps.length}, minmax(0, 1fr))` }}
+      >
+        {steps.map((item, index) => {
           const complete = index < activeIndex;
           const reached = complete || item === step;
           return (
@@ -62,7 +75,7 @@ export async function BookingExperience({
       </ol>
 
       <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_19rem]">
-        <BookingStepForm date={date} draft={draft} flight={flight} offer={offer} step={step} />
+        <BookingStepForm date={date} draft={draft} flight={flight} offer={offer} step={step} steps={steps} />
         <aside className="border-divider dark:border-divider-dark overflow-hidden rounded-2xl border bg-white lg:sticky lg:top-20 dark:bg-black">
           <div className="bg-card dark:bg-card-dark p-5">
             <div className="text-muted flex items-center justify-between text-xs font-semibold tracking-wide uppercase">
@@ -115,14 +128,83 @@ export function BookingExperienceSkeleton() {
       <div className="mb-5 grid grid-cols-4 gap-2">
         {Array.from({ length: 4 }).map((_, index) => (
           <div key={index}>
-            <Skeleton className="mb-2 h-6 w-20" />
-            <Skeleton className="h-1 rounded-full" />
+            <div className="mb-2 flex items-center gap-2">
+              <Skeleton className="skeleton-subtle size-6 shrink-0 rounded-full" />
+              <Skeleton className="h-5 w-16 max-sm:hidden" />
+            </div>
+            <Skeleton className="skeleton-subtle h-1 rounded-full" />
           </div>
         ))}
       </div>
       <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_19rem]">
-        <Skeleton className="h-[31rem] rounded-2xl" />
-        <Skeleton className="h-[19rem] rounded-2xl" />
+        <div className="border-divider dark:border-divider-dark overflow-hidden rounded-2xl border bg-white dark:bg-black">
+          <div className="p-5 sm:p-6">
+            <Skeleton className="h-5 w-28" />
+            <Skeleton className="mt-1.5 h-8 w-72 sm:h-9" />
+            <div className="mt-6 space-y-6">
+              <div>
+                <Skeleton className="mb-3 h-5 w-32" />
+                <div className="grid gap-3 sm:grid-cols-3">
+                  {Array.from({ length: 3 }).map((_, index) => (
+                    <div className="border-divider dark:border-divider-dark rounded-xl border p-4" key={index}>
+                      <Skeleton className="mb-4 size-5" />
+                      <Skeleton className="h-6 w-16" />
+                      <Skeleton className="mt-1 h-4 w-24" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="border-divider dark:border-divider-dark flex items-center gap-4 rounded-xl border p-4">
+                <Skeleton className="skeleton-subtle size-11 rounded-lg" />
+                <div className="flex-1">
+                  <Skeleton className="h-6 w-24" />
+                  <Skeleton className="mt-1 h-4 w-48" />
+                </div>
+                <Skeleton className="size-6 rounded-full" />
+              </div>
+            </div>
+          </div>
+          <div className="border-divider bg-card/60 dark:border-divider-dark dark:bg-card-dark/45 flex flex-col gap-4 border-t p-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+            <div>
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="mt-1 h-7 w-16" />
+            </div>
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-11 w-24 rounded-full" />
+              <Skeleton className="h-11 w-32 rounded-full" />
+            </div>
+          </div>
+        </div>
+        <aside className="border-divider dark:border-divider-dark overflow-hidden rounded-2xl border bg-white dark:bg-black">
+          <div className="bg-card dark:bg-card-dark p-5">
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-4 w-12" />
+              <Skeleton className="h-4 w-10" />
+            </div>
+            <div className="mt-5 flex items-center gap-3">
+              <div>
+                <Skeleton className="h-8 w-14" />
+                <Skeleton className="mt-1 h-4 w-10" />
+              </div>
+              <Skeleton className="h-px flex-1" />
+              <div className="flex flex-col items-end">
+                <Skeleton className="h-8 w-14" />
+                <Skeleton className="mt-1 h-4 w-10" />
+              </div>
+            </div>
+          </div>
+          <div className="space-y-4 p-5">
+            {Array.from({ length: 2 }).map((_, index) => (
+              <div className="flex items-start gap-3" key={index}>
+                <Skeleton className="mt-0.5 size-4" />
+                <div>
+                  <Skeleton className="h-5 w-24" />
+                  <Skeleton className="mt-0.5 h-4 w-32" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </aside>
       </div>
     </div>
   );

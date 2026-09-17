@@ -79,7 +79,37 @@ export async function TripsList() {
 export function TripsListSkeleton() {
   return (
     <div className="grid gap-4">
-      <Skeleton className="h-44 rounded-2xl" />
+      <div className="border-divider dark:border-divider-dark grid overflow-hidden rounded-2xl border bg-white sm:grid-cols-[1fr_14rem] dark:bg-black">
+        <div className="p-5 sm:p-6">
+          <Skeleton className="h-4 w-36" />
+          <div className="mt-4 flex items-center gap-4">
+            <div>
+              <Skeleton className="h-9 w-16" />
+              <Skeleton className="mt-1 h-5 w-12" />
+              <Skeleton className="mt-1 h-5 w-12" />
+            </div>
+            <Skeleton className="skeleton-subtle h-px flex-1" />
+            <div className="flex flex-col items-end">
+              <Skeleton className="h-9 w-16" />
+              <Skeleton className="mt-1 h-5 w-16" />
+              <Skeleton className="mt-1 h-5 w-12" />
+            </div>
+          </div>
+        </div>
+        <div className="border-divider bg-card/60 dark:border-divider-dark dark:bg-card-dark/60 flex flex-col justify-between gap-4 border-t p-5 sm:border-t-0 sm:border-l sm:border-dashed">
+          <div className="grid gap-2">
+            <Skeleton className="h-5 w-24" />
+            <Skeleton className="h-5 w-28" />
+          </div>
+          <div className="flex items-end justify-between">
+            <div>
+              <Skeleton className="h-4 w-14" />
+              <Skeleton className="mt-1 h-7 w-16" />
+            </div>
+            <Skeleton className="size-4" />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

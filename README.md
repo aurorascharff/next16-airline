@@ -27,7 +27,7 @@ The architecture follows the [Next.js App Architecture](https://github.com/auror
 
 ## Getting started
 
-Waypoint uses a local SQLite database. Copy the environment file, install dependencies, create the database, and seed the demo travelers and flight catalog:
+Waypoint uses a local SQLite database. Copy the environment file, install dependencies, create the database, and seed the flight catalog:
 
 ```bash
 cp .env.example .env.local
@@ -37,7 +37,7 @@ pnpm run prisma.seed
 pnpm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser. Pick a demo traveler, search a route from Oslo or Copenhagen, and book a flight. Two travelers start with an upcoming trip, two start empty, and the trips they book stay separate.
+Open [http://localhost:3000](http://localhost:3000) in your browser. Sign in with any email (the default demo account already has an upcoming trip), search a route from Oslo or Copenhagen, and book a flight. Trips stay separate per account.
 
 You can inspect the local data with:
 

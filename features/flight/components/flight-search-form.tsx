@@ -55,6 +55,17 @@ export async function FlightSearchForm({
   );
 }
 
+// Mirrors the form's grid so the page does not shift when the real form streams in.
 export function FlightSearchFormSkeleton() {
-  return <Skeleton className="h-[16.5rem] rounded-2xl sm:h-[5.75rem]" />;
+  return (
+    <div className="border-divider dark:border-divider-dark shadow-soft grid gap-3 rounded-2xl border bg-white p-4 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-end dark:bg-black">
+      {['From', 'To', 'Departure'].map(label => (
+        <div className="grid gap-1.5" key={label}>
+          <Skeleton className="h-4 w-14" />
+          <Skeleton className="skeleton-subtle h-10 rounded-md" />
+        </div>
+      ))}
+      <Skeleton className="h-10 w-full rounded-full sm:w-40" />
+    </div>
+  );
 }

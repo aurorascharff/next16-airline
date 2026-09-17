@@ -9,9 +9,10 @@ test.describe('Login page (/login)', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Waypoint' })).toBeVisible();
   });
 
-  test('choosing a traveler signs in and lands on the home page', async ({ page }) => {
+  test('signing in with an email lands on the home page', async ({ page }) => {
     await page.goto('/login');
-    await page.getByRole('button', { name: /^Vex/ }).click();
+    await page.getByLabel('Demo email').fill('new-traveler@example.com');
+    await page.getByRole('button', { name: 'Continue' }).click();
     await page.waitForURL(url => url.pathname === '/');
     await expect(page.getByRole('heading', { level: 1, name: 'Where to next?' })).toBeVisible();
     await expect(page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Home' })).toHaveAttribute(

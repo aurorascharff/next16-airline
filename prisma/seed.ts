@@ -7,12 +7,11 @@ import { sqlitePath } from '../lib/database-url';
 const url = sqlitePath(process.env.DATABASE_URL ?? './prisma/waypoint.db');
 const prisma = new PrismaClient({ adapter: new PrismaBetterSqlite3({ url }) });
 
-// Demo travelers. The first two start with an upcoming trip; the others start empty.
+// Any email signs in (accounts are created on the fly). These two exist up front so the
+// default demo account has an upcoming trip and another traveler holds a seat on WP 21.
 const users = [
-  { accent: '#245bff', id: 'vex', initials: 'V', name: 'Vex' },
-  { accent: '#0f9f78', id: 'quill', initials: 'Q', name: 'Quill' },
-  { accent: '#7c3aed', id: 'onyx', initials: 'O', name: 'Onyx' },
-  { accent: '#e11d48', id: 'wren', initials: 'W', name: 'Wren' },
+  { email: 'demo@example.com', id: 'demo', name: 'demo@example.com' },
+  { email: 'traveler@example.com', id: 'traveler', name: 'traveler@example.com' },
 ];
 
 const airports = [
@@ -64,15 +63,24 @@ const airports = [
   },
 ];
 
-// Two departures per route: an early flight and an afternoon one.
-type Route = { destination: string; fares: [number, number]; minutes: number; number: number; origin: string };
+// Two departures per route: an early flight and an afternoon one. Afternoon flights have no
+// seat map (seats are assigned at the gate), and the short Copenhagen–Amsterdam hop sells no
+// extras, so the booking flow has steps that only exist for some flights.
+type Route = {
+  destination: string;
+  extras: boolean;
+  fares: [number, number];
+  minutes: number;
+  number: number;
+  origin: string;
+};
 const routes: Route[] = [
-  { destination: 'BCN', fares: [218, 189], minutes: 210, number: 20, origin: 'OSL' },
-  { destination: 'AMS', fares: [142, 129], minutes: 105, number: 30, origin: 'OSL' },
-  { destination: 'LIS', fares: [236, 204], minutes: 215, number: 40, origin: 'OSL' },
-  { destination: 'BCN', fares: [196, 171], minutes: 185, number: 50, origin: 'CPH' },
-  { destination: 'AMS', fares: [118, 99], minutes: 90, number: 60, origin: 'CPH' },
-  { destination: 'LIS', fares: [214, 188], minutes: 205, number: 70, origin: 'CPH' },
+  { destination: 'BCN', extras: true, fares: [218, 189], minutes: 210, number: 20, origin: 'OSL' },
+  { destination: 'AMS', extras: true, fares: [142, 129], minutes: 105, number: 30, origin: 'OSL' },
+  { destination: 'LIS', extras: true, fares: [236, 204], minutes: 215, number: 40, origin: 'OSL' },
+  { destination: 'BCN', extras: true, fares: [196, 171], minutes: 185, number: 50, origin: 'CPH' },
+  { destination: 'AMS', extras: false, fares: [118, 99], minutes: 90, number: 60, origin: 'CPH' },
+  { destination: 'LIS', extras: true, fares: [214, 188], minutes: 205, number: 70, origin: 'CPH' },
 ];
 
 const seatPlan = [
@@ -121,24 +129,29 @@ function flightData(route: Route, index: 0 | 1) {
     destinationCode: route.destination,
     duration: durationLabel(route.minutes),
     extras: {
-      create: extraPlan.map(([extraId, label, description, price]) => ({
-        description,
-        id: `${id}-${extraId}`,
-        label,
-        price,
-      })),
+      create: route.extras
+        ? extraPlan.map(([extraId, label, description, price]) => ({
+            description,
+            id: `${id}-${extraId}`,
+            label,
+            price,
+          }))
+        : [],
     },
     flightNumber: `WP ${route.number + index + 1}`,
     id,
     originCode: route.origin,
     seats: {
-      create: seatPlan.map(([label, price, status, type]) => ({
-        id: `${id}-${label}`,
-        label,
-        price,
-        status,
-        type,
-      })),
+      create:
+        index === 0
+          ? seatPlan.map(([label, price, status, type]) => ({
+              id: `${id}-${label}`,
+              label,
+              price,
+              status,
+              type,
+            }))
+          : [],
     },
   };
 }
@@ -157,7 +170,7 @@ async function main() {
     await prisma.flight.create({ data: flightData(route, 1) });
   }
 
-  // One upcoming trip per demo traveler.
+  // Upcoming trips for the seeded accounts.
   await prisma.booking.create({
     data: {
       bags: 1,
@@ -168,7 +181,7 @@ async function main() {
       reference: 'WAY204',
       seatId: 'wp-21-10A',
       total: 218 + 34 + 28 + 32,
-      userId: 'vex',
+      userId: 'demo',
     },
   });
   await prisma.booking.create({
@@ -180,7 +193,7 @@ async function main() {
       reference: 'WAY318',
       seatId: 'wp-61-11B',
       total: 118 + 14,
-      userId: 'quill',
+      userId: 'traveler',
     },
   });
 }

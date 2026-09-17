@@ -39,9 +39,22 @@ export async function DestinationGrid() {
 export function DestinationGridSkeleton() {
   return (
     <div className="grid gap-4 sm:grid-cols-3">
-      <Skeleton className="h-52 rounded-2xl" />
-      <Skeleton className="h-52 rounded-2xl" />
-      <Skeleton className="h-52 rounded-2xl" />
+      {Array.from({ length: 3 }).map((_, index) => (
+        <div
+          className="border-divider dark:border-divider-dark flex flex-col justify-between gap-8 rounded-2xl border bg-white p-5 dark:bg-black"
+          key={index}
+        >
+          <div>
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="mt-3 h-8 w-36" />
+            <Skeleton className="mt-1 h-5 w-full" />
+          </div>
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-5 w-20" />
+            <Skeleton className="size-4" />
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

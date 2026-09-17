@@ -2,8 +2,10 @@ import 'server-only';
 
 import { cacheLife, cacheTag } from 'next/cache';
 import { notFound } from 'next/navigation';
+import { isSlowEnabled } from '@/components/demo/demo-slow';
 import { verifyAuth } from '@/features/user/user-queries';
 import { prisma } from '@/lib/db';
+import { delay } from '@/lib/utils';
 import type { Booking } from './types/booking';
 
 const bookingInclude = {
@@ -13,15 +15,16 @@ const bookingInclude = {
 } as const;
 
 export async function getBookings() {
-  const user = await verifyAuth();
-  return getBookingsForUser(user.id);
+  const [user, slow] = await Promise.all([verifyAuth(), isSlowEnabled()]);
+  return getBookingsForUser(user.id, slow);
 }
 
-async function getBookingsForUser(userId: string): Promise<Booking[]> {
+async function getBookingsForUser(userId: string, slow: boolean): Promise<Booking[]> {
   'use cache';
   cacheLife('hours');
   cacheTag(`bookings:${userId}`);
 
+  await delay(800, slow);
   return prisma.booking.findMany({
     include: bookingInclude,
     orderBy: [{ date: 'asc' }, { createdAt: 'asc' }],
@@ -35,15 +38,16 @@ export async function getNextBooking() {
 }
 
 export async function getBooking(id: string) {
-  const user = await verifyAuth();
-  return getBookingForUser(id, user.id);
+  const [user, slow] = await Promise.all([verifyAuth(), isSlowEnabled()]);
+  return getBookingForUser(id, user.id, slow);
 }
 
-async function getBookingForUser(id: string, userId: string): Promise<Booking> {
+async function getBookingForUser(id: string, userId: string, slow: boolean): Promise<Booking> {
   'use cache';
   cacheLife('hours');
   cacheTag(`bookings:${userId}`, `booking:${id}`);
 
+  await delay(600, slow);
   const booking = await prisma.booking.findUnique({ include: bookingInclude, where: { id } });
   if (!booking || booking.userId !== userId) notFound();
   return booking;
