@@ -12,17 +12,17 @@ export function MobileTabBar() {
         style={{ viewTransitionName: 'mobile-nav' }}
         className="border-divider/70 dark:border-divider-dark/70 bg-surface dark:bg-surface-dark fixed inset-x-0 bottom-0 z-40 flex border-t pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] md:hidden"
       >
-        <NavLink aria-label="Overview" className={mobileTabClass} href="/">
+        <NavLink aria-label="Home" className={mobileTabClass} href="/">
           <Home className="size-5" />
-          <span>Overview</span>
+          <span>Home</span>
         </NavLink>
-        <NavLink aria-label="Search" className={mobileTabClass} href="/search">
+        <NavLink aria-label="Flights" className={mobileTabClass} href="/search">
           <Search className="size-5" />
-          <span>Search</span>
+          <span>Flights</span>
         </NavLink>
-        <NavLink aria-label="Trips" className={mobileTabClass} href="/trips">
+        <NavLink aria-label="My trips" className={mobileTabClass} href="/trips">
           <Plane className="size-5" />
-          <span>Trips</span>
+          <span>My trips</span>
         </NavLink>
       </nav>
     </div>

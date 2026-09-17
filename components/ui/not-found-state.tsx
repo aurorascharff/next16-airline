@@ -10,7 +10,7 @@ export function NotFoundState({ body, title = 'That journey does not exist.' }: 
       <h1 className="text-xl font-semibold tracking-tight">{title}</h1>
       <p className="text-muted text-sm leading-6">{body}</p>
       <Button className="mt-1" render={<PrefetchLink href="/" />} variant="secondary">
-        Back to overview
+        Back home
       </Button>
     </div>
   );

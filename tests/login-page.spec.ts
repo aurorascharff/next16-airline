@@ -9,13 +9,14 @@ test.describe('Login page (/login)', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Waypoint' })).toBeVisible();
   });
 
-  test('choosing a traveler signs in and lands on the overview', async ({ page }) => {
+  test('choosing a traveler signs in and lands on the home page', async ({ page }) => {
     await page.goto('/login');
     await page.getByRole('button', { name: /Aurora Scharff/ }).click();
     await page.waitForURL(url => url.pathname === '/');
-    await expect(
-      page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Overview' }),
-    ).toHaveAttribute('aria-current', 'page');
-    await expect(page.getByTestId('start-booking')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'Where to next?' })).toBeVisible();
+    await expect(page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Home' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
   });
 });

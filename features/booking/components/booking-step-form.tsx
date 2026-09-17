@@ -12,18 +12,16 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { startTransition, useOptimistic } from 'react';
+import { startTransition, useActionState, useOptimistic } from 'react';
 import { Boundary } from '@/components/internal/boundary';
 import { Button } from '@/components/ui/button';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
-import { cn } from '@/lib/utils';
-import {
-  createBookingHref,
-  nextBookingStep,
-  previousBookingStep,
-  toBookingSearchParams,
-} from '../booking-search-params';
-import type { Booking, BookingDraft, BookingOffer, BookingStep, Extra } from '../types/booking';
+import type { Extra, Flight, FlightOffer } from '@/features/flight/types/flight';
+import { cn, formatPrice } from '@/lib/utils';
+import { confirmBooking } from '../booking-actions';
+import { createBookingHref, nextBookingStep, previousBookingStep } from '../booking-search-params';
+import type { ConfirmBookingState } from '../booking-actions';
+import type { BookingDraft, BookingStep } from '../types/booking';
 
 const titles: Record<BookingStep, { eyebrow: string; title: string }> = {
   baggage: { eyebrow: 'Pack your way', title: 'What are you bringing?' },
@@ -37,14 +35,16 @@ const optionSelected = 'border-accent bg-accent/5 dark:bg-accent/10';
 const optionIdle = 'border-divider hover:bg-card dark:border-divider-dark dark:hover:bg-card-dark';
 
 export function BookingStepForm({
-  booking,
+  date,
   draft,
+  flight,
   offer,
   step,
 }: {
-  booking: Booking;
+  date: string;
   draft: BookingDraft;
-  offer: BookingOffer;
+  flight: Flight;
+  offer: FlightOffer;
   step: BookingStep;
 }) {
   const router = useRouter();
@@ -59,16 +59,13 @@ export function BookingStepForm({
     const nextDraft = { ...optimisticDraft, ...patch };
     startTransition(() => {
       updateOptimisticDraft(patch);
-      router.replace(createBookingHref(booking.id, step, nextDraft), { scroll: false });
+      router.replace(createBookingHref(flight.id, step, nextDraft, date), { scroll: false });
     });
   }
 
   const nextStep = nextBookingStep(step);
   const previousStep = previousBookingStep(step);
   const canContinue = step !== 'seats' || Boolean(optimisticDraft.seat);
-  const nextHref = nextStep
-    ? createBookingHref(booking.id, nextStep, optimisticDraft)
-    : (`/trips/${booking.id}?${toBookingSearchParams(optimisticDraft)}` as const);
   const total = calculateTotal(offer, optimisticDraft);
 
   return (
@@ -81,19 +78,24 @@ export function BookingStepForm({
             {step === 'baggage' && <BaggageOptions draft={optimisticDraft} offer={offer} updateDraft={updateDraft} />}
             {step === 'seats' && <SeatOptions draft={optimisticDraft} offer={offer} updateDraft={updateDraft} />}
             {step === 'extras' && <ExtraOptions draft={optimisticDraft} offer={offer} updateDraft={updateDraft} />}
-            {step === 'review' && <Review booking={booking} draft={optimisticDraft} offer={offer} />}
+            {step === 'review' && <Review draft={optimisticDraft} flight={flight} offer={offer} />}
           </div>
         </div>
         <div className="border-divider bg-card/60 dark:border-divider-dark dark:bg-card-dark/45 flex flex-col gap-4 border-t p-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div>
             <p className="text-muted text-xs font-medium">Trip total</p>
-            <p className="text-xl font-semibold tabular-nums">€{total}</p>
+            <p className="text-xl font-semibold tabular-nums" data-testid="trip-total">
+              {formatPrice(total)}
+            </p>
           </div>
           <div className="flex items-center gap-3">
             {previousStep ? (
               <Button
                 render={
-                  <PrefetchLink href={createBookingHref(booking.id, previousStep, optimisticDraft)} scroll={false} />
+                  <PrefetchLink
+                    href={createBookingHref(flight.id, previousStep, optimisticDraft, date)}
+                    scroll={false}
+                  />
                 }
                 size="lg"
                 variant="secondary"
@@ -101,13 +103,19 @@ export function BookingStepForm({
                 <ArrowLeft className="size-4" /> Back
               </Button>
             ) : (
-              <Button render={<PrefetchLink href="/" />} size="lg" variant="secondary">
+              <Button render={<PrefetchLink href="/search" />} size="lg" variant="secondary">
                 <ArrowLeft className="size-4" /> Exit
               </Button>
             )}
-            {canContinue ? (
-              <Button data-testid="booking-next" render={<PrefetchLink href={nextHref} />} size="lg">
-                {step === 'review' ? 'Confirm trip' : 'Continue'} <ArrowRight className="size-4" />
+            {!nextStep ? (
+              <ConfirmTripForm date={date} draft={optimisticDraft} flightId={flight.id} />
+            ) : canContinue ? (
+              <Button
+                data-testid="booking-next"
+                render={<PrefetchLink href={createBookingHref(flight.id, nextStep, optimisticDraft, date)} />}
+                size="lg"
+              >
+                Continue <ArrowRight className="size-4" />
               </Button>
             ) : (
               <Button disabled size="lg">
@@ -121,9 +129,35 @@ export function BookingStepForm({
   );
 }
 
+const INITIAL_CONFIRM_STATE: ConfirmBookingState = { error: null };
+
+// Confirming is the only mutation in the flow: the draft in the URL becomes a stored booking.
+function ConfirmTripForm({ date, draft, flightId }: { date: string; draft: BookingDraft; flightId: string }) {
+  const [state, formAction] = useActionState(confirmBooking, INITIAL_CONFIRM_STATE);
+
+  return (
+    <form action={formAction} className="flex flex-col items-end gap-2">
+      <input name="flightId" type="hidden" value={flightId} />
+      <input name="date" type="hidden" value={date} />
+      <input name="bags" type="hidden" value={draft.bags} />
+      <input name="carryOn" type="hidden" value={draft.carryOn ? '1' : '0'} />
+      <input name="seat" type="hidden" value={draft.seat} />
+      <input name="extras" type="hidden" value={draft.extras.join(',')} />
+      <Button data-testid="booking-confirm" size="lg" type="submit">
+        Confirm trip <ArrowRight className="size-4" />
+      </Button>
+      {state.error && (
+        <p className="text-danger text-xs" role="alert">
+          {state.error}
+        </p>
+      )}
+    </form>
+  );
+}
+
 type StepProps = {
   draft: BookingDraft;
-  offer: BookingOffer;
+  offer: FlightOffer;
   updateDraft: (patch: Partial<BookingDraft>) => void;
 };
 
@@ -144,7 +178,7 @@ function BaggageOptions({ draft, offer, updateDraft }: StepProps) {
               <Luggage className={cn('mb-4 size-5', draft.bags === count ? 'text-accent' : 'text-muted')} />
               <p className="font-semibold">{count === 0 ? 'No bag' : `${count} bag${count > 1 ? 's' : ''}`}</p>
               <p className="text-muted mt-1 text-xs">
-                {count === 0 ? 'Travel light' : `23 kg · €${offer.bagPrice * count}`}
+                {count === 0 ? 'Travel light' : `23 kg · ${formatPrice(offer.bagPrice * count)}`}
               </p>
               {draft.bags === count && (
                 <span className="bg-accent absolute top-3 right-3 grid size-5 place-items-center rounded-full text-white">
@@ -245,7 +279,7 @@ function ExtraOptions({ draft, offer, updateDraft }: StepProps) {
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between gap-3">
                 <p className="font-semibold">{extra.label}</p>
-                <p className="font-semibold tabular-nums">€{extra.price}</p>
+                <p className="font-semibold tabular-nums">{formatPrice(extra.price)}</p>
               </div>
               <p className="text-muted mt-1 text-sm leading-5">{extra.description}</p>
             </div>
@@ -280,11 +314,11 @@ function ExtraIcon({ extra, index }: { extra: Extra; index: number }) {
   );
 }
 
-function Review({ booking, draft, offer }: { booking: Booking; draft: BookingDraft; offer: BookingOffer }) {
+function Review({ draft, flight, offer }: { draft: BookingDraft; flight: Flight; offer: FlightOffer }) {
   const selectedSeat = offer.seats.find(seat => seat.id === draft.seat);
   const selectedExtras = offer.extras.filter(extra => draft.extras.includes(extra.id));
   const rows = [
-    { label: `${booking.cabin} fare`, value: offer.baseFare },
+    { label: `${flight.cabin} fare`, value: offer.baseFare },
     ...(draft.bags
       ? [{ label: `${draft.bags} checked bag${draft.bags > 1 ? 's' : ''}`, value: offer.bagPrice * draft.bags }]
       : []),
@@ -300,7 +334,7 @@ function Review({ booking, draft, offer }: { booking: Booking; draft: BookingDra
           key={row.label}
         >
           <span className="text-sm font-medium">{row.label}</span>
-          <span className="text-sm font-semibold tabular-nums">€{row.value}</span>
+          <span className="text-sm font-semibold tabular-nums">{formatPrice(row.value)}</span>
         </div>
       ))}
       <div className="bg-success/10 mt-5 flex items-start gap-3 rounded-xl p-4">
@@ -311,7 +345,7 @@ function Review({ booking, draft, offer }: { booking: Booking; draft: BookingDra
   );
 }
 
-function calculateTotal(offer: BookingOffer, draft: BookingDraft) {
+function calculateTotal(offer: FlightOffer, draft: BookingDraft) {
   const seat = offer.seats.find(item => item.id === draft.seat)?.price ?? 0;
   const extras = offer.extras
     .filter(item => draft.extras.includes(item.id))

@@ -12,32 +12,43 @@ export const DEFAULT_BOOKING_DRAFT: BookingDraft = {
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
+function read(params: SearchParams, key: string) {
+  const value = params[key];
+  return Array.isArray(value) ? value[0] : value;
+}
+
 export function isBookingStep(value: string): value is BookingStep {
   return BOOKING_STEPS.includes(value as BookingStep);
 }
 
-export function parseBookingDraft(params: SearchParams | URLSearchParams): BookingDraft {
-  const read = (key: string) => {
-    if (params instanceof URLSearchParams) return params.get(key) ?? undefined;
-    const value = params[key];
-    return Array.isArray(value) ? value[0] : value;
-  };
-  const bags = Number(read('bags'));
-  const extras = (read('extras') ?? '')
+export function parseDate(value: string | string[] | undefined) {
+  const date = Array.isArray(value) ? value[0] : value;
+  return date && /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : '';
+}
+
+export function parseAirportCode(value: string | string[] | undefined) {
+  const code = Array.isArray(value) ? value[0] : value;
+  return code && /^[A-Z]{3}$/.test(code) ? code : '';
+}
+
+export function parseBookingDraft(params: SearchParams): BookingDraft {
+  const bags = Number(read(params, 'bags'));
+  const extras = (read(params, 'extras') ?? '')
     .split(',')
     .map(value => value.trim())
     .filter(Boolean);
 
   return {
     bags: Number.isInteger(bags) ? Math.min(Math.max(bags, 0), 2) : 0,
-    carryOn: read('carryOn') !== '0',
+    carryOn: read(params, 'carryOn') !== '0',
     extras: [...new Set(extras)].sort(),
-    seat: read('seat') ?? '',
+    seat: read(params, 'seat') ?? '',
   };
 }
 
-export function toBookingSearchParams(draft: BookingDraft) {
+export function toBookingSearchParams(draft: BookingDraft, date: string) {
   const params = new URLSearchParams();
+  if (date) params.set('date', date);
   params.set('bags', String(draft.bags));
   params.set('carryOn', draft.carryOn ? '1' : '0');
   if (draft.seat) params.set('seat', draft.seat);
@@ -45,8 +56,14 @@ export function toBookingSearchParams(draft: BookingDraft) {
   return params;
 }
 
-export function createBookingHref(bookingId: string, step: BookingStep, draft: BookingDraft) {
-  return `/book/${bookingId}/${step}?${toBookingSearchParams(draft)}` as Route;
+export function createBookingHref(flightId: string, step: BookingStep, draft: BookingDraft, date: string) {
+  return `/book/${flightId}/${step}?${toBookingSearchParams(draft, date)}` as Route;
+}
+
+export function createSearchHref(from: string, to: string, date = '') {
+  const params = new URLSearchParams({ from, to });
+  if (date) params.set('date', date);
+  return `/search?${params}` as Route;
 }
 
 export function nextBookingStep(step: BookingStep) {

@@ -7,6 +7,71 @@ import { sqlitePath } from '../lib/database-url';
 const url = sqlitePath(process.env.DATABASE_URL ?? './prisma/waypoint.db');
 const prisma = new PrismaClient({ adapter: new PrismaBetterSqlite3({ url }) });
 
+const users = [
+  { accent: '#245bff', id: 'aurora', initials: 'AS', name: 'Aurora Scharff' },
+  { accent: '#0f9f78', id: 'sam', initials: 'SS', name: 'Sam Selikoff' },
+];
+
+const airports = [
+  {
+    city: 'Oslo',
+    code: 'OSL',
+    country: 'Norway',
+    description:
+      'Fjord air, forest trails inside the city limits, and a waterfront that never quite goes dark in summer.',
+    hub: true,
+    slug: 'oslo',
+    tagline: 'Where every Waypoint journey begins.',
+  },
+  {
+    city: 'Copenhagen',
+    code: 'CPH',
+    country: 'Denmark',
+    description: 'Bike lanes, harbour baths, and a food scene that turned a small capital into a destination.',
+    hub: true,
+    slug: 'copenhagen',
+    tagline: 'Our second home, one bridge from Sweden.',
+  },
+  {
+    city: 'Barcelona',
+    code: 'BCN',
+    country: 'Spain',
+    description: 'Warm late evenings, bold architecture, and the Mediterranean within walking distance.',
+    hub: false,
+    slug: 'barcelona',
+    tagline: 'The city that keeps dinner plans open.',
+  },
+  {
+    city: 'Amsterdam',
+    code: 'AMS',
+    country: 'Netherlands',
+    description: 'Canal-side mornings, design districts, and a city made to move through at your own pace.',
+    hub: false,
+    slug: 'amsterdam',
+    tagline: 'A slower rhythm, right after landing.',
+  },
+  {
+    city: 'Lisbon',
+    code: 'LIS',
+    country: 'Portugal',
+    description: 'Hillside streets, Atlantic light, and neighborhood cafés from first tram to last table.',
+    hub: false,
+    slug: 'lisbon',
+    tagline: 'Follow the light downhill.',
+  },
+];
+
+// Two departures per route: an early flight and an afternoon one.
+type Route = { destination: string; fares: [number, number]; minutes: number; number: number; origin: string };
+const routes: Route[] = [
+  { destination: 'BCN', fares: [218, 189], minutes: 210, number: 20, origin: 'OSL' },
+  { destination: 'AMS', fares: [142, 129], minutes: 105, number: 30, origin: 'OSL' },
+  { destination: 'LIS', fares: [236, 204], minutes: 215, number: 40, origin: 'OSL' },
+  { destination: 'BCN', fares: [196, 171], minutes: 185, number: 50, origin: 'CPH' },
+  { destination: 'AMS', fares: [118, 99], minutes: 90, number: 60, origin: 'CPH' },
+  { destination: 'LIS', fares: [214, 188], minutes: 205, number: 70, origin: 'CPH' },
+];
+
 const seatPlan = [
   ['10A', 28, 'available', 'extra-legroom'],
   ['10B', 28, 'occupied', 'extra-legroom'],
@@ -32,43 +97,26 @@ const extraPlan = [
   ['saf', 'Lower-impact fuel', 'Support verified lower-emission aviation fuel for your trip.', 9],
 ] as const;
 
-function bookingData({
-  arrivalAirport,
-  arrivalCity,
-  arrivalTime,
-  baseFare,
-  date,
-  departureAirport,
-  departureCity,
-  departureTime,
-  destinationSlug,
-  duration,
-  flightNumber,
-  id,
-  reference,
-  userId,
-}: {
-  arrivalAirport: string;
-  arrivalCity: string;
-  arrivalTime: string;
-  baseFare: number;
-  date: string;
-  departureAirport: string;
-  departureCity: string;
-  departureTime: string;
-  destinationSlug: string;
-  duration: string;
-  flightNumber: string;
-  id: string;
-  reference: string;
-  userId: string;
-}) {
+function time(minutes: number) {
+  return `${String(Math.floor(minutes / 60) % 24).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
+}
+
+function durationLabel(minutes: number) {
+  const hours = Math.floor(minutes / 60);
+  const rest = minutes % 60;
+  return rest ? `${hours}h ${String(rest).padStart(2, '0')}m` : `${hours}h`;
+}
+
+function flightData(route: Route, index: 0 | 1) {
+  const departs = index === 0 ? 7 * 60 + 15 + route.number : 15 * 60 + 40 + route.number;
+  const id = `wp-${route.number + index + 1}`;
   return {
+    arrivalTime: time(departs + route.minutes),
     bagPrice: 34,
-    baseFare,
-    cabin: 'Flex',
-    currency: 'EUR',
-    destinationSlug,
+    baseFare: route.fares[index],
+    departureTime: time(departs),
+    destinationCode: route.destination,
+    duration: durationLabel(route.minutes),
     extras: {
       create: extraPlan.map(([extraId, label, description, price]) => ({
         description,
@@ -77,22 +125,9 @@ function bookingData({
         price,
       })),
     },
-    flight: {
-      create: {
-        arrivalAirport,
-        arrivalCity,
-        arrivalTime,
-        date,
-        departureAirport,
-        departureCity,
-        departureTime,
-        duration,
-        flightNumber,
-        id: `flight-${id}`,
-      },
-    },
+    flightNumber: `WP ${route.number + index + 1}`,
     id,
-    reference,
+    originCode: route.origin,
     seats: {
       create: seatPlan.map(([label, price, status, type]) => ({
         id: `${id}-${label}`,
@@ -102,102 +137,48 @@ function bookingData({
         type,
       })),
     },
-    userId,
   };
 }
 
 async function main() {
   await prisma.booking.deleteMany();
-  await prisma.destination.deleteMany();
+  await prisma.flight.deleteMany();
+  await prisma.airport.deleteMany();
   await prisma.user.deleteMany();
 
-  await prisma.user.createMany({
-    data: [
-      { accent: '#245bff', id: 'aurora', initials: 'AS', name: 'Aurora Scharff' },
-      { accent: '#0f9f78', id: 'sam', initials: 'SS', name: 'Sam Selikoff' },
-    ],
-  });
+  await prisma.user.createMany({ data: users });
+  await prisma.airport.createMany({ data: airports });
 
-  await prisma.destination.createMany({
-    data: [
-      {
-        accent: '#ff785a',
-        airport: 'BCN',
-        arrivalTime: '12:45',
-        city: 'Barcelona',
-        country: 'Spain',
-        departureTime: '09:15',
-        description: 'Warm late evenings, bold architecture, and the Mediterranean within walking distance.',
-        duration: '3h 30m',
-        fare: 218,
-        slug: 'barcelona',
-        tagline: 'The city that keeps dinner plans open.',
-      },
-      {
-        accent: '#5ed6b3',
-        airport: 'AMS',
-        arrivalTime: '09:25',
-        city: 'Amsterdam',
-        country: 'Netherlands',
-        departureTime: '07:40',
-        description: 'Canal-side mornings, design districts, and a city made to move through at your own pace.',
-        duration: '1h 45m',
-        fare: 142,
-        slug: 'amsterdam',
-        tagline: 'A slower rhythm, right after landing.',
-      },
-      {
-        accent: '#9d82ff',
-        airport: 'LIS',
-        arrivalTime: '13:40',
-        city: 'Lisbon',
-        country: 'Portugal',
-        departureTime: '10:05',
-        description: 'Hillside streets, Atlantic light, and neighborhood cafés from first tram to last table.',
-        duration: '3h 35m',
-        fare: 236,
-        slug: 'lisbon',
-        tagline: 'Follow the light downhill.',
-      },
-    ],
-  });
+  for (const route of routes) {
+    await prisma.flight.create({ data: flightData(route, 0) });
+    await prisma.flight.create({ data: flightData(route, 1) });
+  }
 
+  // One upcoming trip per demo traveler.
   await prisma.booking.create({
-    data: bookingData({
-      arrivalAirport: 'BCN',
-      arrivalCity: 'Barcelona',
-      arrivalTime: '12:45',
-      baseFare: 218,
-      date: 'Friday, September 25',
-      departureAirport: 'OSL',
-      departureCity: 'Oslo',
-      departureTime: '09:15',
-      destinationSlug: 'barcelona',
-      duration: '3h 30m',
-      flightNumber: 'WP 204',
-      id: 'wpt-204',
+    data: {
+      bags: 1,
+      carryOn: true,
+      date: '2026-10-09',
+      extras: { connect: [{ id: 'wp-21-lounge' }] },
+      flightId: 'wp-21',
       reference: 'WAY204',
+      seatId: 'wp-21-10A',
+      total: 218 + 34 + 28 + 32,
       userId: 'aurora',
-    }),
+    },
   });
-
   await prisma.booking.create({
-    data: bookingData({
-      arrivalAirport: 'AMS',
-      arrivalCity: 'Amsterdam',
-      arrivalTime: '10:20',
-      baseFare: 186,
-      date: 'Monday, October 5',
-      departureAirport: 'CPH',
-      departureCity: 'Copenhagen',
-      departureTime: '08:50',
-      destinationSlug: 'amsterdam',
-      duration: '1h 30m',
-      flightNumber: 'WP 318',
-      id: 'wpt-318',
+    data: {
+      bags: 0,
+      carryOn: true,
+      date: '2026-10-05',
+      flightId: 'wp-61',
       reference: 'WAY318',
+      seatId: 'wp-61-11B',
+      total: 118 + 14,
       userId: 'sam',
-    }),
+    },
   });
 }
 

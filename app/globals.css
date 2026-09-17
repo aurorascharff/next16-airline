@@ -130,7 +130,7 @@
 @keyframes waypoint-mark-enter {
   from {
     opacity: 0;
-    stroke-dashoffset: 48;
+    stroke-dashoffset: 80;
   }
   to {
     opacity: 1;
@@ -139,7 +139,7 @@
 }
 
 .waypoint-mark-enter path {
-  stroke-dasharray: 48;
+  stroke-dasharray: 80;
   animation: waypoint-mark-enter 420ms ease-out both;
 }
 

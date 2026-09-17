@@ -28,13 +28,13 @@ export function SiteHeader() {
         </PrefetchLink>
         <nav aria-label="Primary" className="hidden items-center gap-1 md:flex">
           <NavLink className={navLinkClass} href="/">
-            Overview
+            Home
           </NavLink>
           <NavLink className={navLinkClass} href="/search">
-            Search
+            Flights
           </NavLink>
           <NavLink className={navLinkClass} href="/trips">
-            Trips
+            My trips
           </NavLink>
         </nav>
         <div className="flex items-center gap-2">

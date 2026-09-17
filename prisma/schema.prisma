@@ -7,25 +7,6 @@ datasource db {
   provider = "sqlite"
 }
 
-model Booking {
-  id              String @id
-  userId          String
-  destinationSlug String
-  reference       String @unique
-  cabin           String
-  baseFare        Int
-  bagPrice        Int
-  currency        String @default("EUR")
-
-  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  destination Destination @relation(fields: [destinationSlug], references: [slug])
-  flight      Flight?
-  seats       Seat[]
-  extras      Extra[]
-
-  @@index([userId])
-}
-
 model User {
   id       String @id
   name     String
@@ -35,59 +16,86 @@ model User {
   bookings Booking[]
 }
 
-model Destination {
-  slug        String @id
+// Hubs (Oslo, Copenhagen) are where Waypoint flies from; the rest are destinations.
+model Airport {
+  code        String  @id
+  slug        String  @unique
   city        String
   country     String
-  airport     String
   tagline     String
-  description   String
-  accent        String
-  departureTime String
-  arrivalTime   String
-  duration      String
-  fare          Int
+  description String
+  hub         Boolean @default(false)
 
-  bookings Booking[]
+  departures Flight[] @relation("departures")
+  arrivals   Flight[] @relation("arrivals")
 }
 
 model Flight {
-  id               String @id
-  bookingId        String @unique
-  flightNumber     String
-  departureAirport String
-  departureCity    String
-  departureTime    String
-  arrivalAirport   String
-  arrivalCity      String
-  arrivalTime      String
-  date             String
-  duration         String
+  id              String @id
+  flightNumber    String @unique
+  originCode      String
+  destinationCode String
+  departureTime   String
+  arrivalTime     String
+  duration        String
+  cabin           String @default("Flex")
+  baseFare        Int
+  bagPrice        Int
+  currency        String @default("EUR")
 
-  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  origin      Airport   @relation("departures", fields: [originCode], references: [code])
+  destination Airport   @relation("arrivals", fields: [destinationCode], references: [code])
+  seats       Seat[]
+  extras      Extra[]
+  bookings    Booking[]
+
+  @@index([originCode, destinationCode])
 }
 
 model Seat {
-  id        String @id
-  bookingId String
-  label     String
-  price     Int
-  status    String
-  type      String
+  id       String @id
+  flightId String
+  label    String
+  price    Int
+  status   String
+  type     String
 
-  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  flight   Flight    @relation(fields: [flightId], references: [id], onDelete: Cascade)
+  bookings Booking[]
 
-  @@index([bookingId])
+  @@index([flightId])
 }
 
 model Extra {
   id          String @id
-  bookingId   String
+  flightId    String
   label       String
   description String
   price       Int
 
-  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  flight   Flight    @relation(fields: [flightId], references: [id], onDelete: Cascade)
+  bookings Booking[]
 
-  @@index([bookingId])
+  @@index([flightId])
+}
+
+model Booking {
+  id        String   @id @default(cuid())
+  reference String   @unique
+  userId    String
+  flightId  String
+  date      String
+  bags      Int
+  carryOn   Boolean
+  seatId    String?
+  total     Int
+  createdAt DateTime @default(now())
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  flight Flight  @relation(fields: [flightId], references: [id], onDelete: Cascade)
+  seat   Seat?   @relation(fields: [seatId], references: [id])
+  extras Extra[]
+
+  @@index([userId])
+  @@index([flightId, date])
 }

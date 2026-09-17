@@ -11,11 +11,11 @@ export function WaypointMark({ animated = false, className }: { animated?: boole
     >
       <rect fill="currentColor" height="40" rx="12" width="40" />
       <path
-        d="M8.5 24.5c5.1-7.4 11.8-10.2 22.8-9.1M23.8 10.2l7.7 5.2-7.9 4.7"
-        stroke="white"
+        className="stroke-surface dark:stroke-surface-dark"
+        d="M9.5 12.2 15.8 27.8 20 19.2 24.2 27.8 30.5 12.2"
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="2.3"
+        strokeWidth="3.6"
       />
     </svg>
   );

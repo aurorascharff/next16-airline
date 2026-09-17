@@ -1,21 +1,31 @@
+import { instant } from '@next/playwright';
 import { expect, test } from '@playwright/test';
 
 test.describe('Search page (/search)', () => {
-  test('choosing a destination shows the route from Oslo', async ({ page }) => {
-    await page.goto('/search');
-    await expect(page.getByRole('heading', { level: 2, name: 'Choose where to go' })).toBeVisible();
-
-    await page.getByLabel('To').selectOption('BCN');
+  test('searching a route lists its flights', async ({ page }) => {
+    await page.goto('/');
+    await page.getByLabel('From').selectOption('CPH');
+    await page.getByLabel('To').selectOption('AMS');
+    await page.getByLabel('Departure').fill('2026-11-12');
     await page.getByRole('button', { name: 'Search flights' }).click();
-    await page.waitForURL(url => url.searchParams.get('to') === 'BCN');
-    await expect(page.getByRole('heading', { level: 2, name: 'OSL to BCN' })).toBeVisible();
-    await expect(page.getByText('€218')).toBeVisible();
+
+    await page.waitForURL(url => url.pathname === '/search' && url.searchParams.get('to') === 'AMS');
+    await expect(page.getByRole('heading', { level: 2, name: 'Copenhagen to Amsterdam' })).toBeVisible();
+    await expect(page.getByTestId('flight-result')).toHaveCount(2);
+    await expect(page.getByText('Thu 12 Nov')).toBeVisible();
   });
 
-  test('destination chips lead to the explore page', async ({ page }) => {
-    await page.goto('/search');
-    await page.getByRole('link', { name: 'Explore Lisbon' }).click();
-    await page.waitForURL(url => url.pathname === '/explore/lisbon');
-    await expect(page.getByRole('heading', { level: 1, name: 'Lisbon' })).toBeVisible();
+  test('selecting a flight navigates instantly into the booking flow', async ({ page }) => {
+    await page.goto('/search?from=OSL&to=BCN&date=2026-11-12');
+    await expect(page.getByTestId('flight-result')).toHaveCount(2);
+
+    await instant(page, async () => {
+      await page.getByRole('link', { name: 'Select' }).first().click();
+      await page.waitForURL(url => url.pathname === '/book/wp-21/baggage');
+      await expect(page.getByRole('heading', { level: 2, name: 'Build your journey' })).toBeVisible();
+      await expect(page.getByRole('heading', { level: 1, name: 'What are you bringing?' })).toBeVisible();
+    });
+
+    await expect(page.getByTestId('booking-experience')).toBeVisible();
   });
 });
