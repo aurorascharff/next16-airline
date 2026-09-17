@@ -23,9 +23,12 @@ export function SeatMap({
 }) {
   return (
     <div className="mx-auto max-w-lg">
-      <div className="text-muted mb-5 flex items-center justify-between text-xs">
+      <div className="text-muted mb-5 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-xs">
         <span className="flex items-center gap-2">
           <span className="border-divider dark:border-divider-dark size-4 rounded border" /> Available
+        </span>
+        <span className="flex items-center gap-2">
+          <span className="border-success size-4 rounded border" /> Extra legroom
         </span>
         <span className="flex items-center gap-2">
           <span className="bg-card dark:bg-card-dark size-4 rounded" /> Taken or held
@@ -46,8 +49,10 @@ export function SeatMap({
       </div>
       <p aria-live="polite" className="text-muted mt-4 text-center text-xs">
         {pendingSeat
-          ? `Holding seat ${offer.seats.find(seat => seat.id === pendingSeat)?.label ?? ''} for you…`
-          : 'Extra-legroom seats are outlined in green. Picking a seat holds your booking for 5 minutes.'}
+          ? `Holding seat ${labelOf(offer, pendingSeat)} for you…`
+          : draft.seat
+            ? `You have chosen seat ${labelOf(offer, draft.seat)}`
+            : 'Pick a seat'}
       </p>
     </div>
   );
@@ -104,4 +109,8 @@ function SeatGrid({ draft, holds, offer, onSelect, pendingSeat }: SeatGridProps)
       })}
     </div>
   );
+}
+
+function labelOf(offer: FlightOffer, seatId: string) {
+  return offer.seats.find(seat => seat.id === seatId)?.label ?? '';
 }
