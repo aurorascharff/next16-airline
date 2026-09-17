@@ -16,7 +16,6 @@ model User {
   bookings Booking[]
 }
 
-// Hubs (Oslo, Copenhagen) are where Waypoint flies from; the rest are destinations.
 model Airport {
   code        String  @id
   slug        String  @unique

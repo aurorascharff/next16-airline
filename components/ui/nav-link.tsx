@@ -28,8 +28,6 @@ function checkActive(pathname: string, target: string, exact?: boolean): boolean
   return pathname === target || pathname.startsWith(`${target}/`);
 }
 
-// Outer `<Suspense>` makes `usePathname` safe under `cacheComponents` on
-// dynamic routes; the fallback renders the link inactive so layout is stable.
 export function NavLink<T extends string>(props: Props<T>) {
   return (
     <Boundary label="NavLink">

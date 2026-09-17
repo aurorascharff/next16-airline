@@ -7,7 +7,6 @@ import { getNextBooking } from '../booking-queries';
 export async function NextTrip() {
   const booking = await getNextBooking();
 
-  // Same shape as the trip card so the home page never shifts between the two states.
   if (!booking) {
     return (
       <PrefetchLink

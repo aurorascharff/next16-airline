@@ -13,7 +13,6 @@ const sizes: Record<ButtonSize, string> = {
   sm: 'h-8 px-3 text-xs',
 };
 
-// Primary is monochrome; `accent` is reserved for the one action that matters most (confirming a trip).
 const variants: Record<ButtonVariant, string> = {
   accent: 'bg-accent text-white hover:bg-accent-hover',
   ghost: 'text-muted hover:bg-card hover:text-black dark:hover:bg-card-dark dark:hover:text-white',
@@ -22,8 +21,6 @@ const variants: Record<ButtonVariant, string> = {
     'border border-divider bg-white text-black hover:border-gray/40 hover:bg-card dark:border-divider-dark dark:bg-transparent dark:text-white dark:hover:border-gray/30 dark:hover:bg-card-dark',
 };
 
-// Shared with Server Components that render links styled as buttons; `Button` itself is a
-// Client Component, so its exports can't be called on the server.
 export function buttonClasses({
   className,
   size = 'default',

@@ -29,7 +29,6 @@ export async function BookingExperience({
   const [flight, offer] = await Promise.all([getFlight(flightId), getFlightOffer(flightId, date)]);
   const steps = getAvailableSteps(offer);
 
-  // A flight without a seat map or extras has no such step: skip forward to the next one.
   if (!steps.includes(step)) {
     const fallback = nextBookingStep(steps, step === 'seats' ? 'baggage' : 'seats') ?? 'review';
     redirect(createBookingHref(flightId, fallback, draft, date));

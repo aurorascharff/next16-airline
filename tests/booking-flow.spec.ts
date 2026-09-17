@@ -20,13 +20,11 @@ test.describe('Booking flow (/book/[flightId]/[step])', () => {
   });
 
   test('steps a flight does not offer are skipped', async ({ page }) => {
-    // The afternoon flight has no seat map, so Continue goes straight from baggage to extras.
     await page.goto('/book/wp-22/baggage?date=2026-11-12');
     await expect(page.getByRole('list', { name: 'Booking progress' }).getByRole('listitem')).toHaveCount(3);
     await page.getByTestId('booking-next').filter({ visible: true }).click();
     await page.waitForURL(url => url.pathname === '/book/wp-22/extras');
 
-    // The short Copenhagen–Amsterdam hop has seats but sells no extras.
     await page.goto('/book/wp-61/extras?date=2026-11-12');
     await page.waitForURL(url => url.pathname === '/book/wp-61/review');
   });

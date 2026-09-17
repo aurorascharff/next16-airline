@@ -8,7 +8,6 @@ test.describe('Home page (/)', () => {
       async () => {
         await page.goto('/');
         await expect(page.getByRole('heading', { level: 1, name: 'Where to next?' })).toBeVisible();
-        // Everything that reads request data (the Delays cookie, the session) streams in afterwards.
         await expect(page.getByRole('button', { name: 'Search flights' })).toHaveCount(0);
         await expect(page.getByTestId('next-trip')).toHaveCount(0);
       },

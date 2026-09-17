@@ -6,8 +6,6 @@ import { isSlowEnabled } from '@/components/demo/demo-slow';
 import { prisma } from '@/lib/db';
 import { delay } from '@/lib/utils';
 
-// Every read goes through an uncached wrapper that reads the demo's Delays toggle and
-// passes it into the cached twin, so cached functions never touch request data.
 export async function getAirports() {
   return getAirportsCached(await isSlowEnabled());
 }
@@ -21,7 +19,6 @@ async function getAirportsCached(slow: boolean) {
   return prisma.airport.findMany({ orderBy: { city: 'asc' } });
 }
 
-// Destinations with their lowest fare, for the home page grid.
 export async function getDestinations() {
   return getDestinationsCached(await isSlowEnabled());
 }
@@ -56,7 +53,6 @@ async function getAirportCached(slug: string, slow: boolean) {
   return airport;
 }
 
-// Cheapest flight from each hub to this destination, for the explore page.
 export async function getRoutesTo(destinationCode: string) {
   return getRoutesToCached(destinationCode, await isSlowEnabled());
 }

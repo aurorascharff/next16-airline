@@ -5,7 +5,6 @@ import { createSearchHref } from '@/features/booking/booking-search-params';
 import { formatPrice } from '@/lib/utils';
 import { getRoutesFrom } from '../flight-queries';
 
-// Shown on the search page before a destination is chosen: every route from the selected hub.
 export async function RouteSuggestions({ date, from }: { date: string; from: string }) {
   const routes = await getRoutesFrom(from);
 

@@ -1,11 +1,8 @@
 import { Suspense } from 'react';
-import { ThemeToggle } from '@/components/theme/theme-toggle';
-import { GitHubIcon } from '@/components/ui/github-icon';
-import { IconButton } from '@/components/ui/icon-button';
 import { NavLink } from '@/components/ui/nav-link';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { WaypointMark } from '@/components/ui/waypoint-mark';
-import { CurrentUser, CurrentUserSkeleton } from '@/features/user/components/current-user';
+import { UserMenu, UserMenuSkeleton } from '@/features/user/components/user-menu';
 
 const navLinkClass =
   'rounded-full px-4 py-2 text-sm font-medium transition-colors text-muted hover:bg-card hover:text-black dark:hover:bg-card-dark dark:hover:text-white aria-[current=page]:bg-card aria-[current=page]:text-black dark:aria-[current=page]:bg-card-dark dark:aria-[current=page]:text-white';
@@ -36,15 +33,9 @@ export function SiteHeader() {
             My trips
           </NavLink>
         </nav>
-        <div className="flex items-center gap-2">
-          <IconButton external href="https://github.com/aurorascharff/next16-airline" label="View source on GitHub">
-            <GitHubIcon className="size-4" />
-          </IconButton>
-          <ThemeToggle />
-          <Suspense fallback={<CurrentUserSkeleton />}>
-            <CurrentUser />
-          </Suspense>
-        </div>
+        <Suspense fallback={<UserMenuSkeleton />}>
+          <UserMenu />
+        </Suspense>
       </div>
     </header>
   );

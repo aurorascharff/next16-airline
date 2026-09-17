@@ -1,5 +1,3 @@
-// Pre-paint: sets `aria-current` from location.pathname before hydration so the
-// active nav item never flashes, then disables itself for the client render.
 export function NavLinkScript() {
   const html = `(function(){
   function update() {

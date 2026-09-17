@@ -15,7 +15,6 @@ const signInSchema = z.object({
   ),
 });
 
-// Any email works: the account is created on first sign-in, so the demo needs no fixed traveler list.
 export async function signIn(_prev: SignInState, formData: FormData): Promise<SignInState> {
   const parsed = signInSchema.safeParse({ email: formData.get('email') });
   if (!parsed.success) return { error: parsed.error.issues[0].message };

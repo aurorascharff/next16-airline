@@ -105,7 +105,6 @@
   animation: wave-lines 2s infinite ease-out;
 }
 
-/* Large placeholder blocks: keep the tint, drop the wave so the page doesn't shimmer everywhere. */
 .skeleton-animation.skeleton-subtle {
   background: rgba(0, 0, 0, 0.06);
   background-size: unset;
@@ -145,7 +144,6 @@
   animation: waypoint-mark-enter 420ms ease-out both;
 }
 
-/* View Transitions: content cross-fades; persistent chrome is pinned so it never animates. */
 :root {
   --duration-exit: 130ms;
   --duration-enter: 190ms;
@@ -213,7 +211,6 @@
   display: none;
 }
 
-/* Client Component boundaries (demo): toggled by the `boundary-mode` class on <html>. */
 @layer base {
   html.boundary-mode [data-component] {
     position: relative;

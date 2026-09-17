@@ -20,7 +20,6 @@ export type FlightOffer = {
   seats: Seat[];
 };
 
-// Seat status/type are plain strings in SQLite; narrow them once at the data boundary.
 export function toSeat(seat: SeatRecord, booked = false): Seat {
   return {
     ...seat,

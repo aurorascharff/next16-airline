@@ -3,7 +3,6 @@ import { defineConfig, devices } from '@playwright/test';
 const externalBaseURL = process.env.PLAYWRIGHT_BASE_URL;
 const baseURL = externalBaseURL ?? 'http://localhost:3100';
 
-// Tests start signed in as the seeded demo@example.com account; login.spec.ts opts out.
 export const signedInState = {
   cookies: [
     {

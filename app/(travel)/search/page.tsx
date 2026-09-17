@@ -21,7 +21,6 @@ export default function SearchPage({ searchParams }: PageProps<'/search'>) {
       <div className="mt-6">
         <AnimatedSuspense fallback={<FlightSearchFormSkeleton />}>
           {query.then(({ date, from, to }) => (
-            // Keyed by the query so the uncontrolled selects reset when the URL changes.
             <FlightSearchForm date={date} from={from} key={`${from}-${to}-${date}`} to={to} />
           ))}
         </AnimatedSuspense>

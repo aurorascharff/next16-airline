@@ -31,7 +31,6 @@ async function searchFlightsCached(from: string, to: string, slow: boolean) {
   });
 }
 
-// Cheapest flight to each destination from this hub, for the search page before a route is chosen.
 export async function getRoutesFrom(originCode: string) {
   return getRoutesFromCached(originCode, await isSlowEnabled());
 }
@@ -80,9 +79,6 @@ async function getFlightCached(id: string, slow: boolean) {
   return flight;
 }
 
-// The offer is the "provider" call the demo slows down: the seat map and ancillaries for one
-// flight on one date. It is fetched once and shared by every step, so deciding whether a step
-// exists (does this flight have a seat map?) and rendering that step use the same cached entry.
 export async function getFlightOffer(flightId: string, date: string) {
   return getFlightOfferCached(flightId, date, await isSlowEnabled());
 }

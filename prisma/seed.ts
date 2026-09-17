@@ -11,8 +11,6 @@ const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString: normalizeDatabaseUrl(process.env.DATABASE_URL!) }),
 });
 
-// Any email signs in (accounts are created on the fly). These exist for the e2e tests: one to
-// sign in as, and one whose private trip must stay private.
 const users = [
   { email: 'demo@example.com', id: 'demo', name: 'demo@example.com' },
   { email: 'traveler@example.com', id: 'traveler', name: 'traveler@example.com' },
@@ -67,9 +65,6 @@ const airports = [
   },
 ];
 
-// Two departures per route: an early flight and an afternoon one. Afternoon flights have no
-// seat map (seats are assigned at the gate), and the short Copenhagen–Amsterdam hop sells no
-// extras, so the booking flow has steps that only exist for some flights.
 type Route = {
   destination: string;
   extras: boolean;
@@ -174,7 +169,6 @@ async function main() {
     await prisma.flight.create({ data: flightData(route, 1) });
   }
 
-  // Default trips, shared by every account and not cancellable.
   await prisma.booking.create({
     data: {
       bags: 1,
@@ -202,7 +196,6 @@ async function main() {
     },
   });
 
-  // A private trip that belongs to another traveler.
   await prisma.booking.create({
     data: {
       bags: 0,

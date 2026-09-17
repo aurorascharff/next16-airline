@@ -12,7 +12,6 @@ const destinations = [
   ['Portugal', 'Lisbon', 'from €188'],
 ];
 
-// A static, non-interactive sketch of the app that sits behind the sign-in card.
 export function LoginFlightPreview() {
   return (
     <div aria-hidden className="absolute inset-0 overflow-hidden select-none">

@@ -9,7 +9,6 @@ type Props<T extends string = string> = Omit<React.ComponentProps<typeof Link>, 
   href: Route<T> | URL;
 };
 
-// Use for low-intent list links (destination chips) so N of them don't each wake a server on render.
 export function HoverPrefetchLink<T extends string>({ href, onFocus, onMouseEnter, onTouchStart, ...props }: Props<T>) {
   const [intent, setIntent] = useState(false);
   const enabled = usePrefetchDefault() === true;

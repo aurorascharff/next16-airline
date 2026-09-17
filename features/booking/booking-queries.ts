@@ -25,7 +25,6 @@ async function getBookingsForUser(userId: string, slow: boolean): Promise<Bookin
   cacheTag(`bookings:${userId}`);
 
   await delay(800, slow);
-  // Default trips (no user) are shared with everyone, next to the traveler's own bookings.
   return prisma.booking.findMany({
     include: bookingInclude,
     orderBy: [{ date: 'asc' }, { createdAt: 'asc' }],

@@ -54,9 +54,6 @@ export function useBoundaryMode() {
   return context;
 }
 
-// Tags the child's own DOM node so CSS outlines it — no wrapper, so layout is untouched.
-// `asChild`: the single child is a component that forwards unknown props to its host
-// node (Ariakit Dialog/Popover, next/link), including portaled ones.
 export function Boundary({
   children,
   label = 'Client',

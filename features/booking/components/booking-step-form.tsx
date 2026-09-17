@@ -56,8 +56,6 @@ export function BookingStepForm({
     ...patch,
   }));
 
-  // Selections live in the URL: replace it inside a transition so the optimistic draft
-  // stays visible until the server confirms the new search params.
   function updateDraft(patch: Partial<BookingDraft>) {
     const nextDraft = { ...optimisticDraft, ...patch };
     startTransition(() => {
@@ -134,7 +132,6 @@ export function BookingStepForm({
 
 const INITIAL_CONFIRM_STATE: ConfirmBookingState = { error: null };
 
-// Confirming is the only mutation in the flow: the draft in the URL becomes a stored booking.
 function ConfirmTripForm({ date, draft, flightId }: { date: string; draft: BookingDraft; flightId: string }) {
   const [state, formAction] = useActionState(confirmBooking, INITIAL_CONFIRM_STATE);
 
