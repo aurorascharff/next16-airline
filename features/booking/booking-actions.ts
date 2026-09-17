@@ -8,7 +8,7 @@ import { verifySession } from '@/features/user/user-queries';
 import { prisma } from '@/lib/db';
 import { bookingTags } from './booking-cache';
 
-export const SEAT_HOLD_MINUTES = 10;
+const SEAT_HOLD_MINUTES = 10;
 
 export type ConfirmBookingState = { ok: false; error: string } | null;
 
