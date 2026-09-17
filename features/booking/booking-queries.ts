@@ -33,19 +33,6 @@ async function getBookingsForUser(userId: string, slow: boolean): Promise<Bookin
   });
 }
 
-export async function getExistingBooking(flightId: string, date: string) {
-  const sessionId = await verifySession();
-  return getExistingBookingForUser(sessionId, flightId, date);
-}
-
-async function getExistingBookingForUser(userId: string, flightId: string, date: string) {
-  'use cache';
-  cacheLife('hours');
-  cacheTag(bookingTags.user(userId));
-
-  return prisma.booking.findFirst({ select: { id: true }, where: { date, flightId, userId } });
-}
-
 export async function getNextBooking() {
   const bookings = await getBookings();
   return bookings[0] ?? null;
