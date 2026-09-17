@@ -18,9 +18,9 @@ export async function NextTrip() {
   if (!booking) {
     return (
       <PrefetchLink className={linkClass} data-testid="no-trip" href="/search">
-        <div className="min-w-0">
+        <div className="flex min-h-27 min-w-0 flex-col justify-center">
           <p className="text-muted text-xs font-semibold tracking-wide uppercase">Your next trip</p>
-          <p className="mt-4 text-3xl font-semibold tracking-tight">Nothing booked yet</p>
+          <p className="mt-3 text-base font-semibold">Nothing booked yet</p>
           <p className="text-muted mt-1 text-sm">Search a route below and your trip will show up here.</p>
         </div>
         <ArrowRight className="text-muted group-hover:text-accent size-4 shrink-0 transition-colors" />
