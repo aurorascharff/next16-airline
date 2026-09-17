@@ -34,7 +34,7 @@ export default function TripPage({ params, searchParams }: PageProps<'/trips/[bo
       </PrefetchLink>
       <ErrorBoundary title="This trip could not be loaded">
         <div className="border-divider/70 dark:border-divider-dark/70 overflow-hidden rounded-lg border bg-white dark:bg-black">
-          <div className="bg-card dark:bg-card-dark relative flex flex-col p-7 sm:p-10">
+          <div className="bg-card dark:bg-card-dark relative flex flex-col p-7 pr-28 sm:p-10 sm:pr-40">
             <ViewTransition default="none" name="confirm-plane" share="morph-plane">
               <Plane className="text-accent absolute top-7 right-7 size-16 sm:top-10 sm:right-10 sm:size-24" />
             </ViewTransition>

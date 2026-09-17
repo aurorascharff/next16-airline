@@ -11,7 +11,7 @@ export async function getAirports() {
 }
 
 async function getAirportsCached(slow: boolean) {
-  'use cache';
+  'use cache: remote';
   cacheLife('max');
 
   await delay(400, slow);
@@ -23,7 +23,7 @@ export async function getDestinations() {
 }
 
 async function getDestinationsCached(slow: boolean) {
-  'use cache';
+  'use cache: remote';
   cacheLife('max');
 
   await delay(1200, slow);
@@ -41,7 +41,7 @@ export async function getAirport(slug: string) {
 }
 
 async function getAirportCached(slug: string, slow: boolean) {
-  'use cache';
+  'use cache: remote';
   cacheLife('max');
 
   await delay(600, slow);
@@ -51,7 +51,7 @@ async function getAirportCached(slug: string, slow: boolean) {
 }
 
 export async function getAirportSlugs() {
-  'use cache';
+  'use cache: remote';
   cacheLife('max');
 
   const airports = await prisma.airport.findMany({ select: { slug: true } });

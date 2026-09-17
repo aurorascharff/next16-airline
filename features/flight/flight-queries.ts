@@ -22,7 +22,7 @@ export async function searchFlights(from: string, to: string, date: string): Pro
 }
 
 async function searchFlightsCached(from: string, to: string, date: string, slow: boolean): Promise<FlightResult[]> {
-  'use cache';
+  'use cache: remote';
   cacheLife('max');
 
   await delay(1000, slow);
@@ -51,7 +51,7 @@ export async function getRoutesFrom(originCode: string) {
 }
 
 async function getRoutesFromCached(originCode: string, slow: boolean) {
-  'use cache';
+  'use cache: remote';
   cacheLife('max');
 
   await delay(500, slow);
@@ -83,7 +83,7 @@ export async function getFlight(id: string) {
 }
 
 async function getFlightCached(id: string, slow: boolean) {
-  'use cache';
+  'use cache: remote';
   cacheLife('max');
 
   await delay(700, slow);
@@ -138,7 +138,7 @@ function toSeatHold(hold: { expiresAt: Date; seat: { label: string }; seatId: st
 }
 
 async function getFlightOfferCached(flightId: string, date: string, fare: Fare, slow: boolean): Promise<FlightOffer> {
-  'use cache';
+  'use cache: remote';
   cacheLife('hours');
   cacheTag(flightTags.offer(flightId));
 
@@ -173,7 +173,7 @@ export async function getRoutesTo(destinationCode: string) {
 }
 
 async function getRoutesToCached(destinationCode: string, slow: boolean) {
-  'use cache';
+  'use cache: remote';
   cacheLife('max');
 
   await delay(800, slow);
