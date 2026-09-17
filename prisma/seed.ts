@@ -1,14 +1,18 @@
 /* eslint-disable no-console */
-import 'dotenv/config';
-import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { config } from 'dotenv';
 import { PrismaClient } from '../generated/prisma/client';
-import { sqlitePath } from '../lib/database-url';
+import { normalizeDatabaseUrl } from '../lib/database-url';
 
-const url = sqlitePath(process.env.DATABASE_URL ?? './prisma/waypoint.db');
-const prisma = new PrismaClient({ adapter: new PrismaBetterSqlite3({ url }) });
+config({ path: '.env.local' });
+config({ path: '.env' });
 
-// Any email signs in (accounts are created on the fly). These two exist up front so the
-// default demo account has an upcoming trip and another traveler holds a seat on WP 21.
+const prisma = new PrismaClient({
+  adapter: new PrismaPg({ connectionString: normalizeDatabaseUrl(process.env.DATABASE_URL!) }),
+});
+
+// Any email signs in (accounts are created on the fly). These exist for the e2e tests: one to
+// sign in as, and one whose private trip must stay private.
 const users = [
   { email: 'demo@example.com', id: 'demo', name: 'demo@example.com' },
   { email: 'traveler@example.com', id: 'traveler', name: 'traveler@example.com' },
@@ -170,7 +174,7 @@ async function main() {
     await prisma.flight.create({ data: flightData(route, 1) });
   }
 
-  // Upcoming trips for the seeded accounts.
+  // Default trips, shared by every account and not cancellable.
   await prisma.booking.create({
     data: {
       bags: 1,
@@ -178,18 +182,34 @@ async function main() {
       date: '2026-10-09',
       extras: { connect: [{ id: 'wp-21-lounge' }] },
       flightId: 'wp-21',
+      id: 'trip-default-barcelona',
       reference: 'WAY204',
       seatId: 'wp-21-10A',
       total: 218 + 34 + 28 + 32,
-      userId: 'demo',
     },
   });
   await prisma.booking.create({
     data: {
       bags: 0,
       carryOn: true,
+      date: '2026-10-23',
+      extras: { connect: [{ id: 'wp-71-fast-track' }] },
+      flightId: 'wp-71',
+      id: 'trip-default-lisbon',
+      reference: 'WAY731',
+      seatId: 'wp-71-10C',
+      total: 214 + 28 + 12,
+    },
+  });
+
+  // A private trip that belongs to another traveler.
+  await prisma.booking.create({
+    data: {
+      bags: 0,
+      carryOn: true,
       date: '2026-10-05',
       flightId: 'wp-61',
+      id: 'trip-traveler-amsterdam',
       reference: 'WAY318',
       seatId: 'wp-61-11B',
       total: 118 + 14,

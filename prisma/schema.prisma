@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 model User {
@@ -82,7 +82,7 @@ model Extra {
 model Booking {
   id        String   @id @default(cuid())
   reference String   @unique
-  userId    String
+  userId    String?
   flightId  String
   date      String
   bags      Int
@@ -91,7 +91,7 @@ model Booking {
   total     Int
   createdAt DateTime @default(now())
 
-  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
   flight Flight  @relation(fields: [flightId], references: [id], onDelete: Cascade)
   seat   Seat?   @relation(fields: [seatId], references: [id])
   extras Extra[]

@@ -26,7 +26,7 @@ export function SignInForm() {
             type="email"
           />
           <span className="text-muted mt-1.5 block text-xs" id="sign-in-hint">
-            Any fake email works. The default account has an upcoming trip.
+            Any fake email works.
           </span>
         </label>
         {state?.error ? (

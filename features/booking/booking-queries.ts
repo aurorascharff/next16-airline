@@ -25,10 +25,11 @@ async function getBookingsForUser(userId: string, slow: boolean): Promise<Bookin
   cacheTag(`bookings:${userId}`);
 
   await delay(800, slow);
+  // Default trips (no user) are shared with everyone, next to the traveler's own bookings.
   return prisma.booking.findMany({
     include: bookingInclude,
     orderBy: [{ date: 'asc' }, { createdAt: 'asc' }],
-    where: { userId },
+    where: { OR: [{ userId }, { userId: null }] },
   });
 }
 
@@ -49,6 +50,6 @@ async function getBookingForUser(id: string, userId: string, slow: boolean): Pro
 
   await delay(600, slow);
   const booking = await prisma.booking.findUnique({ include: bookingInclude, where: { id } });
-  if (!booking || booking.userId !== userId) notFound();
+  if (!booking || (booking.userId !== null && booking.userId !== userId)) notFound();
   return booking;
 }

@@ -27,25 +27,27 @@ The architecture follows the [Next.js App Architecture](https://github.com/auror
 
 ## Getting started
 
-Waypoint uses a local SQLite database. Copy the environment file, install dependencies, create the database, and seed the flight catalog:
+Waypoint runs on Postgres. Set `DATABASE_URL` in `.env.local`, then:
 
 ```bash
-cp .env.example .env.local
 pnpm install
 pnpm run prisma.push
 pnpm run prisma.seed
 pnpm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser. Sign in with any email (the default demo account already has an upcoming trip), search a route from Oslo or Copenhagen, and book a flight. Trips stay separate per account.
+Open [http://localhost:3000](http://localhost:3000) in your browser. Sign in with any email, search a route from Oslo or Copenhagen, and book a flight. Two demo trips are shared by every account; the trips you book yourself stay private to it. You can browse the data with `pnpm run prisma.studio`, or wipe and re-seed the database with `pnpm run prisma.reset`.
 
-You can inspect the local data with:
+<details>
+<summary>Run locally without Postgres</summary>
 
-```bash
-pnpm run prisma.studio
-```
+Drop this prompt into your agent to swap the datasource for SQLite:
 
-To reset it to the seeded state, run `pnpm run prisma.reset`.
+> Set up Waypoint to run locally on SQLite instead of Postgres. Keep both database adapter stacks installed so the production Postgres setup remains available. Swap `provider = "postgresql"` to `provider = "sqlite"` in `prisma/schema.prisma`. Replace `@prisma/adapter-pg` with `@prisma/adapter-better-sqlite3` in `lib/db.ts` and `prisma/seed.ts`, using `new PrismaBetterSqlite3({ url })` where `url` is `process.env.DATABASE_URL` with the `file:` prefix stripped, and skip `normalizeDatabaseUrl` for file URLs in `prisma.config.ts`. Write `DATABASE_URL=file:./prisma/dev.db` to `.env.local`, then run `pnpm run prisma.push` and `pnpm run prisma.seed`.
+
+The schema is otherwise identical, so the rest of the app behaves the same as production.
+
+</details>
 
 ## Testing
 
@@ -67,7 +69,7 @@ pnpm typecheck
 - **[Next.js 16.3](https://nextjs.org/)**: App Router, Cache Components, Partial Prefetching, Server Functions
 - **[React 19](https://react.dev/)** with React Compiler: Suspense, View Transitions, `useOptimistic`
 - **[TypeScript](https://www.typescriptlang.org/)** and **[Tailwind CSS v4](https://tailwindcss.com/)**
-- **[Prisma 7](https://www.prisma.io/)** on SQLite
+- **[Prisma 7](https://www.prisma.io/)** on PostgreSQL
 - **[Ariakit](https://ariakit.org/)** for accessible dialogs and popovers
 - **[Playwright](https://playwright.dev/)** with `@next/playwright` for end-to-end tests
 

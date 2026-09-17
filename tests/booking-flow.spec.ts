@@ -6,14 +6,14 @@ test.describe('Booking flow (/book/[flightId]/[step])', () => {
     await page.getByRole('button', { name: '1 bag' }).click();
     await expect(page).toHaveURL(/bags=1/);
 
-    await page.getByTestId('booking-next').click();
+    await page.getByTestId('booking-next').filter({ visible: true }).click();
     await page.waitForURL(url => url.pathname === '/book/wp-21/seats');
     await expect(page.getByRole('heading', { level: 1, name: 'Where would you like to sit?' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Select a seat' })).toBeDisabled();
 
     await page.getByRole('button', { exact: true, name: 'Seat 10C' }).click();
     await expect(page).toHaveURL(/seat=wp-21-10C/);
-    await page.getByTestId('booking-next').click();
+    await page.getByTestId('booking-next').filter({ visible: true }).click();
     await page.waitForURL(url => url.pathname === '/book/wp-21/extras');
     await expect(page).toHaveURL(/bags=1/);
     await expect(page).toHaveURL(/seat=wp-21-10C/);
@@ -23,7 +23,7 @@ test.describe('Booking flow (/book/[flightId]/[step])', () => {
     // The afternoon flight has no seat map, so Continue goes straight from baggage to extras.
     await page.goto('/book/wp-22/baggage?date=2026-11-12');
     await expect(page.getByRole('list', { name: 'Booking progress' }).getByRole('listitem')).toHaveCount(3);
-    await page.getByTestId('booking-next').click();
+    await page.getByTestId('booking-next').filter({ visible: true }).click();
     await page.waitForURL(url => url.pathname === '/book/wp-22/extras');
 
     // The short Copenhagen–Amsterdam hop has seats but sells no extras.
@@ -44,7 +44,7 @@ test.describe('Booking flow (/book/[flightId]/[step])', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Review your journey' })).toBeVisible();
     await expect(page.getByTestId('trip-total')).toHaveText('€350');
 
-    await page.getByTestId('booking-confirm').click();
+    await page.getByTestId('booking-confirm').filter({ visible: true }).click();
     await page.waitForURL(url => url.pathname.startsWith('/trips/') && url.searchParams.get('confirmed') === '1');
     await expect(page.getByTestId('trip-confirmed')).toBeVisible();
     await expect(page.getByRole('heading', { level: 1, name: 'See you in Lisbon.' })).toBeVisible();
@@ -52,12 +52,11 @@ test.describe('Booking flow (/book/[flightId]/[step])', () => {
 
     await page.getByRole('link', { name: 'My trips' }).first().click();
     await page.waitForURL(url => url.pathname === '/trips');
-    await expect(page.getByTestId('trip-card')).toHaveCount(2);
+    await expect(page.getByTestId('trip-card')).toHaveCount(3);
 
-    await page.getByTestId('trip-card').filter({ hasText: 'LIS' }).click();
+    await page.getByTestId('trip-card').filter({ hasText: 'Thu 3 Dec' }).click();
     await page.getByRole('button', { name: 'Cancel trip' }).click();
     await page.waitForURL(url => url.pathname === '/trips');
-    await expect(page.getByTestId('trip-card')).toHaveCount(1);
-    await expect(page.getByTestId('trip-card')).toContainText('BCN');
+    await expect(page.getByTestId('trip-card')).toHaveCount(2);
   });
 });
