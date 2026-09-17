@@ -3,16 +3,13 @@ import { Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { RouteLine, RouteLineSkeleton } from '@/features/flight/components/route-line';
 import { getFlight, getOwnSeatHold } from '@/features/flight/flight-queries';
-import { HoldBanner, HoldBannerSkeleton, SeatStatus } from './seat-status';
+import { SeatStatus } from './seat-status';
 
 export async function FlightSummary({ flightId }: { flightId: string }) {
   const flight = await getFlight(flightId);
 
   return (
     <aside className="border-divider/70 dark:border-divider-dark/70 overflow-hidden rounded-lg border bg-white lg:sticky lg:top-20 dark:bg-black">
-      <Suspense fallback={<HoldBannerSkeleton />}>
-        <BookingHold flightId={flightId} />
-      </Suspense>
       <div className="bg-card dark:bg-card-dark p-5">
         <p className="text-gray font-mono text-[12px] leading-4">{flight.flightNumber}</p>
         <div className="mt-5">
@@ -47,10 +44,6 @@ export async function FlightSummary({ flightId }: { flightId: string }) {
   );
 }
 
-async function BookingHold({ flightId }: { flightId: string }) {
-  return <HoldBanner hold={await getOwnSeatHold(flightId)} />;
-}
-
 async function HeldSeat({ flightId }: { flightId: string }) {
   return <SeatStatus hold={await getOwnSeatHold(flightId)} />;
 }
@@ -67,7 +60,6 @@ function DetailRowSkeleton() {
 export function FlightSummarySkeleton() {
   return (
     <aside className="border-divider/70 dark:border-divider-dark/70 overflow-hidden rounded-lg border bg-white dark:bg-black">
-      <HoldBannerSkeleton />
       <div className="bg-card dark:bg-card-dark p-5">
         <div className="flex h-4 items-center">
           <Skeleton className="h-3 w-12" />

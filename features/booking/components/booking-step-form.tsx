@@ -152,6 +152,7 @@ export function BookingStepForm({
                   render={
                     <PrefetchLink
                       href={createBookingHref(flight.id, previousStep, optimisticDraft, date, offer.fare, steps)}
+                      onNavigate={scrollToTop}
                       scroll={false}
                     />
                   }
@@ -185,6 +186,7 @@ export function BookingStepForm({
                   render={
                     <PrefetchLink
                       href={createBookingHref(flight.id, nextStep, optimisticDraft, date, offer.fare, steps)}
+                      onNavigate={scrollToTop}
                       scroll={false}
                     />
                   }
@@ -545,4 +547,8 @@ function ReviewSkeleton({ rows }: { rows: number }) {
       <Skeleton className="skeleton-subtle mt-6 h-14 rounded-md" />
     </div>
   );
+}
+
+function scrollToTop() {
+  window.scrollTo({ top: 0 });
 }

@@ -4,6 +4,8 @@ import ErrorBoundary from '@/components/ui/error-boundary';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { CurrentProgressBar, ProgressBar } from '@/features/booking/components/booking-progress';
 import { FlightSummary, FlightSummarySkeleton } from '@/features/booking/components/flight-summary';
+import { HoldChip, HoldChipSkeleton } from '@/features/booking/components/seat-status';
+import { getOwnSeatHold } from '@/features/flight/flight-queries';
 
 export default function BookingLayout({ children, params }: LayoutProps<'/book/[flightId]'>) {
   return (
@@ -14,9 +16,16 @@ export default function BookingLayout({ children, params }: LayoutProps<'/book/[
       >
         <ArrowLeft className="size-4" /> Flights
       </PrefetchLink>
-      <div className="mb-5">
-        <p className="text-muted text-sm font-medium">Booking</p>
-        <h2 className="mt-1 text-xl">Book your flight</h2>
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="text-muted text-sm font-medium">Booking</p>
+          <h2 className="mt-1 text-xl">Book your flight</h2>
+        </div>
+        <Suspense fallback={<HoldChipSkeleton />}>
+          {params.then(({ flightId }) => (
+            <BookingHold flightId={flightId} />
+          ))}
+        </Suspense>
       </div>
       <Suspense fallback={<ProgressBar />}>
         <CurrentProgressBar />
@@ -35,4 +44,8 @@ export default function BookingLayout({ children, params }: LayoutProps<'/book/[
       </div>
     </main>
   );
+}
+
+async function BookingHold({ flightId }: { flightId: string }) {
+  return <HoldChip hold={await getOwnSeatHold(flightId)} />;
 }
