@@ -1,6 +1,6 @@
 import { ArrowLeft } from 'lucide-react';
-import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { AnimatedSuspense } from '@/components/ui/animated-suspense';
+import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { AirportDetails, AirportDetailsSkeleton } from '@/features/airport/components/airport-details';
 import type { Metadata } from 'next';
 
