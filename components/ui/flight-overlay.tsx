@@ -1,18 +1,17 @@
 'use client';
 
 import { Plane } from 'lucide-react';
-import { createContext, use, useState, ViewTransition } from 'react';
+import { createContext, use, useOptimistic, ViewTransition } from 'react';
 
-type FlightOverlayControls = { hide: () => void; show: (label: string) => void };
+type ShowFlightOverlay = (label: string) => void;
 
-const FlightOverlayContext = createContext<FlightOverlayControls>({ hide: () => {}, show: () => {} });
+const FlightOverlayContext = createContext<ShowFlightOverlay>(() => {});
 
 export function FlightOverlayProvider({ children }: { children: React.ReactNode }) {
-  const [label, setLabel] = useState<string | null>(null);
-  const controls: FlightOverlayControls = { hide: () => setLabel(null), show: setLabel };
+  const [label, showOverlay] = useOptimistic<string | null>(null);
 
   return (
-    <FlightOverlayContext value={controls}>
+    <FlightOverlayContext value={showOverlay}>
       {children}
       {label !== null && (
         <ViewTransition default="none" enter="overlay-fade" exit="overlay-fade">

@@ -11,7 +11,7 @@ import {
   ShieldCheck,
   Sparkles,
 } from 'lucide-react';
-import { useParams, useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   addTransitionType,
   startTransition,
@@ -68,17 +68,14 @@ export function BookingStepForm({
   steps: BookingStep[];
 }) {
   const router = useRouter();
-  const overlay = useFlightOverlay();
+  const showOverlay = useFlightOverlay();
   const [confirmState, confirmAction, confirming] = useActionState(
     async (state: ConfirmBookingState, formData: FormData) => {
-      overlay.show('Confirming your booking');
+      showOverlay('Confirming your booking');
       try {
         return await confirmBooking(state, formData);
       } finally {
-        startTransition(() => {
-          addTransitionType('booking-confirmed');
-          overlay.hide();
-        });
+        startTransition(() => addTransitionType('booking-confirmed'));
       }
     },
     null,
@@ -536,16 +533,27 @@ function calculateTotal(offer: FlightOffer, draft: BookingDraft) {
   return offer.baseFare + draft.bags * offer.bagPrice + seat + extras;
 }
 
-export function BookingStepSkeleton() {
+export function BookingStepSkeleton({ step }: { step: Promise<string> }) {
   return (
-    <Suspense fallback={<StepSkeleton />}>
-      <CurrentStepSkeleton />
+    <Suspense
+      fallback={
+        <Suspense fallback={<StepSkeleton />}>
+          <PathnameStepSkeleton />
+        </Suspense>
+      }
+    >
+      <ResolvedStepSkeleton step={step} />
     </Suspense>
   );
 }
 
-function CurrentStepSkeleton() {
-  const { step } = useParams<{ step: string }>();
+function ResolvedStepSkeleton({ step }: { step: Promise<string> }) {
+  const value = use(step);
+  return <StepSkeleton step={isBookingStep(value) ? value : undefined} />;
+}
+
+function PathnameStepSkeleton() {
+  const step = usePathname().split('/').at(-1) ?? '';
   return <StepSkeleton step={isBookingStep(step) ? step : undefined} />;
 }
 

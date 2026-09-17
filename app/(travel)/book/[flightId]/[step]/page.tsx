@@ -25,7 +25,7 @@ export default function BookingStepPage({ params, searchParams }: PageProps<'/bo
 
   return (
     <div>
-      <AnimatedSuspense fallback={<BookingStepSkeleton />}>
+      <AnimatedSuspense fallback={<BookingStepSkeleton step={params.then(({ step }) => step)} />}>
         {query.then(({ date, draft, fare, flightId, step }) => (
           <BookingStepPanel date={date} draft={draft} fare={fare} flightId={flightId} step={step} />
         ))}
