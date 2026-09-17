@@ -2,10 +2,11 @@ import 'server-only';
 
 import { cacheLife, cacheTag } from 'next/cache';
 import { notFound } from 'next/navigation';
-import { isSlowEnabled } from '@/components/demo/demo-slow';
+import { isSlowEnabled } from '@/features/demo/demo-queries';
 import { verifyAuth } from '@/features/user/user-queries';
 import { prisma } from '@/lib/db';
 import { delay } from '@/lib/utils';
+import { bookingTags } from './booking-cache';
 import type { Booking } from './types/booking';
 
 const bookingInclude = {
@@ -22,7 +23,7 @@ export async function getBookings() {
 async function getBookingsForUser(userId: string, slow: boolean): Promise<Booking[]> {
   'use cache';
   cacheLife('hours');
-  cacheTag(`bookings:${userId}`);
+  cacheTag(bookingTags.user(userId));
 
   await delay(800, slow);
   return prisma.booking.findMany({
@@ -45,7 +46,7 @@ export async function getBooking(id: string) {
 async function getBookingForUser(id: string, userId: string, slow: boolean): Promise<Booking> {
   'use cache';
   cacheLife('hours');
-  cacheTag(`bookings:${userId}`, `booking:${id}`);
+  cacheTag(bookingTags.user(userId), bookingTags.detail(id));
 
   await delay(600, slow);
   const booking = await prisma.booking.findUnique({ include: bookingInclude, where: { id } });

@@ -1,5 +1,6 @@
 import { ArrowLeft } from 'lucide-react';
 import { AnimatedSuspense } from '@/components/ui/animated-suspense';
+import ErrorBoundary from '@/components/ui/error-boundary';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { TripDetail, TripDetailSkeleton } from '@/features/booking/components/trip-detail';
 import type { Metadata } from 'next';
@@ -17,11 +18,13 @@ export default function TripPage({ params, searchParams }: PageProps<'/trips/[bo
           <ArrowLeft className="size-4" /> My trips
         </PrefetchLink>
       </div>
-      <AnimatedSuspense fallback={<TripDetailSkeleton />}>
-        {Promise.all([params, searchParams]).then(([{ bookingId }, values]) => (
-          <TripDetail bookingId={bookingId} confirmed={values.confirmed === '1'} />
-        ))}
-      </AnimatedSuspense>
+      <ErrorBoundary title="This trip could not be loaded">
+        <AnimatedSuspense fallback={<TripDetailSkeleton />}>
+          {Promise.all([params, searchParams]).then(([{ bookingId }, values]) => (
+            <TripDetail bookingId={bookingId} confirmed={values.confirmed === '1'} />
+          ))}
+        </AnimatedSuspense>
+      </ErrorBoundary>
     </main>
   );
 }

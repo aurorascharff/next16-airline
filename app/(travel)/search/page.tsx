@@ -1,10 +1,11 @@
 import { Suspense } from 'react';
 import { AnimatedSuspense } from '@/components/ui/animated-suspense';
+import ErrorBoundary from '@/components/ui/error-boundary';
 import { parseAirportCode, parseDate } from '@/features/booking/booking-search-params';
 import { FlightResults, FlightResultsSkeleton } from '@/features/flight/components/flight-results';
 import { FlightSearchForm, FlightSearchFormSkeleton } from '@/features/flight/components/flight-search-form';
-import { RouteSuggestions } from '@/features/flight/components/route-suggestions';
-import { formatDate } from '@/lib/utils';
+import { RouteSuggestions, RouteSuggestionsSkeleton } from '@/features/flight/components/route-suggestions';
+import { SearchHeading } from '@/features/flight/components/search-heading';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = { title: 'Flights' };
@@ -21,11 +22,13 @@ export default function SearchPage({ searchParams }: PageProps<'/search'>) {
       <p className="text-muted text-sm font-medium">Flights</p>
       <h1 className="mt-1">Find your next flight</h1>
       <div className="mt-6">
-        <AnimatedSuspense fallback={<FlightSearchFormSkeleton />}>
-          {query.then(({ date, from, to }) => (
-            <FlightSearchForm date={date} from={from} key={`${from}-${to}-${date}`} to={to} />
-          ))}
-        </AnimatedSuspense>
+        <ErrorBoundary compact title="Search is unavailable">
+          <AnimatedSuspense fallback={<FlightSearchFormSkeleton />}>
+            {query.then(({ date, from, to }) => (
+              <FlightSearchForm date={date} from={from} key={`${from}-${to}-${date}`} to={to} />
+            ))}
+          </AnimatedSuspense>
+        </ErrorBoundary>
       </div>
       <div className="mt-8">
         <Suspense fallback={<SearchHeading />}>
@@ -33,23 +36,22 @@ export default function SearchPage({ searchParams }: PageProps<'/search'>) {
             <SearchHeading date={date} from={from} to={to} />
           ))}
         </Suspense>
-        <AnimatedSuspense fallback={<FlightResultsSkeleton />}>
-          {query.then(({ date, from, to }) =>
-            to ? <FlightResults date={date} from={from} to={to} /> : <RouteSuggestions date={date} from={from} />,
-          )}
-        </AnimatedSuspense>
+        <ErrorBoundary title="Flights could not be loaded">
+          <Suspense fallback={<FlightResultsSkeleton />}>
+            {query.then(({ date, from, to }) =>
+              to ? (
+                <AnimatedSuspense fallback={<FlightResultsSkeleton />}>
+                  <FlightResults date={date} from={from} to={to} />
+                </AnimatedSuspense>
+              ) : (
+                <AnimatedSuspense fallback={<RouteSuggestionsSkeleton />}>
+                  <RouteSuggestions date={date} from={from} />
+                </AnimatedSuspense>
+              ),
+            )}
+          </Suspense>
+        </ErrorBoundary>
       </div>
     </main>
-  );
-}
-
-function SearchHeading({ date, from, to }: { date?: string; from?: string; to?: string }) {
-  return (
-    <div className="mb-4">
-      <p className="text-muted text-sm font-medium">{to ? formatDate(date ?? '') : 'Pick a destination'}</p>
-      <h2 className="mt-1 text-2xl">
-        {to ? `${from} to ${to}` : from ? `Where Waypoint flies from ${from}` : 'Routes'}
-      </h2>
-    </div>
   );
 }

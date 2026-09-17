@@ -1,6 +1,7 @@
 import { ArrowLeft } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { AnimatedSuspense } from '@/components/ui/animated-suspense';
+import ErrorBoundary from '@/components/ui/error-boundary';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { parseBookingDraft, parseDate } from '@/features/booking/booking-search-params';
 import { isBookingStep } from '@/features/booking/booking-steps';
@@ -25,19 +26,21 @@ export default function BookingPage({ params, searchParams }: PageProps<'/book/[
         <p className="text-muted text-sm font-medium">Trip planner</p>
         <h2 className="mt-1 text-xl">Build your journey</h2>
       </div>
-      <AnimatedSuspense fallback={<BookingExperienceSkeleton />}>
-        {Promise.all([params, searchParams]).then(([{ flightId, step }, values]) => {
-          if (!isBookingStep(step)) notFound();
-          return (
-            <BookingExperience
-              date={parseDate(values.date)}
-              draft={parseBookingDraft(values)}
-              flightId={flightId}
-              step={step}
-            />
-          );
-        })}
-      </AnimatedSuspense>
+      <ErrorBoundary title="The booking could not be loaded">
+        <AnimatedSuspense fallback={<BookingExperienceSkeleton />}>
+          {Promise.all([params, searchParams]).then(([{ flightId, step }, values]) => {
+            if (!isBookingStep(step)) notFound();
+            return (
+              <BookingExperience
+                date={parseDate(values.date)}
+                draft={parseBookingDraft(values)}
+                flightId={flightId}
+                step={step}
+              />
+            );
+          })}
+        </AnimatedSuspense>
+      </ErrorBoundary>
     </main>
   );
 }

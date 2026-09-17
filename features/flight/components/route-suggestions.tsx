@@ -1,4 +1,5 @@
 import { ArrowRight, Plane } from 'lucide-react';
+import { EmptyState } from '@/components/ui/empty-state';
 import { HoverPrefetchLink } from '@/components/ui/hover-prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { createSearchHref } from '@/features/booking/booking-search-params';
@@ -7,6 +8,8 @@ import { getRoutesFrom } from '../flight-queries';
 
 export async function RouteSuggestions({ date, from }: { date: string; from: string }) {
   const routes = await getRoutesFrom(from);
+  if (routes.length === 0)
+    return <EmptyState body="Waypoint does not fly from this airport yet." title="No routes yet" />;
 
   return (
     <section>

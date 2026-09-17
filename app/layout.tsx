@@ -3,12 +3,12 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import { GeistMono } from 'geist/font/mono';
 import { GeistSans } from 'geist/font/sans';
 import { Suspense } from 'react';
-import { DemoToolbar } from '@/components/demo/demo-toolbar';
 import { BoundaryProvider } from '@/components/internal/boundary';
 import { OfflineIndicator } from '@/components/offline-indicator';
 import { NavLinkScript } from '@/components/scripts/nav-link-script';
 import { ThemeProvider } from '@/components/theme/theme-provider';
 import { Toaster } from '@/components/toaster';
+import { DemoToolbar, DemoToolbarSkeleton } from '@/features/demo/components/demo-toolbar';
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
   title: { default: 'Waypoint', template: '%s · Waypoint' },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`} suppressHydrationWarning>
       <body className="flex min-h-dvh flex-col">
@@ -55,7 +55,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <BoundaryProvider>
             {children}
             <div className="demo-toggles fixed right-4 bottom-4 z-50 hidden items-end sm:flex">
-              <Suspense fallback={null}>
+              <Suspense fallback={<DemoToolbarSkeleton />}>
                 <DemoToolbar />
               </Suspense>
             </div>

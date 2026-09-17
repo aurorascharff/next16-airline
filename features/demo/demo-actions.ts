@@ -2,8 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
-import { NO_PREFETCH_COOKIE } from './demo-queries';
-import { SLOW_COOKIE } from './demo-slow';
+import { NO_PREFETCH_COOKIE, SLOW_COOKIE } from './demo-queries';
 
 export async function setSlow(enabled: boolean) {
   const store = await cookies();

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { usePrefetchDefault } from '@/components/demo/use-prefetch-default';
+import { usePrefetchDefault } from '@/features/demo/hooks/use-prefetch-default';
 import type { Route } from 'next';
 
 type Props<T extends string = string> = Omit<React.ComponentProps<typeof Link>, 'href' | 'prefetch'> & {

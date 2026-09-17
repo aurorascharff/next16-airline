@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { SESSION_COOKIE } from '@/features/user/session';
+import { SESSION_COOKIE } from '@/features/user/user-session';
 import type { NextRequest } from 'next/server';
 
 export function proxy(request: NextRequest) {

@@ -2,7 +2,7 @@ import 'server-only';
 
 import { cacheLife, cacheTag } from 'next/cache';
 import { notFound } from 'next/navigation';
-import { isSlowEnabled } from '@/components/demo/demo-slow';
+import { isSlowEnabled } from '@/features/demo/demo-queries';
 import { prisma } from '@/lib/db';
 import { delay } from '@/lib/utils';
 
@@ -53,27 +53,11 @@ async function getAirportCached(slug: string, slow: boolean) {
   return airport;
 }
 
-export async function getRoutesTo(destinationCode: string) {
-  return getRoutesToCached(destinationCode, await isSlowEnabled());
-}
-
-async function getRoutesToCached(destinationCode: string, slow: boolean) {
+export async function getAirportSlugs() {
   'use cache';
   cacheLife('days');
-  cacheTag('flights', `flights-to:${destinationCode}`);
+  cacheTag('airports');
 
-  await delay(800, slow);
-  const flights = await prisma.flight.findMany({
-    include: { origin: true },
-    orderBy: [{ originCode: 'asc' }, { baseFare: 'asc' }],
-    where: { destinationCode },
-  });
-
-  const byOrigin = new Map<string, { count: number; fromFare: number; origin: (typeof flights)[number]['origin'] }>();
-  for (const flight of flights) {
-    const entry = byOrigin.get(flight.originCode);
-    if (entry) entry.count += 1;
-    else byOrigin.set(flight.originCode, { count: 1, fromFare: flight.baseFare, origin: flight.origin });
-  }
-  return [...byOrigin.values()];
+  const airports = await prisma.airport.findMany({ select: { slug: true } });
+  return airports.map(airport => airport.slug);
 }

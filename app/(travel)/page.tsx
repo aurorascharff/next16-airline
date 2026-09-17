@@ -1,4 +1,5 @@
 import { AnimatedSuspense } from '@/components/ui/animated-suspense';
+import ErrorBoundary from '@/components/ui/error-boundary';
 import { DestinationGrid, DestinationGridSkeleton } from '@/features/airport/components/destination-grid';
 import { NextTrip, NextTripSkeleton } from '@/features/booking/components/next-trip';
 import { FlightSearchForm, FlightSearchFormSkeleton } from '@/features/flight/components/flight-search-form';
@@ -18,23 +19,29 @@ export default function HomePage() {
         </p>
       </section>
       <div className="mx-auto mt-8 max-w-4xl">
-        <AnimatedSuspense fallback={<FlightSearchFormSkeleton />}>
-          <FlightSearchForm />
-        </AnimatedSuspense>
+        <ErrorBoundary compact title="Search is unavailable">
+          <AnimatedSuspense fallback={<FlightSearchFormSkeleton />}>
+            <FlightSearchForm />
+          </AnimatedSuspense>
+        </ErrorBoundary>
       </div>
       <section className="mt-10">
-        <AnimatedSuspense fallback={<NextTripSkeleton />}>
-          <NextTrip />
-        </AnimatedSuspense>
+        <ErrorBoundary compact title="Your trips could not be loaded">
+          <AnimatedSuspense fallback={<NextTripSkeleton />}>
+            <NextTrip />
+          </AnimatedSuspense>
+        </ErrorBoundary>
       </section>
       <section className="mt-10">
         <div className="mb-4">
           <p className="text-muted text-sm font-medium">Popular right now</p>
           <h2 className="mt-1 text-2xl">Destinations</h2>
         </div>
-        <AnimatedSuspense fallback={<DestinationGridSkeleton />}>
-          <DestinationGrid />
-        </AnimatedSuspense>
+        <ErrorBoundary title="Destinations could not be loaded">
+          <AnimatedSuspense fallback={<DestinationGridSkeleton />}>
+            <DestinationGrid />
+          </AnimatedSuspense>
+        </ErrorBoundary>
       </section>
     </main>
   );

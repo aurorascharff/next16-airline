@@ -2,9 +2,10 @@ import 'server-only';
 
 import { cacheLife, cacheTag } from 'next/cache';
 import { notFound } from 'next/navigation';
-import { isSlowEnabled } from '@/components/demo/demo-slow';
+import { isSlowEnabled } from '@/features/demo/demo-queries';
 import { prisma } from '@/lib/db';
 import { delay } from '@/lib/utils';
+import { flightTags } from './flight-cache';
 import { toSeat } from './types/flight';
 import type { FlightOffer } from './types/flight';
 
@@ -21,7 +22,7 @@ export async function searchFlights(from: string, to: string) {
 async function searchFlightsCached(from: string, to: string, slow: boolean) {
   'use cache';
   cacheLife('hours');
-  cacheTag('flights', `flights:${from}:${to}`);
+  cacheTag(flightTags.all, flightTags.route(from, to));
 
   await delay(700, slow);
   return prisma.flight.findMany({
@@ -38,7 +39,7 @@ export async function getRoutesFrom(originCode: string) {
 async function getRoutesFromCached(originCode: string, slow: boolean) {
   'use cache';
   cacheLife('days');
-  cacheTag('flights', `flights-from:${originCode}`);
+  cacheTag(flightTags.all, flightTags.from(originCode));
 
   await delay(500, slow);
   const flights = await prisma.flight.findMany({
@@ -71,7 +72,7 @@ export async function getFlight(id: string) {
 async function getFlightCached(id: string, slow: boolean) {
   'use cache';
   cacheLife('hours');
-  cacheTag('flights', `flight:${id}`);
+  cacheTag(flightTags.all, flightTags.detail(id));
 
   await delay(400, slow);
   const flight = await prisma.flight.findUnique({ include: { destination: true, origin: true }, where: { id } });
@@ -86,7 +87,7 @@ export async function getFlightOffer(flightId: string, date: string) {
 async function getFlightOfferCached(flightId: string, date: string, slow: boolean): Promise<FlightOffer> {
   'use cache';
   cacheLife({ expire: 300, revalidate: 60, stale: 60 });
-  cacheTag(`flight-offer:${flightId}`);
+  cacheTag(flightTags.all, flightTags.offer(flightId));
 
   await delay(1300, slow);
   const [flight, booked] = await Promise.all([
@@ -111,4 +112,29 @@ async function getFlightOfferCached(flightId: string, date: string, slow: boolea
     extras: flight.extras,
     seats: flight.seats.map(seat => toSeat(seat, taken.has(seat.id))),
   };
+}
+
+export async function getRoutesTo(destinationCode: string) {
+  return getRoutesToCached(destinationCode, await isSlowEnabled());
+}
+
+async function getRoutesToCached(destinationCode: string, slow: boolean) {
+  'use cache';
+  cacheLife('days');
+  cacheTag(flightTags.all, flightTags.to(destinationCode));
+
+  await delay(800, slow);
+  const flights = await prisma.flight.findMany({
+    include: { origin: true },
+    orderBy: [{ originCode: 'asc' }, { baseFare: 'asc' }],
+    where: { destinationCode },
+  });
+
+  const byOrigin = new Map<string, { count: number; fromFare: number; origin: (typeof flights)[number]['origin'] }>();
+  for (const flight of flights) {
+    const entry = byOrigin.get(flight.originCode);
+    if (entry) entry.count += 1;
+    else byOrigin.set(flight.originCode, { count: 1, fromFare: flight.baseFare, origin: flight.origin });
+  }
+  return [...byOrigin.values()];
 }

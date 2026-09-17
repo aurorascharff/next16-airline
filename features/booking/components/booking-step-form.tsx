@@ -21,7 +21,6 @@ import { cn, formatPrice } from '@/lib/utils';
 import { confirmBooking } from '../booking-actions';
 import { createBookingHref } from '../booking-search-params';
 import { nextBookingStep, previousBookingStep } from '../booking-steps';
-import type { ConfirmBookingState } from '../booking-actions';
 import type { BookingDraft, BookingStep } from '../types/booking';
 
 const titles: Record<BookingStep, { eyebrow: string; title: string }> = {
@@ -130,10 +129,8 @@ export function BookingStepForm({
   );
 }
 
-const INITIAL_CONFIRM_STATE: ConfirmBookingState = { error: null };
-
 function ConfirmTripForm({ date, draft, flightId }: { date: string; draft: BookingDraft; flightId: string }) {
-  const [state, formAction] = useActionState(confirmBooking, INITIAL_CONFIRM_STATE);
+  const [state, formAction] = useActionState(confirmBooking, null);
 
   return (
     <form action={formAction} className="flex flex-col items-end gap-2">
@@ -143,11 +140,18 @@ function ConfirmTripForm({ date, draft, flightId }: { date: string; draft: Booki
       <input name="carryOn" type="hidden" value={draft.carryOn ? '1' : '0'} />
       <input name="seat" type="hidden" value={draft.seat} />
       <input name="extras" type="hidden" value={draft.extras.join(',')} />
-      <Button data-testid="booking-confirm" size="lg" type="submit" variant="accent">
+      <Button
+        aria-describedby={state?.error ? 'confirm-error' : undefined}
+        aria-invalid={state?.error ? true : undefined}
+        data-testid="booking-confirm"
+        size="lg"
+        type="submit"
+        variant="accent"
+      >
         Confirm trip <ArrowRight className="size-4" />
       </Button>
-      {state.error && (
-        <p className="text-danger text-xs" role="alert">
+      {state?.error && (
+        <p className="text-danger text-xs" id="confirm-error" role="alert">
           {state.error}
         </p>
       )}

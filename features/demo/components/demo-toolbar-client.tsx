@@ -6,8 +6,8 @@ import { useOffline } from 'next/offline';
 import { type ButtonHTMLAttributes, type ReactNode, useOptimistic } from 'react';
 import { Boundary, useBoundaryMode } from '@/components/internal/boundary';
 import { cn } from '@/lib/utils';
-import { setPrefetch, setSlow } from './demo-actions';
-import { setSimulatedOffline } from './offline-mode';
+import { setPrefetch, setSlow } from '../demo-actions';
+import { setSimulatedOffline } from '../demo-offline';
 
 function Divider() {
   return <div className="bg-divider dark:bg-divider-dark h-5 w-px" />;

@@ -1,9 +1,8 @@
-import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { WaypointMark } from '@/components/ui/waypoint-mark';
 import { LoginFlightPreview } from '@/features/user/components/login-flight-preview';
+import { LoginRedirect } from '@/features/user/components/login-redirect';
 import { SignInForm } from '@/features/user/components/sign-in-form';
-import { getCurrentUser } from '@/features/user/user-queries';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -29,10 +28,4 @@ export default function LoginPage() {
       </main>
     </>
   );
-}
-
-async function LoginRedirect() {
-  const user = await getCurrentUser();
-  if (user) redirect('/');
-  return null;
 }

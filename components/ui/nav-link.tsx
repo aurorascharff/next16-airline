@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Suspense } from 'react';
-import { usePrefetchDefault } from '@/components/demo/use-prefetch-default';
 import { Boundary } from '@/components/internal/boundary';
+import { usePrefetchDefault } from '@/features/demo/hooks/use-prefetch-default';
 import type { Route } from 'next';
 
 type RenderProps = { isActive: boolean };

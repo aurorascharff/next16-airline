@@ -3,10 +3,12 @@
 import { updateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
+import { flightTags } from '@/features/flight/flight-cache';
 import { verifyAuth } from '@/features/user/user-queries';
 import { prisma } from '@/lib/db';
+import { bookingTags } from './booking-cache';
 
-export type ConfirmBookingState = { error: string | null };
+export type ConfirmBookingState = { ok: false; error: string } | null;
 
 const confirmSchema = z.object({
   bags: z.coerce.number().int().min(0).max(2),
@@ -28,24 +30,24 @@ function createReference() {
 export async function confirmBooking(_state: ConfirmBookingState, formData: FormData): Promise<ConfirmBookingState> {
   const user = await verifyAuth();
   const parsed = confirmSchema.safeParse(Object.fromEntries(formData));
-  if (!parsed.success) return { error: 'Your selections could not be read. Go back and try again.' };
+  if (!parsed.success) return { error: 'Your selections could not be read. Go back and try again.', ok: false };
   const input = parsed.data;
 
   const flight = await prisma.flight.findUnique({
     include: { extras: true, seats: true },
     where: { id: input.flightId },
   });
-  if (!flight) return { error: 'That flight is no longer available.' };
+  if (!flight) return { error: 'That flight is no longer available.', ok: false };
 
   const seat = input.seat ? flight.seats.find(item => item.id === input.seat) : undefined;
-  if (input.seat && !seat) return { error: 'Choose a seat on this flight.' };
-  if (seat?.status === 'occupied') return { error: `Seat ${seat.label} is already taken.` };
+  if (input.seat && !seat) return { error: 'Choose a seat on this flight.', ok: false };
+  if (seat?.status === 'occupied') return { error: `Seat ${seat.label} is already taken.`, ok: false };
   if (seat && input.date) {
     const taken = await prisma.booking.findFirst({
       select: { id: true },
       where: { date: input.date, flightId: flight.id, seatId: seat.id },
     });
-    if (taken) return { error: `Seat ${seat.label} was just booked by another traveler. Pick another one.` };
+    if (taken) return { error: `Seat ${seat.label} was just booked by another traveler. Pick another one.`, ok: false };
   }
 
   const extraIds = new Set(input.extras.split(',').filter(Boolean));
@@ -71,8 +73,8 @@ export async function confirmBooking(_state: ConfirmBookingState, formData: Form
     select: { id: true },
   });
 
-  updateTag(`bookings:${user.id}`);
-  updateTag(`flight-offer:${flight.id}`);
+  updateTag(bookingTags.user(user.id));
+  updateTag(flightTags.offer(flight.id));
   redirect(`/trips/${booking.id}?confirmed=1`);
 }
 
@@ -85,7 +87,7 @@ export async function cancelBooking(bookingId: string) {
   if (!booking || booking.userId !== user.id) return { error: 'That trip could not be found.', ok: false as const };
 
   await prisma.booking.delete({ where: { id: bookingId } });
-  updateTag(`bookings:${user.id}`);
-  updateTag(`flight-offer:${booking.flightId}`);
+  updateTag(bookingTags.user(user.id));
+  updateTag(flightTags.offer(booking.flightId));
   return { ok: true as const };
 }
