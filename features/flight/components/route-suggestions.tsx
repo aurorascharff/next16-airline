@@ -1,6 +1,6 @@
 import { ArrowRight, Plane } from 'lucide-react';
 import { EmptyState } from '@/components/ui/empty-state';
-import { HoverPrefetchLink } from '@/components/ui/hover-prefetch-link';
+import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { createSearchHref } from '@/features/booking/utils/search-params';
 import { formatPrice } from '@/lib/utils';
@@ -16,7 +16,7 @@ export async function RouteSuggestions({ date, from }: { date: string; from: str
       <ul className="grid gap-3 sm:grid-cols-3">
         {routes.map(route => (
           <li key={route.destination.code}>
-            <HoverPrefetchLink
+            <PrefetchLink
               className="border-divider/70 dark:border-divider-dark/70 group hover:bg-card/40 dark:hover:bg-card-dark/40 flex h-full flex-col justify-between gap-6 rounded-lg border bg-white p-5 transition-colors dark:bg-black"
               data-testid="route-suggestion"
               href={createSearchHref(from, route.destination.code, date)}
@@ -33,7 +33,7 @@ export async function RouteSuggestions({ date, from }: { date: string; from: str
                 <span className="text-sm font-semibold tabular-nums">from {formatPrice(route.fromFare)}</span>
                 <ArrowRight className="text-muted group-hover:text-accent size-4 transition-colors" />
               </div>
-            </HoverPrefetchLink>
+            </PrefetchLink>
           </li>
         ))}
       </ul>

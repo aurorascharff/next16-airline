@@ -1,5 +1,5 @@
 import { ArrowRight, MapPin } from 'lucide-react';
-import { HoverPrefetchLink } from '@/components/ui/hover-prefetch-link';
+import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatPrice } from '@/lib/utils';
 import { getDestinations } from '../airport-queries';
@@ -11,7 +11,7 @@ export async function DestinationGrid() {
     <ul className="grid gap-4 sm:grid-cols-3">
       {destinations.map(destination => (
         <li key={destination.code}>
-          <HoverPrefetchLink
+          <PrefetchLink
             className="border-divider/70 dark:border-divider-dark/70 group hover:bg-card/40 dark:hover:bg-card-dark/40 flex h-full flex-col justify-between gap-8 rounded-lg border bg-white p-5 transition-colors dark:bg-black"
             data-testid="destination-card"
             href={`/explore/${destination.slug}`}
@@ -29,7 +29,7 @@ export async function DestinationGrid() {
               </span>
               <ArrowRight className="text-muted group-hover:text-accent size-4 transition-colors" />
             </div>
-          </HoverPrefetchLink>
+          </PrefetchLink>
         </li>
       ))}
     </ul>

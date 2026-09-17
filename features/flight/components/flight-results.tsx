@@ -1,7 +1,7 @@
 import { Plane } from 'lucide-react';
 import { DotSeparator } from '@/components/ui/dot-separator';
 import { EmptyState } from '@/components/ui/empty-state';
-import { HoverPrefetchLink } from '@/components/ui/hover-prefetch-link';
+import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Fare } from '@/features/booking/utils/search-params';
 import { createBookingHref, DEFAULT_BOOKING_DRAFT } from '@/features/booking/utils/search-params';
@@ -120,13 +120,13 @@ function FareOption({
   }
 
   return (
-    <HoverPrefetchLink
+    <PrefetchLink
       className={`${className} hover:border-accent/40 hover:bg-card dark:hover:bg-card-dark transition-colors`}
       data-testid={`fare-${fare.toLowerCase()}`}
       href={href}
     >
       {content}
-    </HoverPrefetchLink>
+    </PrefetchLink>
   );
 }
 
