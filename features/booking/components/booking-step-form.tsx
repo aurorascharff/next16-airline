@@ -71,12 +71,9 @@ export function BookingStepForm({
   const showOverlay = useFlightOverlay();
   const [confirmState, confirmAction, confirming] = useActionState(
     async (state: ConfirmBookingState, formData: FormData) => {
+      addTransitionType('booking-confirmed');
       showOverlay('Confirming your booking');
-      try {
-        return await confirmBooking(state, formData);
-      } finally {
-        startTransition(() => addTransitionType('booking-confirmed'));
-      }
+      return confirmBooking(state, formData);
     },
     null,
   );
@@ -640,7 +637,7 @@ function ReviewSkeleton() {
         ))}
       </div>
       <Skeleton className="mt-[10px] mb-0.5 h-3 w-72" />
-      <Skeleton className="my-[3px] mt-6 h-3.5 w-12" />
+      <Skeleton className="mt-[27px] mb-[3px] h-3.5 w-12" />
       <div className="mt-3 flex flex-col">
         {Array.from({ length: 4 }).map((_, index) => (
           <div
