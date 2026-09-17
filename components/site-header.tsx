@@ -22,7 +22,7 @@ export function SiteHeader() {
           className="flex items-center gap-2 text-lg font-bold tracking-tight"
           href="/"
         >
-          <WaypointMark className="size-7 text-black dark:text-white" />
+          <WaypointMark className="text-accent size-7" />
           <span>Waypoint</span>
         </PrefetchLink>
         <nav aria-label="Primary" className="hidden items-center gap-1 md:flex">

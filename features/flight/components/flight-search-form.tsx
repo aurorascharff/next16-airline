@@ -65,7 +65,7 @@ export function FlightSearchFormSkeleton() {
           <Skeleton className="skeleton-subtle h-10 rounded-md" />
         </div>
       ))}
-      <Skeleton className="h-10 w-full rounded-full sm:w-40" />
+      <Skeleton className="skeleton-subtle h-10 w-full rounded-full sm:w-40" />
     </div>
   );
 }

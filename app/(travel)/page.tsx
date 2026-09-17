@@ -1,4 +1,3 @@
-import { Suspense } from 'react';
 import { AnimatedSuspense } from '@/components/ui/animated-suspense';
 import { DestinationGrid, DestinationGridSkeleton } from '@/features/airport/components/destination-grid';
 import { NextTrip, NextTripSkeleton } from '@/features/booking/components/next-trip';
@@ -15,9 +14,9 @@ export default function HomePage() {
         </p>
       </section>
       <div className="mx-auto mt-8 max-w-4xl">
-        <Suspense fallback={<FlightSearchFormSkeleton />}>
+        <AnimatedSuspense fallback={<FlightSearchFormSkeleton />}>
           <FlightSearchForm />
-        </Suspense>
+        </AnimatedSuspense>
       </div>
       <section className="mt-10">
         <AnimatedSuspense fallback={<NextTripSkeleton />}>

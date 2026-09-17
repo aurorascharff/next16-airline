@@ -28,8 +28,8 @@ export async function CurrentUser() {
 export function CurrentUserSkeleton() {
   return (
     <div className="flex items-center gap-1">
-      <Skeleton className="size-8 rounded-full" />
-      <Skeleton className="size-8 rounded-full" />
+      <Skeleton className="skeleton-subtle size-8 rounded-full" />
+      <Skeleton className="skeleton-subtle size-8 rounded-full" />
     </div>
   );
 }

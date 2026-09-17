@@ -10,9 +10,9 @@
   --color-surface-dark: #121212;
   --color-surface: #fafafa;
 
-  --color-accent: #245bff;
-  --color-accent-hover: #1649dc;
-  --color-accent-fade: #245bff22;
+  --color-accent: #e11d48;
+  --color-accent-hover: #be123c;
+  --color-accent-fade: #e11d4822;
   --color-success: #0fa958;
   --color-danger: #e54848;
   --color-warning: #f5a524;
@@ -34,9 +34,9 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 .dark {
-  --color-accent: #4d7cff;
-  --color-accent-hover: #245bff;
-  --color-accent-fade: #4d7cff22;
+  --color-accent: #f43f5e;
+  --color-accent-hover: #e11d48;
+  --color-accent-fade: #f43f5e22;
 }
 
 @layer base {
@@ -94,42 +94,38 @@
 }
 
 .skeleton-animation {
-  --skeleton-base: rgb(0 0 0 / 0.055);
-  --skeleton-shine: rgb(0 0 0 / 0.1);
-  background-color: var(--skeleton-base);
-  background-image: linear-gradient(
-    90deg,
-    transparent 0%,
-    var(--skeleton-shine) 45%,
-    var(--skeleton-shine) 55%,
-    transparent 100%
+  background: rgba(150, 150, 150, 0.15);
+  background: linear-gradient(
+    to right,
+    rgba(130, 130, 130, 0.15) 8%,
+    rgba(170, 170, 170, 0.25) 18%,
+    rgba(150, 150, 150, 0.15) 33%
   );
-  background-size: 200% 100%;
-  background-repeat: no-repeat;
-  animation: skeleton-sweep 1.5s ease-in-out infinite;
+  background-size: 800px 100px;
+  animation: wave-lines 2s infinite ease-out;
 }
 
-.dark .skeleton-animation {
-  --skeleton-base: rgb(255 255 255 / 0.06);
-  --skeleton-shine: rgb(255 255 255 / 0.09);
+/* Large placeholder blocks: keep the tint, drop the wave so the page doesn't shimmer everywhere. */
+.skeleton-animation.skeleton-subtle {
+  background: rgba(0, 0, 0, 0.06);
+  background-size: unset;
+  animation: none;
+}
+
+.dark .skeleton-animation.skeleton-subtle {
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .skeleton-animation:not([class*='rounded-']) {
   border-radius: var(--radius-sm);
 }
 
-/* Large placeholder blocks: keep the tint, drop the sweep so the page doesn't shimmer everywhere. */
-.skeleton-animation.skeleton-subtle {
-  background-image: none;
-  animation: none;
-}
-
-@keyframes skeleton-sweep {
+@keyframes wave-lines {
   0% {
-    background-position: 150% 0;
+    background-position: -468px 0;
   }
   100% {
-    background-position: -150% 0;
+    background-position: 468px 0;
   }
 }
 

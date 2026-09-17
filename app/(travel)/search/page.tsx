@@ -1,4 +1,3 @@
-import { Suspense } from 'react';
 import { AnimatedSuspense } from '@/components/ui/animated-suspense';
 import { parseAirportCode, parseDate } from '@/features/booking/booking-search-params';
 import { FlightResults, FlightResultsSkeleton } from '@/features/flight/components/flight-results';
@@ -20,12 +19,12 @@ export default function SearchPage({ searchParams }: PageProps<'/search'>) {
       <p className="text-muted text-sm font-medium">Flights</p>
       <h1 className="mt-1">Find your next flight</h1>
       <div className="mt-6">
-        <Suspense fallback={<FlightSearchFormSkeleton />}>
+        <AnimatedSuspense fallback={<FlightSearchFormSkeleton />}>
           {query.then(({ date, from, to }) => (
             // Keyed by the query so the uncontrolled selects reset when the URL changes.
             <FlightSearchForm date={date} from={from} key={`${from}-${to}-${date}`} to={to} />
           ))}
-        </Suspense>
+        </AnimatedSuspense>
       </div>
       <div className="mt-8">
         <AnimatedSuspense fallback={<FlightResultsSkeleton />}>

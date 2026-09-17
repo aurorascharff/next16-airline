@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, MapPin, Plane } from 'lucide-react';
+import { ArrowRight, MapPin, Plane } from 'lucide-react';
 import { buttonClasses } from '@/components/ui/button-classes';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -12,13 +12,7 @@ export async function AirportDetails({ slug }: { slug: string }) {
 
   return (
     <article>
-      <PrefetchLink
-        className="text-muted hover:text-accent inline-flex items-center gap-2 text-sm font-medium"
-        href="/"
-      >
-        <ArrowLeft className="size-4" /> Home
-      </PrefetchLink>
-      <div className="border-divider dark:border-divider-dark mt-5 grid overflow-hidden rounded-2xl border bg-white lg:grid-cols-[1.05fr_0.95fr] dark:bg-black">
+      <div className="border-divider dark:border-divider-dark grid overflow-hidden rounded-2xl border bg-white lg:grid-cols-[1.05fr_0.95fr] dark:bg-black">
         <div className="p-7 sm:p-10">
           <p className="text-accent flex items-center gap-2 text-sm font-semibold">
             <MapPin className="size-4" /> {airport.country}
@@ -68,8 +62,7 @@ export async function AirportDetails({ slug }: { slug: string }) {
 export function AirportDetailsSkeleton() {
   return (
     <div>
-      <Skeleton className="h-5 w-14" />
-      <div className="border-divider dark:border-divider-dark mt-5 grid overflow-hidden rounded-2xl border bg-white lg:grid-cols-[1.05fr_0.95fr] dark:bg-black">
+      <div className="border-divider dark:border-divider-dark grid overflow-hidden rounded-2xl border bg-white lg:grid-cols-[1.05fr_0.95fr] dark:bg-black">
         <div className="p-7 sm:p-10">
           <Skeleton className="h-5 w-24" />
           <Skeleton className="mt-6 h-10 w-56 sm:h-12" />

@@ -121,7 +121,7 @@ export function FlightResultsSkeleton() {
                 <Skeleton className="h-4 w-44" />
                 <Skeleton className="mt-1 h-7 w-14" />
               </div>
-              <Skeleton className="h-9 w-20 rounded-full" />
+              <Skeleton className="skeleton-subtle h-9 w-20 rounded-full" />
             </div>
           </div>
         ))}

@@ -11,7 +11,7 @@ export function WaypointMark({ animated = false, className }: { animated?: boole
     >
       <rect fill="currentColor" height="40" rx="12" width="40" />
       <path
-        className="stroke-surface dark:stroke-surface-dark"
+        stroke="white"
         d="M9.5 12.2 15.8 27.8 20 19.2 24.2 27.8 30.5 12.2"
         strokeLinecap="round"
         strokeLinejoin="round"

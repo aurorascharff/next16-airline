@@ -8,7 +8,7 @@ function ErrorFallback(props: { title?: string; compact?: boolean }, { retry }: 
   if (props.compact) {
     return (
       <div className="flex flex-col items-center gap-2 px-4 py-4 text-center">
-        <WaypointMark animated className="size-5 text-black dark:text-white" />
+        <WaypointMark animated className="text-accent size-5" />
         <p className="text-muted text-xs">{props.title ?? 'Something went wrong'}</p>
         <Button size="sm" variant="secondary" onClick={() => retry()}>
           Try again
@@ -19,7 +19,7 @@ function ErrorFallback(props: { title?: string; compact?: boolean }, { retry }: 
 
   return (
     <div className="flex flex-col items-center gap-3 px-5 py-10 text-center">
-      <WaypointMark animated className="size-8 text-black dark:text-white" />
+      <WaypointMark animated className="text-accent size-8" />
       <p className="text-sm font-medium text-black dark:text-white">{props.title ?? 'Something went wrong'}</p>
       <Button size="sm" variant="secondary" onClick={() => retry()}>
         Try again

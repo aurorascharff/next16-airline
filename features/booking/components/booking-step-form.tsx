@@ -146,7 +146,7 @@ function ConfirmTripForm({ date, draft, flightId }: { date: string; draft: Booki
       <input name="carryOn" type="hidden" value={draft.carryOn ? '1' : '0'} />
       <input name="seat" type="hidden" value={draft.seat} />
       <input name="extras" type="hidden" value={draft.extras.join(',')} />
-      <Button data-testid="booking-confirm" size="lg" type="submit">
+      <Button data-testid="booking-confirm" size="lg" type="submit" variant="accent">
         Confirm trip <ArrowRight className="size-4" />
       </Button>
       {state.error && (
@@ -241,7 +241,7 @@ function SeatOptions({ draft, offer, updateDraft }: StepProps) {
                   occupied
                     ? 'bg-card text-muted dark:bg-card-dark cursor-not-allowed border-transparent'
                     : 'border-divider dark:border-divider-dark bg-white hover:-translate-y-0.5 dark:bg-black',
-                  seat.type === 'extra-legroom' && !occupied && !selected && 'border-success',
+                  seat.type === 'extra-legroom' && !occupied && !selected && 'border-success dark:border-success',
                   selected && 'border-accent bg-accent dark:bg-accent text-white',
                 )}
                 disabled={occupied}

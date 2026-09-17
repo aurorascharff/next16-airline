@@ -160,7 +160,7 @@ export function BookingExperienceSkeleton() {
                   <Skeleton className="h-6 w-24" />
                   <Skeleton className="mt-1 h-4 w-48" />
                 </div>
-                <Skeleton className="size-6 rounded-full" />
+                <Skeleton className="skeleton-subtle size-6 rounded-full" />
               </div>
             </div>
           </div>
@@ -170,8 +170,8 @@ export function BookingExperienceSkeleton() {
               <Skeleton className="mt-1 h-7 w-16" />
             </div>
             <div className="flex items-center gap-3">
-              <Skeleton className="h-11 w-24 rounded-full" />
-              <Skeleton className="h-11 w-32 rounded-full" />
+              <Skeleton className="skeleton-subtle h-11 w-24 rounded-full" />
+              <Skeleton className="skeleton-subtle h-11 w-32 rounded-full" />
             </div>
           </div>
         </div>

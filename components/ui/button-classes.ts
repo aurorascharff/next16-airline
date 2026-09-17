@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost';
+export type ButtonVariant = 'primary' | 'accent' | 'secondary' | 'ghost';
 export type ButtonSize = 'default' | 'lg' | 'sm' | 'icon';
 
 const base =
@@ -13,9 +13,11 @@ const sizes: Record<ButtonSize, string> = {
   sm: 'h-8 px-3 text-xs',
 };
 
+// Primary is monochrome; `accent` is reserved for the one action that matters most (confirming a trip).
 const variants: Record<ButtonVariant, string> = {
+  accent: 'bg-accent text-white hover:bg-accent-hover',
   ghost: 'text-muted hover:bg-card hover:text-black dark:hover:bg-card-dark dark:hover:text-white',
-  primary: 'bg-accent text-white hover:bg-accent-hover',
+  primary: 'bg-black text-white hover:bg-black/85 dark:bg-white dark:text-black dark:hover:bg-white/90',
   secondary:
     'border border-divider bg-white text-black hover:border-gray/40 hover:bg-card dark:border-divider-dark dark:bg-transparent dark:text-white dark:hover:border-gray/30 dark:hover:bg-card-dark',
 };

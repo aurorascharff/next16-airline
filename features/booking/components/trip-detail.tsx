@@ -1,4 +1,4 @@
-import { ArrowLeft, Armchair, CalendarDays, CheckCircle2, Luggage, Plane, Sparkles } from 'lucide-react';
+import { Armchair, CalendarDays, CheckCircle2, Luggage, Plane, Sparkles } from 'lucide-react';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatDate, formatPrice } from '@/lib/utils';
@@ -19,12 +19,6 @@ export async function TripDetail({ bookingId, confirmed }: { bookingId: string; 
 
   return (
     <div className="mx-auto max-w-4xl">
-      <PrefetchLink
-        className="text-muted hover:text-accent mb-6 inline-flex items-center gap-2 text-sm font-semibold"
-        href="/trips"
-      >
-        <ArrowLeft className="size-4" /> My trips
-      </PrefetchLink>
       <div className="border-divider dark:border-divider-dark overflow-hidden rounded-2xl border bg-white dark:bg-black">
         <div className={confirmed ? 'bg-success/10 p-7 sm:p-10' : 'bg-card dark:bg-card-dark p-7 sm:p-10'}>
           {confirmed ? (
@@ -128,7 +122,6 @@ function Detail({ icon, label, value }: { icon: React.ReactNode; label: string; 
 export function TripDetailSkeleton() {
   return (
     <div className="mx-auto max-w-4xl">
-      <Skeleton className="mb-6 h-5 w-20" />
       <div className="border-divider dark:border-divider-dark overflow-hidden rounded-2xl border bg-white dark:bg-black">
         <div className="bg-card dark:bg-card-dark p-7 sm:p-10">
           <Skeleton className="h-5 w-32" />
@@ -172,7 +165,7 @@ export function TripDetailSkeleton() {
           </div>
           <div className="mt-8 flex items-center justify-between">
             <Skeleton className="h-5 w-36" />
-            <Skeleton className="h-9 w-28 rounded-full" />
+            <Skeleton className="skeleton-subtle h-9 w-28 rounded-full" />
           </div>
         </div>
       </div>
