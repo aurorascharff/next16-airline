@@ -99,7 +99,7 @@ export function BookingProgress({ available, step }: { available?: BookingStep[]
         const complete = index < activeIndex && !skipped;
         const reached = complete || item === step;
         return (
-          <li className="min-w-0" data-skipped={skipped || undefined} key={item}>
+          <li className={skipped ? 'min-w-0 opacity-40' : 'min-w-0'} data-skipped={skipped || undefined} key={item}>
             <div className="mb-2 flex items-center gap-2">
               <span
                 className={
@@ -112,11 +112,7 @@ export function BookingProgress({ available, step }: { available?: BookingStep[]
               </span>
               <span
                 className={
-                  skipped
-                    ? 'text-muted text-sm font-medium line-through max-sm:hidden'
-                    : reached
-                      ? 'text-sm font-semibold max-sm:hidden'
-                      : 'text-muted text-sm font-medium max-sm:hidden'
+                  reached ? 'text-sm font-semibold max-sm:hidden' : 'text-muted text-sm font-medium max-sm:hidden'
                 }
               >
                 {stepLabels[item]}

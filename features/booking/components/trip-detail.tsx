@@ -5,7 +5,122 @@ import { formatDate, formatPrice } from '@/lib/utils';
 import { getBooking } from '../booking-queries';
 import { CancelTripButton } from './cancel-trip-button';
 
-export async function TripDetail({ bookingId, confirmed }: { bookingId: string; confirmed: boolean }) {
+export async function TripHeader({ bookingId, confirmed }: { bookingId: string; confirmed: boolean }) {
+  const booking = await getBooking(bookingId);
+
+  return (
+    <>
+      {confirmed ? (
+        <p className="text-success flex items-center gap-2 text-sm font-semibold" data-testid="trip-confirmed">
+          <CheckCircle2 className="size-5" /> Trip confirmed
+        </p>
+      ) : (
+        <p className="text-muted flex items-center gap-2 text-sm font-semibold">
+          <Plane className="size-5" /> Upcoming trip
+        </p>
+      )}
+      <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
+        See you in {booking.flight.destination.city}.
+      </h1>
+      <p className="text-muted mt-3 text-sm">
+        Booking reference <span className="font-semibold text-black dark:text-white">{booking.reference}</span>
+      </p>
+    </>
+  );
+}
+
+export function TripHeaderSkeleton() {
+  return (
+    <>
+      <Skeleton className="my-[3px] h-3.5 w-32" />
+      <Skeleton className="mt-[24px] mb-2 h-8 w-80" />
+      <Skeleton className="mt-[15px] mb-[3px] h-3.5 w-48" />
+    </>
+  );
+}
+
+export async function TripRoute({ bookingId }: { bookingId: string }) {
+  const { flight } = await getBooking(bookingId);
+
+  return (
+    <div className="grid gap-6 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
+      <div>
+        <p className="text-muted text-sm">{flight.origin.city}</p>
+        <p className="mt-1 text-5xl font-semibold">{flight.origin.code}</p>
+        <p className="mt-2 font-semibold">{flight.departureTime}</p>
+      </div>
+      <div className="flex flex-col items-center gap-1 sm:w-56">
+        <span className="text-muted text-xs">{flight.duration}</span>
+        <div className="flex w-full items-center gap-3">
+          <span className="bg-divider dark:bg-divider-dark h-px flex-1" />
+          <Plane className="text-accent size-5" />
+          <span className="bg-divider dark:bg-divider-dark h-px flex-1" />
+        </div>
+        <span className="text-muted text-xs">{flight.flightNumber}</span>
+      </div>
+      <div className="sm:text-right">
+        <p className="text-muted text-sm">{flight.destination.city}</p>
+        <p className="mt-1 text-5xl font-semibold">{flight.destination.code}</p>
+        <p className="mt-2 font-semibold">{flight.arrivalTime}</p>
+      </div>
+    </div>
+  );
+}
+
+export function TripRouteSkeleton() {
+  return (
+    <div className="grid gap-6 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
+      <div className="flex flex-col">
+        <Skeleton className="my-[3px] h-3.5 w-12" />
+        <Skeleton className="mt-[10px] mb-1.5 h-9 w-28" />
+        <Skeleton className="mt-[12px] mb-1 h-4 w-14" />
+      </div>
+      <div className="flex flex-col items-center gap-1 sm:w-56">
+        <Skeleton className="my-0.5 h-3 w-12" />
+        <Skeleton className="skeleton-subtle my-2 h-px w-full" />
+        <Skeleton className="my-0.5 h-3 w-12" />
+      </div>
+      <div className="flex flex-col sm:items-end">
+        <Skeleton className="my-[3px] h-3.5 w-16" />
+        <Skeleton className="mt-[10px] mb-1.5 h-9 w-28" />
+        <Skeleton className="mt-[12px] mb-1 h-4 w-14" />
+      </div>
+    </div>
+  );
+}
+
+export async function TripSummary({ bookingId }: { bookingId: string }) {
+  const booking = await getBooking(bookingId);
+
+  return (
+    <div className="grid gap-4 sm:grid-cols-4">
+      <Detail icon={<CalendarDays className="size-4" />} label="Date" value={formatDate(booking.date)} />
+      <Detail icon={<Armchair className="size-4" />} label="Seat" value={booking.seat?.label ?? 'Assigned at gate'} />
+      <Detail
+        icon={<Luggage className="size-4" />}
+        label="Baggage"
+        value={`${booking.bags} checked · ${booking.carryOn ? 'cabin bag' : 'no cabin bag'}`}
+      />
+      <Detail
+        icon={<Sparkles className="size-4" />}
+        label="Extras"
+        value={booking.extras.length ? booking.extras.map(extra => extra.label).join(', ') : 'None'}
+      />
+    </div>
+  );
+}
+
+export function TripSummarySkeleton() {
+  return (
+    <div className="grid gap-4 sm:grid-cols-4">
+      {Array.from({ length: 4 }).map((_, index) => (
+        <Skeleton className="skeleton-subtle h-[4.75rem] rounded-xl" key={index} />
+      ))}
+    </div>
+  );
+}
+
+export async function TripReceipt({ bookingId }: { bookingId: string }) {
   const booking = await getBooking(bookingId);
   const { flight } = booking;
   const rows = [
@@ -18,93 +133,55 @@ export async function TripDetail({ bookingId, confirmed }: { bookingId: string; 
   ];
 
   return (
-    <div className="mx-auto max-w-4xl">
-      <div className="border-divider dark:border-divider-dark shadow-soft overflow-hidden rounded-2xl border bg-white dark:bg-black">
-        <div className={confirmed ? 'bg-success/10 p-7 sm:p-10' : 'bg-card dark:bg-card-dark p-7 sm:p-10'}>
-          {confirmed ? (
-            <p className="text-success flex items-center gap-2 text-sm font-semibold" data-testid="trip-confirmed">
-              <CheckCircle2 className="size-5" /> Trip confirmed
-            </p>
-          ) : (
-            <p className="text-muted flex items-center gap-2 text-sm font-semibold">
-              <Plane className="size-5" /> Upcoming trip
-            </p>
-          )}
-          <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
-            See you in {flight.destination.city}.
-          </h1>
-          <p className="text-muted mt-3 text-sm">
-            Booking reference <span className="font-semibold text-black dark:text-white">{booking.reference}</span>
-          </p>
+    <>
+      {rows.map(row => (
+        <div
+          className="border-divider dark:border-divider-dark flex items-center justify-between border-b py-3 text-sm last:border-0"
+          key={row.label}
+        >
+          <span className="font-medium">{row.label}</span>
+          <span className="font-semibold tabular-nums">{formatPrice(row.value)}</span>
         </div>
-        <div className="p-7 sm:p-10">
-          <div className="grid gap-6 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
-            <div>
-              <p className="text-muted text-sm">{flight.origin.city}</p>
-              <p className="mt-1 text-5xl font-semibold">{flight.origin.code}</p>
-              <p className="mt-2 font-semibold">{flight.departureTime}</p>
-            </div>
-            <div className="flex flex-col items-center gap-1 sm:w-56">
-              <span className="text-muted text-xs">{flight.duration}</span>
-              <div className="flex w-full items-center gap-3">
-                <span className="bg-divider dark:bg-divider-dark h-px flex-1" />
-                <Plane className="text-accent size-5" />
-                <span className="bg-divider dark:bg-divider-dark h-px flex-1" />
-              </div>
-              <span className="text-muted text-xs">{flight.flightNumber}</span>
-            </div>
-            <div className="sm:text-right">
-              <p className="text-muted text-sm">{flight.destination.city}</p>
-              <p className="mt-1 text-5xl font-semibold">{flight.destination.code}</p>
-              <p className="mt-2 font-semibold">{flight.arrivalTime}</p>
-            </div>
-          </div>
-          <div className="border-divider dark:border-divider-dark mt-8 grid gap-4 border-t pt-8 sm:grid-cols-4">
-            <Detail icon={<CalendarDays className="size-4" />} label="Date" value={formatDate(booking.date)} />
-            <Detail
-              icon={<Armchair className="size-4" />}
-              label="Seat"
-              value={booking.seat?.label ?? 'Assigned at gate'}
-            />
-            <Detail
-              icon={<Luggage className="size-4" />}
-              label="Baggage"
-              value={`${booking.bags} checked · ${booking.carryOn ? 'cabin bag' : 'no cabin bag'}`}
-            />
-            <Detail
-              icon={<Sparkles className="size-4" />}
-              label="Extras"
-              value={booking.extras.length ? booking.extras.map(extra => extra.label).join(', ') : 'None'}
-            />
-          </div>
-          <div className="border-divider dark:border-divider-dark mt-8 border-t pt-6">
-            {rows.map(row => (
-              <div
-                className="border-divider dark:border-divider-dark flex items-center justify-between border-b py-3 text-sm last:border-0"
-                key={row.label}
-              >
-                <span className="font-medium">{row.label}</span>
-                <span className="font-semibold tabular-nums">{formatPrice(row.value)}</span>
-              </div>
-            ))}
-            <div className="mt-3 flex items-center justify-between">
-              <span className="text-sm font-semibold">Total paid</span>
-              <span className="text-2xl font-semibold tabular-nums">{formatPrice(booking.total)}</span>
-            </div>
-          </div>
-          <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
-            <PrefetchLink className="text-accent text-sm font-semibold hover:underline" href="/">
-              Book another flight
-            </PrefetchLink>
-            {booking.userId ? (
-              <CancelTripButton bookingId={booking.id} destination={flight.destination.city} />
-            ) : (
-              <p className="text-muted text-sm">Demo trip · cannot be cancelled</p>
-            )}
-          </div>
-        </div>
+      ))}
+      <div className="mt-3 flex items-center justify-between">
+        <span className="text-sm font-semibold">Total paid</span>
+        <span className="text-2xl font-semibold tabular-nums">{formatPrice(booking.total)}</span>
       </div>
-    </div>
+      <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
+        <PrefetchLink className="text-accent text-sm font-semibold hover:underline" href="/">
+          Book another flight
+        </PrefetchLink>
+        {booking.userId ? (
+          <CancelTripButton bookingId={booking.id} destination={flight.destination.city} />
+        ) : (
+          <p className="text-muted text-sm">Demo trip · cannot be cancelled</p>
+        )}
+      </div>
+    </>
+  );
+}
+
+export function TripReceiptSkeleton() {
+  return (
+    <>
+      {Array.from({ length: 4 }).map((_, index) => (
+        <div
+          className="border-divider dark:border-divider-dark flex h-11 items-center justify-between border-b last:border-0"
+          key={index}
+        >
+          <Skeleton className="h-3.5 w-28" />
+          <Skeleton className="h-3.5 w-12" />
+        </div>
+      ))}
+      <div className="mt-3 flex h-8 items-center justify-between">
+        <Skeleton className="h-3.5 w-20" />
+        <Skeleton className="h-6 w-20" />
+      </div>
+      <div className="mt-8 flex h-9 items-center justify-between">
+        <Skeleton className="h-3.5 w-36" />
+        <Skeleton className="skeleton-subtle h-9 w-28 rounded-full" />
+      </div>
+    </>
   );
 }
 
@@ -115,101 +192,6 @@ function Detail({ icon, label, value }: { icon: React.ReactNode; label: string; 
         {icon} {label}
       </div>
       <p className="mt-2 text-sm font-semibold">{value}</p>
-    </div>
-  );
-}
-
-export function TripDetailSkeleton() {
-  return (
-    <div className="mx-auto max-w-4xl">
-      <div className="border-divider dark:border-divider-dark shadow-soft overflow-hidden rounded-2xl border bg-white dark:bg-black">
-        <div className="bg-card dark:bg-card-dark flex flex-col p-7 sm:p-10">
-          <div className="text-muted flex h-5 items-center gap-2 text-sm font-semibold">
-            <Plane className="size-5" /> Upcoming trip
-          </div>
-          <div className="mt-4 flex h-10 items-center sm:h-12">
-            <Skeleton className="h-8 w-80" />
-          </div>
-          <div className="mt-3 flex h-5 items-center">
-            <Skeleton className="h-3.5 w-48" />
-          </div>
-        </div>
-        <div className="p-7 sm:p-10">
-          <div className="grid gap-6 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
-            <div className="flex flex-col">
-              <div className="flex h-5 items-center">
-                <Skeleton className="h-3.5 w-12" />
-              </div>
-              <div className="mt-1 flex h-12 items-center">
-                <Skeleton className="h-9 w-28" />
-              </div>
-              <div className="mt-2 flex h-6 items-center">
-                <Skeleton className="h-4 w-14" />
-              </div>
-            </div>
-            <div className="flex flex-col items-center gap-1 sm:w-56">
-              <div className="flex h-4 items-center">
-                <Skeleton className="h-3 w-12" />
-              </div>
-              <div className="flex h-5 w-full items-center gap-3">
-                <span className="bg-divider dark:bg-divider-dark h-px flex-1" />
-                <Plane className="text-accent size-5" />
-                <span className="bg-divider dark:bg-divider-dark h-px flex-1" />
-              </div>
-              <div className="flex h-4 items-center">
-                <Skeleton className="h-3 w-12" />
-              </div>
-            </div>
-            <div className="flex flex-col sm:items-end">
-              <div className="flex h-5 items-center">
-                <Skeleton className="h-3.5 w-16" />
-              </div>
-              <div className="mt-1 flex h-12 items-center">
-                <Skeleton className="h-9 w-28" />
-              </div>
-              <div className="mt-2 flex h-6 items-center">
-                <Skeleton className="h-4 w-14" />
-              </div>
-            </div>
-          </div>
-          <div className="border-divider dark:border-divider-dark mt-8 grid gap-4 border-t pt-8 sm:grid-cols-4">
-            {[
-              [CalendarDays, 'Date'],
-              [Armchair, 'Seat'],
-              [Luggage, 'Baggage'],
-              [Sparkles, 'Extras'],
-            ].map(([Icon, label]) => (
-              <div className="bg-card/60 dark:bg-card-dark/60 rounded-xl p-4" key={label as string}>
-                <div className="text-accent flex h-4 items-center gap-2 text-xs font-semibold tracking-wide uppercase">
-                  <Icon className="size-4" /> {label as string}
-                </div>
-                <div className="mt-2 flex h-5 items-center">
-                  <Skeleton className="h-3.5 w-20" />
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="border-divider dark:border-divider-dark mt-8 border-t pt-6">
-            {Array.from({ length: 4 }).map((_, index) => (
-              <div
-                className="border-divider dark:border-divider-dark flex h-11 items-center justify-between border-b last:border-0"
-                key={index}
-              >
-                <Skeleton className="h-3.5 w-28" />
-                <Skeleton className="h-3.5 w-12" />
-              </div>
-            ))}
-            <div className="mt-3 flex h-8 items-center justify-between">
-              <span className="text-sm font-semibold">Total paid</span>
-              <Skeleton className="h-6 w-20" />
-            </div>
-          </div>
-          <div className="mt-8 flex h-9 items-center justify-between">
-            <span className="text-accent text-sm font-semibold">Book another flight</span>
-            <Skeleton className="skeleton-subtle h-9 w-28 rounded-full" />
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
