@@ -18,29 +18,20 @@ export default function SearchPage({ searchParams }: PageProps<'/search'>) {
     <main className="mx-auto w-full max-w-4xl px-4 py-6 sm:px-6 sm:py-8">
       <p className="text-muted text-sm font-medium">Flights</p>
       <h1 className="mt-1">Find your next flight</h1>
-      <AnimatedSuspense
-        fallback={
-          <div>
-            <div className="mt-6">
-              <FlightSearchFormSkeleton />
-            </div>
-            <div className="mt-8">
-              <FlightResultsSkeleton />
-            </div>
-          </div>
-        }
-      >
-        {query.then(({ date, from, to }) => (
-          <div>
-            <div className="mt-6">
-              <FlightSearchForm date={date} from={from} key={`${from}-${to}-${date}`} to={to} />
-            </div>
-            <div className="mt-8">
-              {to ? <FlightResults date={date} from={from} to={to} /> : <RouteSuggestions date={date} from={from} />}
-            </div>
-          </div>
-        ))}
-      </AnimatedSuspense>
+      <div className="mt-6">
+        <AnimatedSuspense fallback={<FlightSearchFormSkeleton />}>
+          {query.then(({ date, from, to }) => (
+            <FlightSearchForm date={date} from={from} key={`${from}-${to}-${date}`} to={to} />
+          ))}
+        </AnimatedSuspense>
+      </div>
+      <div className="mt-8">
+        <AnimatedSuspense fallback={<FlightResultsSkeleton />}>
+          {query.then(({ date, from, to }) =>
+            to ? <FlightResults date={date} from={from} to={to} /> : <RouteSuggestions date={date} from={from} />,
+          )}
+        </AnimatedSuspense>
+      </div>
     </main>
   );
 }

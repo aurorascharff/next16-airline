@@ -17,41 +17,25 @@ export default function HomePage() {
           Direct flights from Oslo and Copenhagen. Pick a route, then shape the trip your way: bags, seat, and extras.
         </p>
       </section>
-      <AnimatedSuspense
-        fallback={
-          <HomeSections form={<FlightSearchFormSkeleton />} nextTrip={<NextTripSkeleton />}>
-            <DestinationGridSkeleton />
-          </HomeSections>
-        }
-      >
-        <HomeSections form={<FlightSearchForm />} nextTrip={<NextTrip />}>
-          <DestinationGrid />
-        </HomeSections>
-      </AnimatedSuspense>
-    </main>
-  );
-}
-
-function HomeSections({
-  children,
-  form,
-  nextTrip,
-}: {
-  children: React.ReactNode;
-  form: React.ReactNode;
-  nextTrip: React.ReactNode;
-}) {
-  return (
-    <div>
-      <div className="mx-auto mt-8 max-w-4xl">{form}</div>
-      <section className="mt-10">{nextTrip}</section>
+      <div className="mx-auto mt-8 max-w-4xl">
+        <AnimatedSuspense fallback={<FlightSearchFormSkeleton />}>
+          <FlightSearchForm />
+        </AnimatedSuspense>
+      </div>
+      <section className="mt-10">
+        <AnimatedSuspense fallback={<NextTripSkeleton />}>
+          <NextTrip />
+        </AnimatedSuspense>
+      </section>
       <section className="mt-10">
         <div className="mb-4">
           <p className="text-muted text-sm font-medium">Popular right now</p>
           <h2 className="mt-1 text-2xl">Destinations</h2>
         </div>
-        {children}
+        <AnimatedSuspense fallback={<DestinationGridSkeleton />}>
+          <DestinationGrid />
+        </AnimatedSuspense>
       </section>
-    </div>
+    </main>
   );
 }
