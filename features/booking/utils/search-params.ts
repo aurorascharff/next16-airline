@@ -1,3 +1,4 @@
+import { BOOKING_STEPS, isBookingStep } from './steps';
 import type { BookingDraft, BookingStep } from '../types/booking';
 import type { Route } from 'next';
 
@@ -33,6 +34,14 @@ export function parseFare(value: string | string[] | undefined): Fare {
   return FARES.includes(fare as Fare) ? (fare as Fare) : 'Flex';
 }
 
+export function parseSteps(value: string | string[] | undefined): BookingStep[] | undefined {
+  const raw = Array.isArray(value) ? value[0] : value;
+  if (!raw) return undefined;
+  const steps = raw.split(',').filter(isBookingStep);
+  const ordered = BOOKING_STEPS.filter(step => steps.includes(step));
+  return ordered.length ? ordered : undefined;
+}
+
 export function parseBookingDraft(params: SearchParams): BookingDraft {
   const bags = Number(read(params, 'bags'));
   const extras = (read(params, 'extras') ?? '')
@@ -48,7 +57,7 @@ export function parseBookingDraft(params: SearchParams): BookingDraft {
   };
 }
 
-export function toBookingSearchParams(draft: BookingDraft, date: string, fare: Fare) {
+export function toBookingSearchParams(draft: BookingDraft, date: string, fare: Fare, steps?: BookingStep[]) {
   const params = new URLSearchParams();
   if (date) params.set('date', date);
   params.set('fare', fare);
@@ -56,11 +65,19 @@ export function toBookingSearchParams(draft: BookingDraft, date: string, fare: F
   params.set('carryOn', draft.carryOn ? '1' : '0');
   if (draft.seat) params.set('seat', draft.seat);
   if (draft.extras.length > 0) params.set('extras', draft.extras.join(','));
+  if (steps) params.set('steps', steps.join(','));
   return params;
 }
 
-export function createBookingHref(flightId: string, step: BookingStep, draft: BookingDraft, date: string, fare: Fare) {
-  return `/book/${flightId}/${step}?${toBookingSearchParams(draft, date, fare)}` as Route;
+export function createBookingHref(
+  flightId: string,
+  step: BookingStep,
+  draft: BookingDraft,
+  date: string,
+  fare: Fare,
+  steps?: BookingStep[],
+) {
+  return `/book/${flightId}/${step}?${toBookingSearchParams(draft, date, fare, steps)}` as Route;
 }
 
 export function createSearchHref(from: string, to: string, date = '') {

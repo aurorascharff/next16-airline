@@ -11,8 +11,8 @@ import {
   ShieldCheck,
   Sparkles,
 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { startTransition, useActionState, useOptimistic, useRef } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { startTransition, useActionState, useEffect, useOptimistic, useRef } from 'react';
 import { toast } from 'sonner';
 import { Boundary } from '@/components/internal/boundary';
 import { Button } from '@/components/ui/button';
@@ -23,6 +23,7 @@ import { cn, formatPrice } from '@/lib/utils';
 import { confirmBooking, holdSeat } from '../booking-actions';
 import { createBookingHref } from '../utils/search-params';
 import { nextBookingStep, previousBookingStep } from '../utils/steps';
+import { SeatHoldTimer } from './seat-hold-timer';
 import type { BookingDraft, BookingStep } from '../types/booking';
 
 const titles: Record<BookingStep, { eyebrow: string; title: string }> = {
@@ -62,7 +63,7 @@ export function BookingStepForm({
     const nextDraft = { ...optimisticDraft, ...patch };
     startTransition(() => {
       updateOptimisticDraft(patch);
-      router.replace(createBookingHref(flight.id, step, nextDraft, date, offer.fare), { scroll: false });
+      router.replace(createBookingHref(flight.id, step, nextDraft, date, offer.fare, steps), { scroll: false });
     });
   }
 
@@ -74,19 +75,30 @@ export function BookingStepForm({
     startTransition(async () => {
       updateOptimisticDraft({ seat: seatId });
       setPendingSeat(seatId);
-      router.replace(createBookingHref(flight.id, step, { ...optimisticDraft, seat: seatId }, date, offer.fare), {
-        scroll: false,
-      });
+      router.replace(
+        createBookingHref(flight.id, step, { ...optimisticDraft, seat: seatId }, date, offer.fare, steps),
+        {
+          scroll: false,
+        },
+      );
       const result = await holdSeat(flight.id, date, seatId);
       if (!result.ok && latestSeat.current === seatId) {
         toast.error(result.error);
         updateOptimisticDraft({ seat: '' });
-        router.replace(createBookingHref(flight.id, step, { ...optimisticDraft, seat: '' }, date, offer.fare), {
+        router.replace(createBookingHref(flight.id, step, { ...optimisticDraft, seat: '' }, date, offer.fare, steps), {
           scroll: false,
         });
       }
     });
   }
+
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    if (searchParams.get('steps') !== steps.join(',')) {
+      router.replace(createBookingHref(flight.id, step, optimisticDraft, date, offer.fare, steps), { scroll: false });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [steps, step]);
 
   const nextStep = nextBookingStep(steps, step);
   const previousStep = previousBookingStep(steps, step);
@@ -99,6 +111,14 @@ export function BookingStepForm({
         action={confirmAction}
         className="border-divider dark:border-divider-dark shadow-soft overflow-hidden rounded-2xl border bg-white dark:bg-black"
       >
+        {offer.hold && (
+          <div className="border-divider dark:border-divider-dark bg-accent/5 border-b px-5 py-3 sm:px-6">
+            <SeatHoldTimer
+              expiresAt={offer.hold.expiresAt}
+              seatLabel={offer.seats.find(seat => seat.id === offer.hold?.seatId)?.label ?? ''}
+            />
+          </div>
+        )}
         <div className="p-5 sm:p-6">
           <p className="text-accent text-sm font-semibold">{titles[step].eyebrow}</p>
           <h1 className="mt-1.5 text-2xl sm:text-3xl">{titles[step].title}</h1>
@@ -125,7 +145,7 @@ export function BookingStepForm({
               <Button
                 render={
                   <PrefetchLink
-                    href={createBookingHref(flight.id, previousStep, optimisticDraft, date, offer.fare)}
+                    href={createBookingHref(flight.id, previousStep, optimisticDraft, date, offer.fare, steps)}
                     scroll={false}
                   />
                 }
@@ -147,7 +167,9 @@ export function BookingStepForm({
               <Button
                 data-testid="booking-next"
                 render={
-                  <PrefetchLink href={createBookingHref(flight.id, nextStep, optimisticDraft, date, offer.fare)} />
+                  <PrefetchLink
+                    href={createBookingHref(flight.id, nextStep, optimisticDraft, date, offer.fare, steps)}
+                  />
                 }
                 size="lg"
               >
