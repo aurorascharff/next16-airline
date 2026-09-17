@@ -5,7 +5,7 @@ import { parseAirportCode, parseDate } from '@/features/booking/utils/search-par
 import { FlightResults, FlightResultsSkeleton } from '@/features/flight/components/flight-results';
 import { FlightSearchForm, FlightSearchFormSkeleton } from '@/features/flight/components/flight-search-form';
 import { RouteSuggestions, RouteSuggestionsSkeleton } from '@/features/flight/components/route-suggestions';
-import { SearchHeading } from '@/features/flight/components/search-heading';
+import { SearchHeading, SearchHeadingSkeleton } from '@/features/flight/components/search-heading';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = { title: 'Flights' };
@@ -30,7 +30,7 @@ export default function SearchPage({ searchParams }: PageProps<'/search'>) {
           </AnimatedSuspense>
         </div>
         <div className="mt-8">
-          <Suspense fallback={<SearchHeading />}>
+          <Suspense fallback={<SearchHeadingSkeleton />}>
             {query.then(({ date, from, to }) => (
               <SearchHeading date={date} from={from} to={to} />
             ))}
