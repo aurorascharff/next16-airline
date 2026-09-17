@@ -1,55 +1,70 @@
 import { ArrowRight, CalendarDays, MapPin, Plane, Search, Sparkles } from 'lucide-react';
-import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
+import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
-import { createBookingHref, DEFAULT_BOOKING_DRAFT } from '../booking-search-params';
 import { getBookings } from '../booking-queries';
+import { createBookingHref, DEFAULT_BOOKING_DRAFT } from '../booking-search-params';
 
 export async function TripDashboard() {
-  const [booking] = await getBookings();
+  const bookings = await getBookings();
+  const [booking] = bookings;
+
+  if (!booking) {
+    return (
+      <EmptyState body="Search for a flight and your next journey will show up here." title="No trips yet">
+        <Button render={<PrefetchLink href="/search" />} variant="secondary">
+          Search flights
+        </Button>
+      </EmptyState>
+    );
+  }
+
+  const destination = booking.flight.arrivalCity;
   const startHref = createBookingHref(booking.id, 'baggage', DEFAULT_BOOKING_DRAFT);
 
   return (
     <div className="space-y-7">
       <section className="grid gap-5 lg:grid-cols-[1.35fr_0.65fr]">
-        <div className="bg-accent relative min-h-[17rem] overflow-hidden rounded-2xl p-6 text-white sm:p-8">
-          <div className="absolute -top-24 -right-24 size-72 rounded-full border border-white/20" />
-          <div className="absolute top-10 right-10 size-48 rounded-full border border-white/10" />
+        <div className="border-divider dark:border-divider-dark relative min-h-[17rem] overflow-hidden rounded-2xl border bg-white p-6 sm:p-8 dark:bg-black">
           <div className="relative z-10 flex h-full flex-col justify-between gap-10">
             <div>
-              <p className="mb-4 flex items-center gap-2 text-sm font-semibold text-white/75">
+              <p className="text-accent mb-4 flex items-center gap-2 text-sm font-semibold">
                 <Sparkles className="size-4" /> Your next journey
               </p>
-              <h1 className="max-w-2xl text-4xl font-semibold tracking-[-0.04em] text-balance sm:text-5xl">
-                Barcelona is closer than it feels.
+              <h1 className="max-w-2xl text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
+                {destination} is closer than it feels.
               </h1>
             </div>
-            <Link
-              className="bg-surface text-black hover:bg-card flex w-fit items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-colors"
-              href={`/explore/${booking.destinationSlug}`}
-              prefetch={true}
-            >
-              Explore Barcelona <ArrowRight className="size-4" />
-            </Link>
+            <Button render={<PrefetchLink href={`/explore/${booking.destinationSlug}`} />} size="lg">
+              Explore {destination} <ArrowRight className="size-4" />
+            </Button>
           </div>
-          <Plane className="absolute right-10 bottom-8 size-28 rotate-[-12deg] text-white/12 sm:size-40" strokeWidth={1} />
+          <Plane
+            aria-hidden
+            className="text-accent/10 absolute right-10 bottom-8 size-28 rotate-[-12deg] sm:size-40"
+            strokeWidth={1}
+          />
         </div>
 
-        <div className="border-divider bg-surface dark:border-divider-dark dark:bg-black flex flex-col justify-between rounded-2xl border p-6">
+        <div className="border-divider dark:border-divider-dark flex flex-col justify-between rounded-2xl border bg-white p-6 dark:bg-black">
           <div>
-            <div className="bg-accent/10 text-accent mb-5 grid size-10 place-items-center rounded-xl">
+            <div className="bg-accent/10 text-accent mb-5 grid size-10 place-items-center rounded-lg">
               <Search className="size-5" />
             </div>
-            <h2 className="text-xl font-semibold tracking-tight">Where to next?</h2>
+            <h2>Where to next?</h2>
             <p className="text-muted mt-2 text-sm leading-6">
               Start with your upcoming flight, then shape every part of the journey.
             </p>
           </div>
-          <Link
-            className="border-divider hover:bg-card dark:border-divider-dark dark:hover:bg-card-dark mt-8 flex items-center justify-between rounded-xl border px-4 py-3 text-sm font-semibold transition-colors"
-            href="/search"
+          <Button
+            className="mt-8 justify-between rounded-xl px-4"
+            render={<PrefetchLink href="/search" />}
+            size="lg"
+            variant="secondary"
           >
             Search flights <ArrowRight className="size-4" />
-          </Link>
+          </Button>
         </div>
       </section>
 
@@ -57,15 +72,16 @@ export async function TripDashboard() {
         <div className="mb-4 flex items-end justify-between">
           <div>
             <p className="text-muted text-sm font-medium">Coming up</p>
-            <h2 className="mt-1 text-2xl font-semibold tracking-tight">Your trip</h2>
+            <h2 className="mt-1 text-2xl">Your trip</h2>
           </div>
-          <span className="text-muted text-sm">1 booking</span>
+          <span className="text-muted text-sm">
+            {bookings.length} booking{bookings.length === 1 ? '' : 's'}
+          </span>
         </div>
-        <Link
-          className="border-divider bg-surface hover:border-accent/40 dark:border-divider-dark dark:bg-black group block overflow-hidden rounded-2xl border transition-colors"
+        <PrefetchLink
+          className="border-divider hover:border-accent/40 dark:border-divider-dark group block overflow-hidden rounded-2xl border bg-white transition-colors dark:bg-black"
           data-testid="start-booking"
           href={startHref}
-          prefetch={true}
         >
           <div className="grid gap-5 p-5 sm:p-6 lg:grid-cols-[1fr_auto_1fr_auto] lg:items-center">
             <div>
@@ -95,11 +111,11 @@ export async function TripDashboard() {
               </div>
             </div>
           </div>
-          <div className="bg-card/70 dark:bg-card-dark/70 text-muted flex items-center gap-2 px-5 py-2.5 text-xs font-medium sm:px-6">
+          <div className="bg-card/70 text-muted dark:bg-card-dark/70 flex items-center gap-2 px-5 py-2.5 text-xs font-medium sm:px-6">
             <MapPin className="size-3.5" /> Manage baggage, seats and extras
             <ArrowRight className="group-hover:text-accent ml-auto size-4 transition-colors" />
           </div>
-        </Link>
+        </PrefetchLink>
       </section>
     </div>
   );

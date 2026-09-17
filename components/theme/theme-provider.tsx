@@ -1,12 +1,27 @@
 'use client';
 
-import { ThemeProvider as NextThemesProvider } from 'next-themes';
-import type { ReactNode } from 'react';
+import { ThemeProvider as NextThemesProvider, useTheme } from 'next-themes';
+import { useEffect } from 'react';
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
   return (
-    <NextThemesProvider attribute="class" defaultTheme="system" disableTransitionOnChange enableSystem>
+    <NextThemesProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+      <ThemeColorSync />
       {children}
     </NextThemesProvider>
   );
+}
+
+function ThemeColorSync() {
+  const { resolvedTheme } = useTheme();
+
+  useEffect(() => {
+    if (!resolvedTheme) return;
+    const color = resolvedTheme === 'dark' ? '#121212' : '#fafafa';
+    document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]').forEach(meta => {
+      meta.content = color;
+    });
+  }, [resolvedTheme]);
+
+  return null;
 }

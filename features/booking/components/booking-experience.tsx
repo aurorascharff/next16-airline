@@ -1,10 +1,9 @@
 import { Check, Clock3, Plane } from 'lucide-react';
-import { isPrefetchEnabled } from '@/components/demo/demo-queries';
 import { Skeleton } from '@/components/ui/skeleton';
-import { BOOKING_STEPS } from '../booking-search-params';
 import { getBooking, getBookingOffer } from '../booking-queries';
-import type { BookingDraft, BookingStep } from '../types/booking';
+import { BOOKING_STEPS } from '../booking-search-params';
 import { BookingStepForm } from './booking-step-form';
+import type { BookingDraft, BookingStep } from '../types/booking';
 
 const stepLabels: Record<BookingStep, string> = {
   baggage: 'Baggage',
@@ -22,11 +21,7 @@ export async function BookingExperience({
   draft: BookingDraft;
   step: BookingStep;
 }) {
-  const [booking, offer, prefetchEnabled] = await Promise.all([
-    getBooking(bookingId),
-    getBookingOffer(bookingId, draft),
-    isPrefetchEnabled(),
-  ]);
+  const [booking, offer] = await Promise.all([getBooking(bookingId), getBookingOffer(bookingId)]);
   const activeIndex = BOOKING_STEPS.indexOf(step);
 
   return (
@@ -35,53 +30,56 @@ export async function BookingExperience({
         {BOOKING_STEPS.map((item, index) => {
           const complete = index < activeIndex;
           const active = item === step;
+          const reached = complete || active;
           return (
-            <li key={item} className="min-w-0">
+            <li className="min-w-0" key={item}>
               <div className="mb-2 flex items-center gap-2">
                 <span
                   className={
-                    complete || active
-                      ? 'bg-accent text-white grid size-6 shrink-0 place-items-center rounded-full text-xs font-bold'
+                    reached
+                      ? 'bg-accent grid size-6 shrink-0 place-items-center rounded-full text-xs font-bold text-white'
                       : 'bg-card text-muted dark:bg-card-dark grid size-6 shrink-0 place-items-center rounded-full text-xs font-bold'
                   }
                 >
                   {complete ? <Check className="size-3.5" /> : index + 1}
                 </span>
-                <span className="text-sm font-semibold max-sm:hidden">{stepLabels[item]}</span>
+                <span
+                  className={
+                    reached ? 'text-sm font-semibold max-sm:hidden' : 'text-muted text-sm font-medium max-sm:hidden'
+                  }
+                >
+                  {stepLabels[item]}
+                </span>
               </div>
-              <div className={complete || active ? 'bg-accent h-1 rounded-full' : 'bg-divider dark:bg-divider-dark h-1 rounded-full'} />
+              <div
+                className={reached ? 'bg-accent h-1 rounded-full' : 'bg-divider dark:bg-divider-dark h-1 rounded-full'}
+              />
             </li>
           );
         })}
       </ol>
 
       <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_19rem]">
-        <BookingStepForm
-          booking={booking}
-          draft={draft}
-          offer={offer}
-          prefetchEnabled={prefetchEnabled}
-          step={step}
-        />
-        <aside className="border-divider bg-surface dark:border-divider-dark dark:bg-black overflow-hidden rounded-2xl border lg:sticky lg:top-20">
-          <div className="bg-accent p-5 text-white">
-            <div className="flex items-center justify-between text-xs font-semibold tracking-[0.16em] text-white/65 uppercase">
+        <BookingStepForm booking={booking} draft={draft} offer={offer} step={step} />
+        <aside className="border-divider dark:border-divider-dark overflow-hidden rounded-2xl border bg-white lg:sticky lg:top-20 dark:bg-black">
+          <div className="bg-card dark:bg-card-dark p-5">
+            <div className="text-muted flex items-center justify-between text-xs font-semibold tracking-wide uppercase">
               <span>{booking.flight.flightNumber}</span>
               <span>{booking.cabin}</span>
             </div>
             <div className="mt-5 flex items-center gap-3">
               <div>
                 <p className="text-2xl font-semibold">{booking.flight.departureAirport}</p>
-                <p className="mt-1 text-xs text-white/70">{booking.flight.departureTime}</p>
+                <p className="text-muted mt-1 text-xs">{booking.flight.departureTime}</p>
               </div>
               <div className="flex flex-1 items-center gap-2">
-                <span className="h-px flex-1 bg-white/25" />
-                <Plane className="size-4" />
-                <span className="h-px flex-1 bg-white/25" />
+                <span className="bg-divider dark:bg-divider-dark h-px flex-1" />
+                <Plane className="text-accent size-4" />
+                <span className="bg-divider dark:bg-divider-dark h-px flex-1" />
               </div>
               <div className="text-right">
                 <p className="text-2xl font-semibold">{booking.flight.arrivalAirport}</p>
-                <p className="mt-1 text-xs text-white/70">{booking.flight.arrivalTime}</p>
+                <p className="text-muted mt-1 text-xs">{booking.flight.arrivalTime}</p>
               </div>
             </div>
           </div>

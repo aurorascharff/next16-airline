@@ -2,31 +2,68 @@ import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { GeistMono } from 'geist/font/mono';
 import { GeistSans } from 'geist/font/sans';
+import { Suspense } from 'react';
+import { DemoToolbar } from '@/components/demo/demo-toolbar';
+import { BoundaryProvider } from '@/components/internal/boundary';
+import { OfflineIndicator } from '@/components/offline-indicator';
+import { NavLinkScript } from '@/components/scripts/nav-link-script';
 import { ThemeProvider } from '@/components/theme/theme-provider';
+import { Toaster } from '@/components/toaster';
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
-export const metadata: Metadata = {
-  description: 'A modern airline booking demo built with Next.js Cache Components and Partial Prefetching.',
-  title: {
-    default: 'Waypoint',
-    template: '%s · Waypoint',
-  },
-};
-
 export const viewport: Viewport = {
   themeColor: [
-    { color: '#f4f6f3', media: '(prefers-color-scheme: light)' },
-    { color: '#071019', media: '(prefers-color-scheme: dark)' },
+    { color: '#fafafa', media: '(prefers-color-scheme: light)' },
+    { color: '#121212', media: '(prefers-color-scheme: dark)' },
   ],
   viewportFit: 'cover',
 };
 
-export default function RootLayout({ children }: LayoutProps<'/'>) {
+const description =
+  'A Next.js 16.3 airline booking demo demonstrating Instant Navigations with Cache Components and Partial Prefetching.';
+
+export const metadata: Metadata = {
+  applicationName: 'Waypoint',
+  description,
+  formatDetection: {
+    address: false,
+    date: false,
+    email: false,
+    telephone: false,
+  },
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_BASE_URL ??
+      (process.env.VERCEL_PROJECT_PRODUCTION_URL
+        ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+        : 'http://localhost:3000'),
+  ),
+  openGraph: {
+    description,
+    siteName: 'Waypoint',
+    title: 'Waypoint',
+    type: 'website',
+  },
+  title: { default: 'Waypoint', template: '%s · Waypoint' },
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html className={`${GeistSans.variable} ${GeistMono.variable}`} lang="en" suppressHydrationWarning>
-      <body className="min-h-dvh antialiased">
-        <ThemeProvider>{children}</ThemeProvider>
+    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`} suppressHydrationWarning>
+      <body className="flex min-h-dvh flex-col">
+        <ThemeProvider>
+          <BoundaryProvider>
+            {children}
+            <div className="demo-toggles fixed right-4 bottom-4 z-50 hidden items-end sm:flex">
+              <Suspense fallback={null}>
+                <DemoToolbar />
+              </Suspense>
+            </div>
+            <Toaster />
+            <OfflineIndicator />
+            <NavLinkScript />
+          </BoundaryProvider>
+        </ThemeProvider>
         <Analytics />
         <SpeedInsights />
       </body>

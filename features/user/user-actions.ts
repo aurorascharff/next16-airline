@@ -1,40 +1,40 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { prisma } from '@/lib/db';
+import { SESSION_COOKIE, SESSION_COOKIE_MAX_AGE } from './session';
 
-const SESSION_COOKIE = 'waypoint-user';
 const userIdSchema = z.string().min(1).max(40);
 
-export async function signIn(formData: FormData) {
-  const parsed = userIdSchema.safeParse(formData.get('userId'));
-  if (!parsed.success) return;
-  const user = await prisma.user.findUnique({ select: { id: true }, where: { id: parsed.data } });
-  if (!user) return;
+async function setSessionCookie(userId: string) {
+  const user = await prisma.user.findUnique({ select: { id: true }, where: { id: userId } });
+  if (!user) return false;
 
   (await cookies()).set(SESSION_COOKIE, user.id, {
     httpOnly: true,
-    maxAge: 60 * 60 * 24 * 30,
+    maxAge: SESSION_COOKIE_MAX_AGE,
     path: '/',
     sameSite: 'lax',
   });
+  return true;
+}
+
+export async function signIn(formData: FormData) {
+  const parsed = userIdSchema.safeParse(formData.get('userId'));
+  if (!parsed.success || !(await setSessionCookie(parsed.data))) return;
   redirect('/');
 }
 
 export async function switchUser(userId: string) {
   const parsed = userIdSchema.safeParse(userId);
-  if (!parsed.success) return { ok: false as const };
-  const user = await prisma.user.findUnique({ select: { id: true }, where: { id: parsed.data } });
-  if (!user) return { ok: false as const };
+  if (!parsed.success) return { error: 'Choose a demo traveler.', ok: false as const };
+  if (!(await setSessionCookie(parsed.data))) return { error: 'That traveler no longer exists.', ok: false as const };
 
-  (await cookies()).set(SESSION_COOKIE, user.id, {
-    httpOnly: true,
-    maxAge: 60 * 60 * 24 * 30,
-    path: '/',
-    sameSite: 'lax',
-  });
+  // Every cached route belongs to the previous traveler now, so drop the whole client cache.
+  revalidatePath('/', 'layout');
   return { ok: true as const };
 }
 

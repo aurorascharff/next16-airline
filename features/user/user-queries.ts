@@ -4,35 +4,21 @@ import { cacheLife, cacheTag } from 'next/cache';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/db';
+import { SESSION_COOKIE } from './session';
 
-const SESSION_COOKIE = 'waypoint-user';
+export type CurrentUser = { accent: string; id: string; initials: string; name: string };
 
-export async function getCurrentUserId() {
+export async function getCurrentUser(): Promise<CurrentUser | null> {
   'use cache: private';
   cacheLife({ stale: Infinity });
 
-  const userId = (await cookies()).get(SESSION_COOKIE)?.value;
-  if (!userId) return '';
-  const user = await prisma.user.findUnique({ select: { id: true }, where: { id: userId } });
-  return user?.id ?? '';
+  const id = (await cookies()).get(SESSION_COOKIE)?.value;
+  if (!id) return null;
+  return prisma.user.findUnique({ select: { accent: true, id: true, initials: true, name: true }, where: { id } });
 }
 
-export async function verifyAuth() {
-  const userId = await getCurrentUserId();
-  if (!userId) redirect('/login');
-  return userId;
-}
-
-export async function getCurrentUser() {
-  const userId = await verifyAuth();
-  return getUser(userId);
-}
-
-async function getUser(userId: string) {
-  'use cache';
-  cacheLife('hours');
-  cacheTag('users', `user:${userId}`);
-  const user = await prisma.user.findUnique({ where: { id: userId } });
+export async function verifyAuth(): Promise<CurrentUser> {
+  const user = await getCurrentUser();
   if (!user) redirect('/login');
   return user;
 }
@@ -41,5 +27,6 @@ export async function getDemoUsers() {
   'use cache';
   cacheLife('hours');
   cacheTag('users');
+
   return prisma.user.findMany({ orderBy: { name: 'asc' } });
 }

@@ -1,9 +1,21 @@
 'use client';
 
-import { Armchair, ArrowLeft, ArrowRight, BriefcaseBusiness, Check, Leaf, Luggage, ShieldCheck, Sparkles } from 'lucide-react';
-import Link from 'next/link';
+import {
+  Armchair,
+  ArrowLeft,
+  ArrowRight,
+  BriefcaseBusiness,
+  Check,
+  Leaf,
+  Luggage,
+  ShieldCheck,
+  Sparkles,
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { startTransition, useOptimistic } from 'react';
+import { Boundary } from '@/components/internal/boundary';
+import { Button } from '@/components/ui/button';
+import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { cn } from '@/lib/utils';
 import {
   createBookingHref,
@@ -20,17 +32,19 @@ const titles: Record<BookingStep, { eyebrow: string; title: string }> = {
   seats: { eyebrow: 'Choose your place', title: 'Where would you like to sit?' },
 };
 
+const optionClass = 'relative rounded-xl border p-4 text-left transition-colors';
+const optionSelected = 'border-accent bg-accent/5 dark:bg-accent/10';
+const optionIdle = 'border-divider hover:bg-card dark:border-divider-dark dark:hover:bg-card-dark';
+
 export function BookingStepForm({
   booking,
   draft,
   offer,
-  prefetchEnabled,
   step,
 }: {
   booking: Booking;
   draft: BookingDraft;
   offer: BookingOffer;
-  prefetchEnabled: boolean;
   step: BookingStep;
 }) {
   const router = useRouter();
@@ -39,6 +53,8 @@ export function BookingStepForm({
     ...patch,
   }));
 
+  // Selections live in the URL: replace it inside a transition so the optimistic draft
+  // stays visible until the server confirms the new search params.
   function updateDraft(patch: Partial<BookingDraft>) {
     const nextDraft = { ...optimisticDraft, ...patch };
     startTransition(() => {
@@ -56,70 +72,62 @@ export function BookingStepForm({
   const total = calculateTotal(offer, optimisticDraft);
 
   return (
-    <section className="border-divider bg-surface dark:border-divider-dark dark:bg-black overflow-hidden rounded-2xl border">
-      <div className="p-5 sm:p-6">
-        <p className="text-accent text-sm font-semibold">{titles[step].eyebrow}</p>
-        <h1 className="mt-1.5 text-2xl font-semibold tracking-[-0.03em] sm:text-3xl">{titles[step].title}</h1>
-        <div className="mt-6">
-          {step === 'baggage' && (
-            <BaggageOptions draft={optimisticDraft} offer={offer} updateDraft={updateDraft} />
-          )}
-          {step === 'seats' && <SeatOptions draft={optimisticDraft} offer={offer} updateDraft={updateDraft} />}
-          {step === 'extras' && <ExtraOptions draft={optimisticDraft} offer={offer} updateDraft={updateDraft} />}
-          {step === 'review' && <Review booking={booking} draft={optimisticDraft} offer={offer} />}
+    <Boundary label="BookingStepForm">
+      <section className="border-divider dark:border-divider-dark overflow-hidden rounded-2xl border bg-white dark:bg-black">
+        <div className="p-5 sm:p-6">
+          <p className="text-accent text-sm font-semibold">{titles[step].eyebrow}</p>
+          <h1 className="mt-1.5 text-2xl sm:text-3xl">{titles[step].title}</h1>
+          <div className="mt-6">
+            {step === 'baggage' && <BaggageOptions draft={optimisticDraft} offer={offer} updateDraft={updateDraft} />}
+            {step === 'seats' && <SeatOptions draft={optimisticDraft} offer={offer} updateDraft={updateDraft} />}
+            {step === 'extras' && <ExtraOptions draft={optimisticDraft} offer={offer} updateDraft={updateDraft} />}
+            {step === 'review' && <Review booking={booking} draft={optimisticDraft} offer={offer} />}
+          </div>
         </div>
-      </div>
-      <div className="border-divider bg-card/60 dark:border-divider-dark dark:bg-card-dark/45 flex flex-col gap-4 border-t p-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-        <div>
-          <p className="text-muted text-xs font-medium">Trip total</p>
-          <p className="text-xl font-semibold">€{total}</p>
+        <div className="border-divider bg-card/60 dark:border-divider-dark dark:bg-card-dark/45 flex flex-col gap-4 border-t p-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <div>
+            <p className="text-muted text-xs font-medium">Trip total</p>
+            <p className="text-xl font-semibold tabular-nums">€{total}</p>
+          </div>
+          <div className="flex items-center gap-3">
+            {previousStep ? (
+              <Button
+                render={
+                  <PrefetchLink href={createBookingHref(booking.id, previousStep, optimisticDraft)} scroll={false} />
+                }
+                size="lg"
+                variant="secondary"
+              >
+                <ArrowLeft className="size-4" /> Back
+              </Button>
+            ) : (
+              <Button render={<PrefetchLink href="/" />} size="lg" variant="secondary">
+                <ArrowLeft className="size-4" /> Exit
+              </Button>
+            )}
+            {canContinue ? (
+              <Button data-testid="booking-next" render={<PrefetchLink href={nextHref} />} size="lg">
+                {step === 'review' ? 'Confirm trip' : 'Continue'} <ArrowRight className="size-4" />
+              </Button>
+            ) : (
+              <Button disabled size="lg">
+                Select a seat <ArrowRight className="size-4" />
+              </Button>
+            )}
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          {previousStep ? (
-            <Link
-              className="border-divider hover:bg-surface dark:border-divider-dark dark:hover:bg-black flex h-11 items-center gap-2 rounded-full border px-5 text-sm font-semibold transition-colors"
-              href={createBookingHref(booking.id, previousStep, optimisticDraft)}
-              scroll={false}
-            >
-              <ArrowLeft className="size-4" /> Back
-            </Link>
-          ) : (
-            <Link
-              className="border-divider hover:bg-surface dark:border-divider-dark dark:hover:bg-black flex h-11 items-center gap-2 rounded-full border px-5 text-sm font-semibold transition-colors"
-              href="/"
-            >
-              <ArrowLeft className="size-4" /> Exit
-            </Link>
-          )}
-          {canContinue ? (
-            <Link
-              className="bg-accent hover:bg-accent-hover text-white flex h-11 items-center gap-2 rounded-full px-6 text-sm font-semibold transition-colors"
-              data-testid="booking-next"
-              href={nextHref}
-              prefetch={prefetchEnabled ? true : null}
-            >
-              {step === 'review' ? 'Confirm trip' : 'Continue'} <ArrowRight className="size-4" />
-            </Link>
-          ) : (
-            <span className="bg-card text-muted dark:bg-card-dark flex h-11 cursor-not-allowed items-center gap-2 rounded-full px-6 text-sm font-semibold">
-              Select a seat <ArrowRight className="size-4" />
-            </span>
-          )}
-        </div>
-      </div>
-    </section>
+      </section>
+    </Boundary>
   );
 }
 
-function BaggageOptions({
-  draft,
-  offer,
-  updateDraft,
-}: {
+type StepProps = {
   draft: BookingDraft;
   offer: BookingOffer;
   updateDraft: (patch: Partial<BookingDraft>) => void;
-}) {
+};
+
+function BaggageOptions({ draft, offer, updateDraft }: StepProps) {
   return (
     <div className="space-y-6">
       <fieldset>
@@ -128,12 +136,7 @@ function BaggageOptions({
           {[0, 1, 2].map(count => (
             <button
               aria-pressed={draft.bags === count}
-              className={cn(
-                'relative rounded-xl border p-3.5 text-left transition-colors',
-                draft.bags === count
-                  ? 'border-accent bg-accent/5 dark:bg-accent/10'
-                  : 'border-divider hover:bg-card/70 dark:border-divider-dark dark:hover:bg-card-dark/70',
-              )}
+              className={cn(optionClass, draft.bags === count ? optionSelected : optionIdle)}
               key={count}
               onClick={() => updateDraft({ bags: count })}
               type="button"
@@ -144,7 +147,7 @@ function BaggageOptions({
                 {count === 0 ? 'Travel light' : `23 kg · €${offer.bagPrice * count}`}
               </p>
               {draft.bags === count && (
-                <span className="bg-accent text-white absolute top-3 right-3 grid size-5 place-items-center rounded-full">
+                <span className="bg-accent absolute top-3 right-3 grid size-5 place-items-center rounded-full text-white">
                   <Check className="size-3" />
                 </span>
               )}
@@ -154,95 +157,74 @@ function BaggageOptions({
       </fieldset>
       <button
         aria-pressed={draft.carryOn}
-        className={cn(
-          'flex w-full items-center gap-4 rounded-xl border p-4 text-left transition-colors',
-          draft.carryOn
-            ? 'border-accent bg-accent/5 dark:bg-accent/10'
-            : 'border-divider hover:bg-card/70 dark:border-divider-dark dark:hover:bg-card-dark/70',
-        )}
+        className={cn(optionClass, 'flex w-full items-center gap-4', draft.carryOn ? optionSelected : optionIdle)}
         onClick={() => updateDraft({ carryOn: !draft.carryOn })}
         type="button"
       >
-        <div className="bg-accent/10 grid size-11 place-items-center rounded-xl">
+        <div className="bg-accent/10 text-accent grid size-11 place-items-center rounded-lg">
           <BriefcaseBusiness className="size-5" />
         </div>
         <div className="flex-1">
           <p className="font-semibold">Cabin bag</p>
           <p className="text-muted mt-1 text-xs">One 8 kg bag included with Flex</p>
         </div>
-        <span className={cn('grid size-6 place-items-center rounded-full border', draft.carryOn && 'border-accent bg-accent text-white')}>
-          {draft.carryOn && <Check className="size-3.5" />}
-        </span>
+        <Checkmark checked={draft.carryOn} />
       </button>
     </div>
   );
 }
 
-function SeatOptions({
-  draft,
-  offer,
-  updateDraft,
-}: {
-  draft: BookingDraft;
-  offer: BookingOffer;
-  updateDraft: (patch: Partial<BookingDraft>) => void;
-}) {
+function SeatOptions({ draft, offer, updateDraft }: StepProps) {
   return (
     <div className="mx-auto max-w-lg">
-      <div className="mb-5 flex items-center justify-between text-xs">
-        <span className="text-muted flex items-center gap-2">
+      <div className="text-muted mb-5 flex items-center justify-between text-xs">
+        <span className="flex items-center gap-2">
           <span className="border-divider dark:border-divider-dark size-4 rounded border" /> Available
         </span>
-        <span className="text-muted flex items-center gap-2">
+        <span className="flex items-center gap-2">
           <span className="bg-card dark:bg-card-dark size-4 rounded" /> Occupied
         </span>
         <span className="text-accent flex items-center gap-2">
           <span className="bg-accent size-4 rounded" /> Selected
         </span>
       </div>
-      <div className="border-divider bg-surface/60 dark:border-divider-dark dark:bg-surface-dark/60 rounded-2xl border px-7 pt-10 pb-7">
+      <div className="border-divider bg-surface dark:border-divider-dark dark:bg-surface-dark rounded-2xl border px-7 pt-10 pb-7">
         <div className="border-divider dark:border-divider-dark mx-auto mb-8 h-7 w-3/4 rounded-t-[50%] border-t" />
         <div className="grid grid-cols-[1fr_1fr_2rem_1fr_1fr] gap-2">
-          {offer.seats.map((seat, index) => (
-            <button
-              aria-label={`Seat ${seat.label}${seat.status === 'occupied' ? ', occupied' : ''}`}
-              aria-pressed={draft.seat === seat.id}
-              className={cn(
-                'relative grid aspect-square place-items-center rounded-lg border text-xs font-bold transition-transform',
-                index % 4 === 2 && 'col-start-4',
-                seat.status === 'occupied'
-                  ? 'bg-card text-muted dark:bg-card-dark cursor-not-allowed border-transparent'
-                  : 'border-divider bg-surface hover:-translate-y-0.5 dark:border-divider-dark dark:bg-black',
-                draft.seat === seat.id && 'border-accent bg-accent text-white dark:bg-accent',
-                seat.type === 'extra-legroom' && seat.status === 'available' && draft.seat !== seat.id && 'border-success',
-              )}
-              disabled={seat.status === 'occupied'}
-              key={seat.id}
-              onClick={() => updateDraft({ seat: seat.id })}
-              type="button"
-            >
-              <Armchair className="mb-3 size-4" />
-              <span className="absolute bottom-1.5">{seat.label}</span>
-            </button>
-          ))}
+          {offer.seats.map((seat, index) => {
+            const selected = draft.seat === seat.id;
+            const occupied = seat.status === 'occupied';
+            return (
+              <button
+                aria-label={`Seat ${seat.label}${occupied ? ', occupied' : ''}`}
+                aria-pressed={selected}
+                className={cn(
+                  'relative grid aspect-square place-items-center rounded-lg border text-xs font-bold transition-transform',
+                  index % 4 === 2 && 'col-start-4',
+                  occupied
+                    ? 'bg-card text-muted dark:bg-card-dark cursor-not-allowed border-transparent'
+                    : 'border-divider dark:border-divider-dark bg-white hover:-translate-y-0.5 dark:bg-black',
+                  seat.type === 'extra-legroom' && !occupied && !selected && 'border-success',
+                  selected && 'border-accent bg-accent dark:bg-accent text-white',
+                )}
+                disabled={occupied}
+                key={seat.id}
+                onClick={() => updateDraft({ seat: seat.id })}
+                type="button"
+              >
+                <Armchair className="mb-3 size-4" />
+                <span className="absolute bottom-1.5">{seat.label}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
-      <p className="text-muted mt-4 text-center text-xs">
-        Extra-legroom seats are highlighted in green.
-      </p>
+      <p className="text-muted mt-4 text-center text-xs">Extra-legroom seats are outlined in green.</p>
     </div>
   );
 }
 
-function ExtraOptions({
-  draft,
-  offer,
-  updateDraft,
-}: {
-  draft: BookingDraft;
-  offer: BookingOffer;
-  updateDraft: (patch: Partial<BookingDraft>) => void;
-}) {
+function ExtraOptions({ draft, offer, updateDraft }: StepProps) {
   return (
     <div className="grid gap-3">
       {offer.extras.map((extra, index) => {
@@ -250,12 +232,7 @@ function ExtraOptions({
         return (
           <button
             aria-pressed={selected}
-            className={cn(
-              'flex items-center gap-4 rounded-xl border p-4 text-left transition-colors',
-              selected
-                ? 'border-accent bg-accent/5 dark:bg-accent/10'
-                : 'border-divider hover:bg-card/70 dark:border-divider-dark dark:hover:bg-card-dark/70',
-            )}
+            className={cn(optionClass, 'flex items-center gap-4', selected ? optionSelected : optionIdle)}
             key={extra.id}
             onClick={() =>
               updateDraft({
@@ -268,13 +245,11 @@ function ExtraOptions({
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between gap-3">
                 <p className="font-semibold">{extra.label}</p>
-                <p className="font-semibold">€{extra.price}</p>
+                <p className="font-semibold tabular-nums">€{extra.price}</p>
               </div>
               <p className="text-muted mt-1 text-sm leading-5">{extra.description}</p>
             </div>
-            <span className={cn('grid size-6 shrink-0 place-items-center rounded-full border', selected && 'border-accent bg-accent text-white')}>
-              {selected && <Check className="size-3.5" />}
-            </span>
+            <Checkmark checked={selected} />
           </button>
         );
       })}
@@ -282,10 +257,23 @@ function ExtraOptions({
   );
 }
 
+function Checkmark({ checked }: { checked: boolean }) {
+  return (
+    <span
+      className={cn(
+        'border-divider dark:border-divider-dark grid size-6 shrink-0 place-items-center rounded-full border',
+        checked && 'border-accent bg-accent text-white',
+      )}
+    >
+      {checked && <Check className="size-3.5" />}
+    </span>
+  );
+}
+
 function ExtraIcon({ extra, index }: { extra: Extra; index: number }) {
   const Icon = index === 0 ? ShieldCheck : index === 1 ? Sparkles : Leaf;
   return (
-    <div className="bg-accent/10 text-accent grid size-11 shrink-0 place-items-center rounded-xl">
+    <div className="bg-accent/10 text-accent grid size-11 shrink-0 place-items-center rounded-lg">
       <Icon className="size-5" />
       <span className="sr-only">{extra.label}</span>
     </div>
@@ -297,7 +285,9 @@ function Review({ booking, draft, offer }: { booking: Booking; draft: BookingDra
   const selectedExtras = offer.extras.filter(extra => draft.extras.includes(extra.id));
   const rows = [
     { label: `${booking.cabin} fare`, value: offer.baseFare },
-    ...(draft.bags ? [{ label: `${draft.bags} checked bag${draft.bags > 1 ? 's' : ''}`, value: offer.bagPrice * draft.bags }] : []),
+    ...(draft.bags
+      ? [{ label: `${draft.bags} checked bag${draft.bags > 1 ? 's' : ''}`, value: offer.bagPrice * draft.bags }]
+      : []),
     ...(selectedSeat ? [{ label: `Seat ${selectedSeat.label}`, value: selectedSeat.price }] : []),
     ...selectedExtras.map(extra => ({ label: extra.label, value: extra.price })),
   ];
@@ -305,13 +295,16 @@ function Review({ booking, draft, offer }: { booking: Booking; draft: BookingDra
   return (
     <div className="space-y-3">
       {rows.map(row => (
-        <div className="border-divider dark:border-divider-dark flex items-center justify-between border-b py-3 last:border-0" key={row.label}>
+        <div
+          className="border-divider dark:border-divider-dark flex items-center justify-between border-b py-3 last:border-0"
+          key={row.label}
+        >
           <span className="text-sm font-medium">{row.label}</span>
-          <span className="text-sm font-semibold">€{row.value}</span>
+          <span className="text-sm font-semibold tabular-nums">€{row.value}</span>
         </div>
       ))}
       <div className="bg-success/10 mt-5 flex items-start gap-3 rounded-xl p-4">
-        <ShieldCheck className="mt-0.5 size-5 shrink-0" />
+        <ShieldCheck className="text-success mt-0.5 size-5 shrink-0" />
         <p className="text-sm leading-6">Your fare can be changed without a fee. Any fare difference still applies.</p>
       </div>
     </div>

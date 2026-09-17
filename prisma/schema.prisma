@@ -41,8 +41,12 @@ model Destination {
   country     String
   airport     String
   tagline     String
-  description String
-  accent      String
+  description   String
+  accent        String
+  departureTime String
+  arrivalTime   String
+  duration      String
+  fare          Int
 
   bookings Booking[]
 }

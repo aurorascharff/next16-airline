@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import 'dotenv/config';
 import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import { PrismaClient } from '../generated/prisma/client';
@@ -122,27 +123,39 @@ async function main() {
       {
         accent: '#ff785a',
         airport: 'BCN',
+        arrivalTime: '12:45',
         city: 'Barcelona',
         country: 'Spain',
+        departureTime: '09:15',
         description: 'Warm late evenings, bold architecture, and the Mediterranean within walking distance.',
+        duration: '3h 30m',
+        fare: 218,
         slug: 'barcelona',
         tagline: 'The city that keeps dinner plans open.',
       },
       {
         accent: '#5ed6b3',
         airport: 'AMS',
+        arrivalTime: '09:25',
         city: 'Amsterdam',
         country: 'Netherlands',
+        departureTime: '07:40',
         description: 'Canal-side mornings, design districts, and a city made to move through at your own pace.',
+        duration: '1h 45m',
+        fare: 142,
         slug: 'amsterdam',
         tagline: 'A slower rhythm, right after landing.',
       },
       {
         accent: '#9d82ff',
         airport: 'LIS',
+        arrivalTime: '13:40',
         city: 'Lisbon',
         country: 'Portugal',
+        departureTime: '10:05',
         description: 'Hillside streets, Atlantic light, and neighborhood cafés from first tram to last table.',
+        duration: '3h 35m',
+        fare: 236,
         slug: 'lisbon',
         tagline: 'Follow the light downhill.',
       },

@@ -22,7 +22,8 @@ The architecture follows the [Next.js App Architecture](https://github.com/auror
 - **[Server Functions](https://nextjs.org/docs/app/getting-started/mutating-data)** switch the active demo traveler through an HTTP-only cookie while preserving server-owned authorization checks.
 - **[React Compiler](https://react.dev/learn/react-compiler)** memoizes components and hooks automatically, so the code needs no manual `useMemo` or `useCallback`.
 - **[Async React](https://github.com/rickhanlonii/async-react)** keeps the booking flow responsive with `Suspense`, `useOptimistic`, and transitions while server-rendered content streams in.
-- **Demo controls** make prefetching and simulated latency easy to toggle so the behavior can be compared directly.
+- **[View Transitions](https://nextjs.org/docs/app/guides/view-transitions)** cross-fade streamed content into place while the header, tab bar, and demo toolbar stay pinned.
+- **Demo controls** outline Client Components, toggle prefetching and simulated latency, and simulate going offline so the behavior can be compared directly.
 
 ## Getting started
 
@@ -48,20 +49,27 @@ To reset it to the seeded state, run `pnpm run prisma.reset`.
 
 ## Testing
 
-Run the static checks and production build with:
+The end-to-end tests use [`@next/playwright`](https://nextjs.org/docs/app/guides/testing/playwright) with the [`instant()`](https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config/instant) API to assert that the App Shell renders immediately and that navigations stay instant, and they run in CI.
 
 ```bash
-pnpm run lint
-pnpm run build
+pnpm test:e2e
+```
+
+Static checks:
+
+```bash
+pnpm lint
+pnpm typecheck
 ```
 
 ## Stack
 
 - **[Next.js 16.3](https://nextjs.org/)**: App Router, Cache Components, Partial Prefetching, Server Functions
-- **[React 19](https://react.dev/)** with React Compiler: Suspense and `useOptimistic`
+- **[React 19](https://react.dev/)** with React Compiler: Suspense, View Transitions, `useOptimistic`
 - **[TypeScript](https://www.typescriptlang.org/)** and **[Tailwind CSS v4](https://tailwindcss.com/)**
 - **[Prisma 7](https://www.prisma.io/)** on SQLite
 - **[Ariakit](https://ariakit.org/)** for accessible dialogs and popovers
+- **[Playwright](https://playwright.dev/)** with `@next/playwright` for end-to-end tests
 
 ## License
 

@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export async function delay(duration: number, enabled = true) {
-  if (!enabled) return;
-  await new Promise(resolve => setTimeout(resolve, duration));
+// Artificial latency to simulate a slow provider, gated by the demo's Delays toggle.
+export function delay(ms: number, enabled: boolean) {
+  return enabled ? new Promise<void>(resolve => setTimeout(resolve, ms)) : Promise.resolve();
 }

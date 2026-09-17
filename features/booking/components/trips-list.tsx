@@ -1,22 +1,33 @@
 import { ArrowRight, Plane } from 'lucide-react';
-import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
+import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
-import { createBookingHref, DEFAULT_BOOKING_DRAFT } from '../booking-search-params';
 import { getBookings } from '../booking-queries';
+import { createBookingHref, DEFAULT_BOOKING_DRAFT } from '../booking-search-params';
 
 export async function TripsList() {
   const bookings = await getBookings();
 
+  if (bookings.length === 0) {
+    return (
+      <EmptyState body="Search for a flight and it will show up here." title="No trips yet">
+        <Button render={<PrefetchLink href="/search" />} variant="secondary">
+          Search flights
+        </Button>
+      </EmptyState>
+    );
+  }
+
   return (
     <div className="grid gap-3">
       {bookings.map(booking => (
-        <Link
-          className="border-divider bg-surface hover:border-accent/40 dark:border-divider-dark dark:bg-black flex items-center gap-4 rounded-xl border p-4 transition-colors"
+        <PrefetchLink
+          className="border-divider hover:border-accent/40 dark:border-divider-dark flex items-center gap-4 rounded-xl border bg-white p-4 transition-colors dark:bg-black"
           href={createBookingHref(booking.id, 'baggage', DEFAULT_BOOKING_DRAFT)}
           key={booking.id}
-          prefetch={true}
         >
-          <span className="bg-accent/10 text-accent grid size-10 place-items-center rounded-xl">
+          <span className="bg-accent/10 text-accent grid size-10 place-items-center rounded-lg">
             <Plane className="size-5" />
           </span>
           <span className="min-w-0 flex-1">
@@ -28,7 +39,7 @@ export async function TripsList() {
             </span>
           </span>
           <ArrowRight className="text-muted size-4" />
-        </Link>
+        </PrefetchLink>
       ))}
     </div>
   );

@@ -1,5 +1,5 @@
-import type { Route } from 'next';
 import type { BookingDraft, BookingStep } from './types/booking';
+import type { Route } from 'next';
 
 export const BOOKING_STEPS: BookingStep[] = ['baggage', 'seats', 'extras', 'review'];
 

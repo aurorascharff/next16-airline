@@ -1,0 +1,23 @@
+'use client';
+
+import { useSyncExternalStore } from 'react';
+
+const NO_PREFETCH_COOKIE = 'waypoint-no-prefetch';
+
+function subscribe() {
+  return () => {};
+}
+
+function getSnapshot() {
+  return document.cookie.split('; ').some(cookie => cookie === `${NO_PREFETCH_COOKIE}=1`);
+}
+
+// SSR can't read the cookie — assume enabled; the client corrects if it's off.
+function getServerSnapshot() {
+  return false;
+}
+
+export function usePrefetchDefault() {
+  const disabled = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  return disabled ? null : true;
+}
