@@ -147,6 +147,7 @@
 :root {
   --duration-exit: 130ms;
   --duration-enter: 190ms;
+  --duration-move: 400ms;
 }
 
 @keyframes opacity-fade {
@@ -169,20 +170,20 @@
   z-index: 150;
 }
 ::view-transition-old(.overlay-fade) {
-  animation: 600ms ease-in-out both opacity-fade reverse;
+  animation: var(--duration-move) ease-in both opacity-fade reverse;
 }
 ::view-transition-new(.overlay-fade) {
-  animation: 200ms ease-out both opacity-fade;
+  animation: var(--duration-enter) ease-out both opacity-fade;
 }
 
 ::view-transition-group(.morph-plane) {
   z-index: 160;
-  animation-duration: 650ms;
+  animation-duration: var(--duration-move);
   animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 ::view-transition-old(.morph-plane),
 ::view-transition-new(.morph-plane) {
-  animation-duration: 650ms;
+  animation-duration: var(--duration-move);
 }
 
 @keyframes plane-drift {

@@ -17,7 +17,7 @@ export function FlightOverlayProvider({ children }: { children: React.ReactNode 
         <ViewTransition default="none" enter="overlay-fade" exit="overlay-fade">
           <div
             aria-live="polite"
-            className="bg-surface/85 dark:bg-surface-dark/85 fixed inset-0 z-100 flex flex-col items-center justify-center gap-6 backdrop-blur-sm"
+            className="fixed inset-0 z-100 flex flex-col items-center justify-center gap-6 bg-white/95 dark:bg-black/95"
             role="status"
           >
             <ViewTransition default="none" name="confirm-plane" share="morph-plane">
