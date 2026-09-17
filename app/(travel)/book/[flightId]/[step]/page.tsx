@@ -23,10 +23,12 @@ export default function BookingStepPage({ params, searchParams }: PageProps<'/bo
   });
 
   return (
-    <AnimatedSuspense fallback={<BookingStepSkeleton />}>
-      {query.then(({ date, draft, fare, flightId, step }) => (
-        <BookingStepPanel date={date} draft={draft} fare={fare} flightId={flightId} step={step} />
-      ))}
-    </AnimatedSuspense>
+    <div>
+      <AnimatedSuspense fallback={<BookingStepSkeleton />}>
+        {query.then(({ date, draft, fare, flightId, step }) => (
+          <BookingStepPanel date={date} draft={draft} fare={fare} flightId={flightId} step={step} />
+        ))}
+      </AnimatedSuspense>
+    </div>
   );
 }

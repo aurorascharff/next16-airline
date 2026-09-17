@@ -1,20 +1,23 @@
 'use client';
 
 import { Plane } from 'lucide-react';
+import { ViewTransition } from 'react';
 import { createPortal } from 'react-dom';
 
 export function FlightOverlay({ label, open }: { label: string; open: boolean }) {
   if (!open) return null;
 
   return createPortal(
-    <div
-      aria-live="polite"
-      className="bg-surface/85 dark:bg-surface-dark/85 fixed inset-0 z-100 flex flex-col items-center justify-center gap-6 backdrop-blur-sm"
-      role="status"
-    >
-      <PlanePath className="h-12 w-72" distance="20rem" iconClassName="size-8" />
-      <p className="text-sm font-semibold">{label}</p>
-    </div>,
+    <ViewTransition default="none" enter="nav-crossfade" exit="nav-crossfade">
+      <div
+        aria-live="polite"
+        className="bg-surface/85 dark:bg-surface-dark/85 fixed inset-0 z-100 flex flex-col items-center justify-center gap-6 backdrop-blur-sm"
+        role="status"
+      >
+        <PlanePath className="h-12 w-72" distance="20rem" iconClassName="size-8" />
+        <p className="text-sm font-semibold">{label}</p>
+      </div>
+    </ViewTransition>,
     document.body,
   );
 }
