@@ -2,7 +2,7 @@
 
 import { ArrowLeft, ArrowRight, BriefcaseBusiness, Check, Leaf, Luggage, ShieldCheck, Sparkles } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { startTransition, Suspense, use, useActionState, useEffect, useOptimistic, useRef } from 'react';
+import { startTransition, Suspense, use, useActionState,  useOptimistic, useRef } from 'react';
 import { toast } from 'sonner';
 import { Boundary } from '@/components/internal/boundary';
 import { Button } from '@/components/ui/button';
@@ -57,7 +57,6 @@ export function BookingStepForm({
     },
     null,
   );
-  useLeaveGuard(confirming);
   const [optimisticDraft, updateOptimisticDraft] = useOptimistic(draft, (current, patch: Partial<BookingDraft>) => ({
     ...current,
     ...patch,
@@ -197,15 +196,6 @@ export function BookingStepForm({
       </form>
     </Boundary>
   );
-}
-
-function useLeaveGuard(active: boolean) {
-  useEffect(() => {
-    if (!active) return;
-    const warn = (event: BeforeUnloadEvent) => event.preventDefault();
-    window.addEventListener('beforeunload', warn);
-    return () => window.removeEventListener('beforeunload', warn);
-  }, [active]);
 }
 
 type StepProps = {
