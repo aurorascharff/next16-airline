@@ -6,7 +6,11 @@ import { normalizeDatabaseUrl } from '@/lib/database-url';
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
-const adapter = new PrismaPg({ connectionString: normalizeDatabaseUrl(process.env.DATABASE_URL!) });
+const adapter = new PrismaPg({
+  connectionString: normalizeDatabaseUrl(process.env.DATABASE_URL!),
+  idleTimeoutMillis: 10_000,
+  max: 3,
+});
 
 export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
 

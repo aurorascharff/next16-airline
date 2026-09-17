@@ -8,7 +8,7 @@ config({ path: '.env.local' });
 config({ path: '.env' });
 
 const prisma = new PrismaClient({
-  adapter: new PrismaPg({ connectionString: normalizeDatabaseUrl(process.env.DATABASE_URL!) }),
+  adapter: new PrismaPg({ connectionString: normalizeDatabaseUrl(process.env.DATABASE_URL!), max: 1 }),
 });
 
 const users = [{ id: 'demo' }, { id: 'traveler' }];
