@@ -55,7 +55,7 @@ export function NextTripSkeleton() {
     <div className="border-divider dark:border-divider-dark shadow-soft flex items-center gap-4 rounded-2xl border bg-white p-4 sm:p-5 dark:bg-black">
       <Skeleton className="skeleton-subtle size-11 shrink-0 rounded-lg" />
       <div className="flex min-w-0 flex-1 flex-col">
-        <Skeleton className="my-[3px] h-3 w-24" />
+        <Skeleton className="my-0.5 h-3 w-24" />
         <Skeleton className="mt-[8px] mb-1 h-4 w-48" />
         <Skeleton className="my-[3px] h-3.5 w-64" />
       </div>
