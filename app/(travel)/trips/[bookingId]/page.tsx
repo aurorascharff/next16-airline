@@ -1,4 +1,4 @@
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Plane } from 'lucide-react';
 import { ViewTransition } from 'react';
 import { AnimatedSuspense } from '@/components/ui/animated-suspense';
 import ErrorBoundary from '@/components/ui/error-boundary';
@@ -25,7 +25,7 @@ export default function TripPage({ params, searchParams }: PageProps<'/trips/[bo
   }));
 
   return (
-    <ViewTransition default="none" enter={{ 'booking-confirmed': 'slide-up', default: 'none' }}>
+    <ViewTransition default="none" enter={{ 'booking-confirmed': 'nav-crossfade', default: 'none' }}>
       <main className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 sm:py-12">
         <PrefetchLink
           className="text-muted hover:text-accent mb-6 inline-flex items-center gap-2 text-sm font-semibold"
@@ -35,7 +35,10 @@ export default function TripPage({ params, searchParams }: PageProps<'/trips/[bo
         </PrefetchLink>
         <ErrorBoundary title="This trip could not be loaded">
           <div className="border-divider/70 dark:border-divider-dark/70 overflow-hidden rounded-lg border bg-white dark:bg-black">
-            <div className="bg-card dark:bg-card-dark flex flex-col p-7 sm:p-10">
+            <div className="bg-card dark:bg-card-dark relative flex flex-col p-7 sm:p-10">
+              <ViewTransition default="none" name="confirm-plane" share="morph-plane">
+                <Plane className="text-accent absolute top-7 right-7 size-16 sm:top-10 sm:right-10 sm:size-24" />
+              </ViewTransition>
               <AnimatedSuspense fallback={<TripHeaderSkeleton />}>
                 {query.then(({ bookingId, confirmed, reference }) => (
                   <TripHeader bookingId={bookingId} confirmed={confirmed} reference={reference} />

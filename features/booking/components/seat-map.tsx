@@ -75,7 +75,7 @@ function SeatGrid({ draft, holds, offer, onSelect, pendingSeat }: SeatGridProps)
         const status = seat.status === 'available' && heldByOthers.has(seat.id) ? 'held' : seat.status;
         const blocked = status !== 'available';
         const pending = pendingSeat === seat.id;
-        const locked = Boolean(pendingSeat) && !pending;
+        const holding = Boolean(pendingSeat);
         return (
           <button
             aria-busy={pending || undefined}
@@ -90,9 +90,9 @@ function SeatGrid({ draft, holds, offer, onSelect, pendingSeat }: SeatGridProps)
               seat.type === 'extra-legroom' && !blocked && !selected && 'border-success dark:border-success',
               selected && 'border-accent bg-accent dark:bg-accent text-white',
               pending && 'border-accent',
-              locked && 'cursor-wait',
+              holding && !pending && 'opacity-50',
             )}
-            disabled={blocked || locked}
+            disabled={blocked || holding}
             key={seat.id}
             onClick={() => onSelect(seat.id)}
             type="button"

@@ -1,0 +1,17 @@
+import { chromium } from '@playwright/test';
+const base = 'http://localhost:3000';
+const browser = await chromium.launch();
+const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+await ctx.addCookies([{ name: 'waypoint-session', value: 'demo', url: base }, { name: 'waypoint-slow', value: '1', url: base }]);
+const page = await ctx.newPage();
+page.on('pageerror', e => console.log('PAGEERROR', e.message));
+await page.goto(base + '/book/wp-21/seats?date=2026-11-29&fare=Flex&steps=baggage%2Cseats%2Cextras%2Creview');
+await page.getByRole('heading', { level: 1, name: 'Choose your seat' }).waitFor();
+await page.getByRole('button', { exact: true, name: 'Seat 12C' }).click();
+await page.waitForTimeout(120);
+const during = await page.evaluate(() => { const b = [...document.querySelectorAll('button[aria-label^="Seat "]')]; return { disabled: b.filter(x => x.disabled).length, total: b.length, faded: b.filter(x => x.className.includes('opacity-50')).length, busy: b.filter(x => x.getAttribute('aria-busy') === 'true').map(x => x.getAttribute('aria-label')), status: document.querySelector('p[aria-live=polite]')?.textContent }; });
+const t0 = Date.now();
+await page.getByText(/Booking held for/).first().waitFor({ timeout: 30000 }).then(() => console.log('hold visible after', Date.now() - t0, 'ms')).catch(() => console.log('hold NOT visible; banner:', page.getByTestId('seat-hold')));
+const after = await page.evaluate(() => { const b = [...document.querySelectorAll('button[aria-label^="Seat "]')]; return { disabled: b.filter(x => x.disabled).length, total: b.length, faded: b.filter(x => x.className.includes('opacity-50')).length, banner: document.querySelector('[data-testid=seat-hold]')?.textContent }; });
+console.log('during hold:', JSON.stringify(during)); console.log('after hold:', JSON.stringify(after));
+await browser.close();

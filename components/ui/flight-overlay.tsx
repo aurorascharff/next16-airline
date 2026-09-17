@@ -20,7 +20,9 @@ export function FlightOverlayProvider({ children }: { children: React.ReactNode 
             className="bg-surface/85 dark:bg-surface-dark/85 fixed inset-0 z-100 flex flex-col items-center justify-center gap-6 backdrop-blur-sm"
             role="status"
           >
-            <PlanePath className="h-12 w-72" distance="20rem" iconClassName="size-8" />
+            <ViewTransition default="none" name="confirm-plane" share="morph-plane">
+              <Plane className="plane-drift text-accent size-7" />
+            </ViewTransition>
             <p className="text-sm font-semibold">{label}</p>
           </div>
         </ViewTransition>
