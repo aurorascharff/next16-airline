@@ -64,22 +64,22 @@ export function AirportDetailsSkeleton() {
   return (
     <div>
       <div className="border-divider dark:border-divider-dark shadow-soft grid overflow-hidden rounded-2xl border bg-white lg:grid-cols-[1.05fr_0.95fr] dark:bg-black">
-        <div className="p-7 sm:p-10">
+        <div className="flex flex-col p-7 sm:p-10">
           <Skeleton className="my-[3px] h-3.5 w-24" />
           <Skeleton className="mt-[32px] mb-2 h-8 w-56" />
           <Skeleton className="mt-[18px] mb-1.5 h-4 w-72" />
-          <Skeleton className="mt-[27px] mb-[3px] h-3.5 w-full max-w-md" />
-          <Skeleton className="mt-[7px] mb-[3px] h-3.5 w-64" />
+          <Skeleton className="mt-[29px] mb-[5px] h-3.5 w-full max-w-md" />
+          <Skeleton className="my-[5px] h-3.5 w-64" />
         </div>
         <div className="border-divider bg-card/60 dark:border-divider-dark dark:bg-card-dark/60 flex flex-col justify-between gap-8 border-t p-7 sm:p-10 lg:border-t-0 lg:border-l">
-          <div>
+          <div className="flex flex-col">
             <Skeleton className="skeleton-subtle size-10 rounded-md" />
             <Skeleton className="mt-[26px] mb-0.5 h-3 w-20" />
-            <Skeleton className="mt-[16px] mb-2 h-6 w-20" />
+            <Skeleton className="mt-[12px] mb-1 h-8 w-20" />
           </div>
           <div className="grid gap-2">
-            <Skeleton className="skeleton-subtle h-[3.75rem] rounded-xl" />
-            <Skeleton className="skeleton-subtle h-[3.75rem] rounded-xl" />
+            <Skeleton className="skeleton-subtle h-[3.875rem] rounded-xl" />
+            <Skeleton className="skeleton-subtle h-[3.875rem] rounded-xl" />
           </div>
         </div>
       </div>
