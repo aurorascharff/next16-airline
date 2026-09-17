@@ -1,12 +1,8 @@
-'use client';
-
 import { Check } from 'lucide-react';
-import { useParams, useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
-import { Boundary } from '@/components/internal/boundary';
-import { parseFare } from '../utils/search-params';
-import { BOOKING_STEPS, expectedSteps, isBookingStep } from '../utils/steps';
+import { getFlightOffer } from '@/features/flight/flight-queries';
+import { BOOKING_STEPS, getAvailableSteps } from '../utils/steps';
 import type { BookingStep } from '../types/booking';
+import type { Fare } from '../utils/search-params';
 
 const stepLabels: Record<BookingStep, string> = {
   baggage: 'Baggage',
@@ -15,29 +11,28 @@ const stepLabels: Record<BookingStep, string> = {
   seats: 'Seats',
 };
 
-export function BookingProgress() {
-  return (
-    <Boundary label="BookingProgress">
-      <Suspense fallback={<ProgressBar available={BOOKING_STEPS} />}>
-        <CurrentProgressBar />
-      </Suspense>
-    </Boundary>
-  );
+export async function BookingProgress({
+  date,
+  fare,
+  flightId,
+  step,
+}: {
+  date: string;
+  fare: Fare;
+  flightId: string;
+  step: BookingStep;
+}) {
+  const offer = await getFlightOffer(flightId, date, fare);
+  return <ProgressBar available={getAvailableSteps(offer)} step={step} />;
 }
 
-function CurrentProgressBar() {
-  const { step } = useParams<{ step: string }>();
-  const fare = parseFare(useSearchParams().get('fare') ?? undefined);
-  return <ProgressBar available={expectedSteps(fare)} step={isBookingStep(step) ? step : undefined} />;
-}
-
-function ProgressBar({ available, step }: { available: BookingStep[]; step?: BookingStep }) {
+export function ProgressBar({ available, step }: { available?: BookingStep[]; step?: BookingStep }) {
   const activeIndex = step ? BOOKING_STEPS.indexOf(step) : -1;
 
   return (
     <ol aria-label="Booking progress" className="mb-5 grid grid-cols-4 gap-2">
       {BOOKING_STEPS.map((item, index) => {
-        const skipped = !available.includes(item);
+        const skipped = available !== undefined && !available.includes(item);
         const complete = index < activeIndex && !skipped;
         const reached = complete || item === step;
         return (

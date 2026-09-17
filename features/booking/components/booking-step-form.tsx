@@ -18,7 +18,6 @@ import { Boundary } from '@/components/internal/boundary';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
-import { Spinner } from '@/components/ui/spinner';
 import type { Extra, Flight, FlightOffer } from '@/features/flight/types/flight';
 import { cn, formatPrice } from '@/lib/utils';
 import { confirmBooking, holdSeat } from '../booking-actions';
@@ -81,6 +80,7 @@ export function BookingStepForm({
       const result = await holdSeat(flight.id, date, seatId);
       if (!result.ok && latestSeat.current === seatId) {
         toast.error(result.error);
+        updateOptimisticDraft({ seat: '' });
         router.replace(createBookingHref(flight.id, step, { ...optimisticDraft, seat: '' }, date, offer.fare), {
           scroll: false,
         });
@@ -262,14 +262,14 @@ function SeatOptions({
                     : 'border-divider dark:border-divider-dark bg-white hover:-translate-y-0.5 dark:bg-black',
                   seat.type === 'extra-legroom' && !blocked && !selected && 'border-success dark:border-success',
                   selected && 'border-accent bg-accent dark:bg-accent text-white',
-                  pending && 'opacity-80',
+                  pending && 'animate-pulse opacity-60',
                 )}
                 disabled={blocked}
                 key={seat.id}
                 onClick={() => onSelect(seat.id)}
                 type="button"
               >
-                {pending ? <Spinner className="mb-3 size-4" /> : <Armchair className="mb-3 size-4" />}
+                <Armchair className="mb-3 size-4" />
                 <span className="absolute bottom-1.5">{seat.label}</span>
               </button>
             );
