@@ -5,7 +5,6 @@ import { getFlight, getFlightOffer } from '@/features/flight/flight-queries';
 import { formatDate } from '@/lib/utils';
 import { createBookingHref } from '../utils/search-params';
 import { getAvailableSteps, nextBookingStep } from '../utils/steps';
-import { BookingProgress } from './booking-progress';
 import { BookingStepForm } from './booking-step-form';
 import { SeatHoldTimer } from './seat-hold-timer';
 import type { BookingDraft, BookingStep } from '../types/booking';
@@ -34,8 +33,6 @@ export async function BookingExperience({
 
   return (
     <div data-testid="booking-experience">
-      <BookingProgress available={steps} />
-
       <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_19rem]">
         <BookingStepForm date={date} draft={draft} flight={flight} offer={offer} step={step} steps={steps} />
         <aside className="border-divider dark:border-divider-dark shadow-soft overflow-hidden rounded-2xl border bg-white lg:sticky lg:top-20 dark:bg-black">
@@ -95,7 +92,6 @@ export async function BookingExperience({
 export function BookingExperienceSkeleton() {
   return (
     <div>
-      <BookingProgress />
       <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_19rem]">
         <div className="border-divider dark:border-divider-dark shadow-soft overflow-hidden rounded-2xl border bg-white dark:bg-black">
           <div className="p-5 sm:p-6">

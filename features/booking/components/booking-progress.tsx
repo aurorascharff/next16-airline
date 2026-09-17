@@ -15,29 +15,29 @@ const stepLabels: Record<BookingStep, string> = {
   seats: 'Seats',
 };
 
-export function BookingProgress({ available }: { available?: BookingStep[] }) {
+export function BookingProgress() {
   return (
     <Boundary label="BookingProgress">
-      <Suspense fallback={<ProgressBar available={available} />}>
-        <CurrentProgressBar available={available} />
+      <Suspense fallback={<ProgressBar available={BOOKING_STEPS} />}>
+        <CurrentProgressBar />
       </Suspense>
     </Boundary>
   );
 }
 
-function CurrentProgressBar({ available }: { available?: BookingStep[] }) {
+function CurrentProgressBar() {
   const { step } = useParams<{ step: string }>();
   const fare = parseFare(useSearchParams().get('fare') ?? undefined);
-  return <ProgressBar available={available ?? expectedSteps(fare)} step={isBookingStep(step) ? step : undefined} />;
+  return <ProgressBar available={expectedSteps(fare)} step={isBookingStep(step) ? step : undefined} />;
 }
 
-function ProgressBar({ available, step }: { available?: BookingStep[]; step?: BookingStep }) {
+function ProgressBar({ available, step }: { available: BookingStep[]; step?: BookingStep }) {
   const activeIndex = step ? BOOKING_STEPS.indexOf(step) : -1;
 
   return (
     <ol aria-label="Booking progress" className="mb-5 grid grid-cols-4 gap-2">
       {BOOKING_STEPS.map((item, index) => {
-        const skipped = available !== undefined && !available.includes(item);
+        const skipped = !available.includes(item);
         const complete = index < activeIndex && !skipped;
         const reached = complete || item === step;
         return (

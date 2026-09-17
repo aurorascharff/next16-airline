@@ -4,6 +4,7 @@ import { AnimatedSuspense } from '@/components/ui/animated-suspense';
 import ErrorBoundary from '@/components/ui/error-boundary';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { BookingExperience, BookingExperienceSkeleton } from '@/features/booking/components/booking-experience';
+import { BookingProgress } from '@/features/booking/components/booking-progress';
 import { parseBookingDraft, parseDate, parseFare } from '@/features/booking/utils/search-params';
 import { isBookingStep } from '@/features/booking/utils/steps';
 import type { Metadata } from 'next';
@@ -26,6 +27,7 @@ export default function BookingPage({ params, searchParams }: PageProps<'/book/[
         <p className="text-muted text-sm font-medium">Booking</p>
         <h2 className="mt-1 text-xl">Book your flight</h2>
       </div>
+      <BookingProgress />
       <ErrorBoundary title="The booking could not be loaded">
         <AnimatedSuspense fallback={<BookingExperienceSkeleton />}>
           {Promise.all([params, searchParams]).then(([{ flightId, step }, values]) => {
