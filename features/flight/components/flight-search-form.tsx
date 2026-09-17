@@ -23,19 +23,19 @@ export async function FlightSearchForm({
       className="border-divider dark:border-divider-dark shadow-soft grid gap-3 rounded-2xl border bg-white p-4 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-end dark:bg-black"
       method="get"
     >
-      <label className="grid gap-1.5 text-xs font-semibold">
-        From
-        <Select defaultValue={from} name="from">
+      <div className="grid gap-1.5 text-xs font-semibold">
+        <label htmlFor="search-from">From</label>
+        <Select defaultValue={from} id="search-from" name="from">
           {hubs.map(airport => (
             <option key={airport.code} value={airport.code}>
               {airport.city} ({airport.code})
             </option>
           ))}
         </Select>
-      </label>
-      <label className="grid gap-1.5 text-xs font-semibold">
-        To
-        <Select defaultValue={to} name="to" required>
+      </div>
+      <div className="grid gap-1.5 text-xs font-semibold">
+        <label htmlFor="search-to">To</label>
+        <Select defaultValue={to} id="search-to" name="to" required>
           <option value="">Choose a destination</option>
           {destinations.map(airport => (
             <option key={airport.code} value={airport.code}>
@@ -43,11 +43,11 @@ export async function FlightSearchForm({
             </option>
           ))}
         </Select>
-      </label>
-      <label className="grid gap-1.5 text-xs font-semibold">
-        Departure
-        <Input defaultValue={date} name="date" type="date" />
-      </label>
+      </div>
+      <div className="grid gap-1.5 text-xs font-semibold">
+        <label htmlFor="search-date">Departure</label>
+        <Input defaultValue={date} id="search-date" name="date" type="date" />
+      </div>
       <Button className="h-10" type="submit">
         Search flights <ArrowRight className="size-4" />
       </Button>

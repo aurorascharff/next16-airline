@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { cacheLife, cacheTag } from 'next/cache';
+import { cacheLife } from 'next/cache';
 import { notFound } from 'next/navigation';
 import { isSlowEnabled } from '@/features/demo/demo-queries';
 import { prisma } from '@/lib/db';
@@ -12,8 +12,7 @@ export async function getAirports() {
 
 async function getAirportsCached(slow: boolean) {
   'use cache';
-  cacheLife('days');
-  cacheTag('airports');
+  cacheLife('max');
 
   await delay(400, slow);
   return prisma.airport.findMany({ orderBy: { city: 'asc' } });
@@ -25,8 +24,7 @@ export async function getDestinations() {
 
 async function getDestinationsCached(slow: boolean) {
   'use cache';
-  cacheLife('days');
-  cacheTag('airports', 'flights');
+  cacheLife('max');
 
   await delay(900, slow);
   const airports = await prisma.airport.findMany({
@@ -44,8 +42,7 @@ export async function getAirport(slug: string) {
 
 async function getAirportCached(slug: string, slow: boolean) {
   'use cache';
-  cacheLife('days');
-  cacheTag('airports', `airport:${slug}`);
+  cacheLife('max');
 
   await delay(600, slow);
   const airport = await prisma.airport.findUnique({ where: { slug } });
@@ -55,8 +52,7 @@ async function getAirportCached(slug: string, slow: boolean) {
 
 export async function getAirportSlugs() {
   'use cache';
-  cacheLife('days');
-  cacheTag('airports');
+  cacheLife('max');
 
   const airports = await prisma.airport.findMany({ select: { slug: true } });
   return airports.map(airport => airport.slug);

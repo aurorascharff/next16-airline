@@ -12,7 +12,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { startTransition, useActionState, useOptimistic, useRef, useState } from 'react';
+import { startTransition, useActionState, useOptimistic, useRef } from 'react';
 import { toast } from 'sonner';
 import { Boundary } from '@/components/internal/boundary';
 import { Button } from '@/components/ui/button';
@@ -24,7 +24,6 @@ import { cn, formatPrice } from '@/lib/utils';
 import { confirmBooking, holdSeat } from '../booking-actions';
 import { createBookingHref } from '../utils/search-params';
 import { nextBookingStep, previousBookingStep } from '../utils/steps';
-import { SeatHoldTimer } from './seat-hold-timer';
 import type { BookingDraft, BookingStep } from '../types/booking';
 import type { Fare } from '../utils/search-params';
 
@@ -69,7 +68,6 @@ export function BookingStepForm({
   }
 
   const [pendingSeat, setPendingSeat] = useOptimistic('');
-  const [holdExpiresAt, setHoldExpiresAt] = useState(offer.hold?.expiresAt ?? null);
   const latestSeat = useRef('');
 
   function selectSeat(seatId: string) {
@@ -81,9 +79,7 @@ export function BookingStepForm({
         scroll: false,
       });
       const result = await holdSeat(flight.id, date, seatId);
-      if (result.ok) {
-        setHoldExpiresAt(result.expiresAt);
-      } else if (latestSeat.current === seatId) {
+      if (!result.ok && latestSeat.current === seatId) {
         toast.error(result.error);
         router.replace(createBookingHref(flight.id, step, { ...optimisticDraft, seat: '' }, date, offer.fare), {
           scroll: false,
@@ -92,7 +88,6 @@ export function BookingStepForm({
     });
   }
 
-  const heldSeat = offer.seats.find(seat => seat.id === optimisticDraft.seat);
   const nextStep = nextBookingStep(steps, step);
   const previousStep = previousBookingStep(steps, step);
   const canContinue = step !== 'seats' || Boolean(optimisticDraft.seat);
@@ -119,7 +114,6 @@ export function BookingStepForm({
             <p className="text-xl font-semibold tabular-nums" data-testid="trip-total">
               {formatPrice(total)}
             </p>
-            {heldSeat && holdExpiresAt && <SeatHoldTimer expiresAt={holdExpiresAt} seatLabel={heldSeat.label} />}
           </div>
           <div className="flex items-center gap-3">
             {previousStep ? (
@@ -179,18 +173,19 @@ function ConfirmTripForm({
 
   return (
     <form action={formAction} className="flex flex-col items-end gap-3 sm:flex-row sm:items-start">
-      <label className="grid gap-1.5 text-xs font-semibold">
-        Passenger name
+      <div className="grid gap-1.5 text-xs font-semibold">
+        <label htmlFor="confirm-passenger">Passenger name</label>
         <Input
           aria-describedby={state?.error ? 'confirm-error' : undefined}
           aria-invalid={state?.error ? true : undefined}
           autoComplete="name"
           className="w-56"
+          id="confirm-passenger"
           name="passenger"
           placeholder="Full name as on passport"
           required
         />
-      </label>
+      </div>
       <input name="flightId" type="hidden" value={flightId} />
       <input name="date" type="hidden" value={date} />
       <input name="fare" type="hidden" value={fare} />

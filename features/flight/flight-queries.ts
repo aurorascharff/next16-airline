@@ -22,8 +22,7 @@ export async function searchFlights(from: string, to: string) {
 
 async function searchFlightsCached(from: string, to: string, slow: boolean) {
   'use cache';
-  cacheLife('hours');
-  cacheTag(flightTags.all, flightTags.route(from, to));
+  cacheLife('max');
 
   await delay(700, slow);
   return prisma.flight.findMany({
@@ -39,8 +38,7 @@ export async function getRoutesFrom(originCode: string) {
 
 async function getRoutesFromCached(originCode: string, slow: boolean) {
   'use cache';
-  cacheLife('days');
-  cacheTag(flightTags.all, flightTags.from(originCode));
+  cacheLife('max');
 
   await delay(500, slow);
   const flights = await prisma.flight.findMany({
@@ -72,8 +70,7 @@ export async function getFlight(id: string) {
 
 async function getFlightCached(id: string, slow: boolean) {
   'use cache';
-  cacheLife('hours');
-  cacheTag(flightTags.all, flightTags.detail(id));
+  cacheLife('max');
 
   await delay(400, slow);
   const flight = await prisma.flight.findUnique({ include: { destination: true, origin: true }, where: { id } });
@@ -106,8 +103,8 @@ export async function getFlightOffer(flightId: string, date: string, fare: Fare)
 
 async function getFlightOfferCached(flightId: string, date: string, fare: Fare, slow: boolean): Promise<FlightOffer> {
   'use cache';
-  cacheLife({ expire: 300, revalidate: 60, stale: 60 });
-  cacheTag(flightTags.all, flightTags.offer(flightId));
+  cacheLife('hours');
+  cacheTag(flightTags.offer(flightId));
 
   await delay(1300, slow);
   const [flight, booked] = await Promise.all([
@@ -143,8 +140,7 @@ export async function getRoutesTo(destinationCode: string) {
 
 async function getRoutesToCached(destinationCode: string, slow: boolean) {
   'use cache';
-  cacheLife('days');
-  cacheTag(flightTags.all, flightTags.to(destinationCode));
+  cacheLife('max');
 
   await delay(800, slow);
   const flights = await prisma.flight.findMany({

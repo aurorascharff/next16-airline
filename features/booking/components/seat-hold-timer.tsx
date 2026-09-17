@@ -30,13 +30,13 @@ export function SeatHoldTimer({ expiresAt, seatLabel }: { expiresAt: string; sea
       <p
         className={
           expired
-            ? 'text-danger flex items-center gap-1.5 text-xs font-medium'
-            : 'text-muted flex items-center gap-1.5 text-xs font-medium'
+            ? 'text-danger flex items-center gap-1.5 text-xs font-semibold tracking-normal normal-case'
+            : 'text-accent flex items-center gap-1.5 text-xs font-semibold tracking-normal normal-case'
         }
         data-testid="seat-hold"
       >
         <Timer className="size-3.5" />
-        {expired ? `Hold on seat ${seatLabel} expired` : `Seat ${seatLabel} held for ${label}`}
+        {expired ? `Hold expired · seat ${seatLabel} may be released` : `Booking held for ${label} · seat ${seatLabel}`}
       </p>
     </Boundary>
   );

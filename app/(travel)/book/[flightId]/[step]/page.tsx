@@ -1,6 +1,5 @@
 import { ArrowLeft } from 'lucide-react';
 import { notFound } from 'next/navigation';
-import { Suspense } from 'react';
 import { AnimatedSuspense } from '@/components/ui/animated-suspense';
 import ErrorBoundary from '@/components/ui/error-boundary';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
@@ -28,24 +27,20 @@ export default function BookingPage({ params, searchParams }: PageProps<'/book/[
         <h2 className="mt-1 text-xl">Build your journey</h2>
       </div>
       <ErrorBoundary title="The booking could not be loaded">
-        <Suspense fallback={<BookingExperienceSkeleton step="baggage" />}>
-          {params.then(({ flightId, step }) => {
+        <AnimatedSuspense fallback={<BookingExperienceSkeleton />}>
+          {Promise.all([params, searchParams]).then(([{ flightId, step }, values]) => {
             if (!isBookingStep(step)) notFound();
             return (
-              <AnimatedSuspense fallback={<BookingExperienceSkeleton step={step} />}>
-                {searchParams.then(values => (
-                  <BookingExperience
-                    date={parseDate(values.date)}
-                    draft={parseBookingDraft(values)}
-                    fare={parseFare(values.fare)}
-                    flightId={flightId}
-                    step={step}
-                  />
-                ))}
-              </AnimatedSuspense>
+              <BookingExperience
+                date={parseDate(values.date)}
+                draft={parseBookingDraft(values)}
+                fare={parseFare(values.fare)}
+                flightId={flightId}
+                step={step}
+              />
             );
           })}
-        </Suspense>
+        </AnimatedSuspense>
       </ErrorBoundary>
     </main>
   );
