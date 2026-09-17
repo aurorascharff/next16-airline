@@ -48,11 +48,12 @@ export async function confirmBooking(_state: ConfirmBookingState, formData: Form
   const flex = input.fare === 'Flex';
   const seat = flex && input.seat ? flight.seats.find(item => item.id === input.seat) : undefined;
   if (input.seat && !seat) return { error: 'Choose a seat on this flight.', ok: false };
-  if (seat?.status === 'occupied') return { error: `Seat ${seat.label} is already taken.`, ok: false };
   if (seat) {
     const conflict = await seatConflict(flight.id, input.date, seat.id, sessionId);
     if (conflict) return { error: `Seat ${seat.label} ${conflict}. Pick another one.`, ok: false };
   }
+  const bookedCount = await prisma.booking.count({ where: { date: input.date, flightId: flight.id } });
+  if (bookedCount >= flight.seats.length) return { error: 'This flight is sold out on that date.', ok: false };
 
   const extraIds = new Set(input.extras.split(',').filter(Boolean));
   const extras = flex ? flight.extras.filter(extra => extraIds.has(extra.id)) : [];
@@ -102,7 +103,7 @@ export async function holdSeat(flightId: string, date: string, seatId: string) {
   const sessionId = await verifySession();
   await ensureTraveler(sessionId);
   const seat = await prisma.seat.findFirst({ where: { flightId, id: seatId } });
-  if (!seat || seat.status === 'occupied') return { error: 'That seat is not available.', ok: false as const };
+  if (!seat) return { error: 'That seat is not available.', ok: false as const };
 
   const conflict = await seatConflict(flightId, date, seatId, sessionId);
   if (conflict) return { error: `Seat ${seat.label} ${conflict}.`, ok: false as const };

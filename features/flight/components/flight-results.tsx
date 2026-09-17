@@ -9,7 +9,7 @@ import { searchFlights } from '../flight-queries';
 import type { Route } from 'next';
 
 export async function FlightResults({ date, from, to }: { date: string; from: string; to: string }) {
-  const flights = await searchFlights(from, to);
+  const flights = await searchFlights(from, to, date);
   const [first] = flights;
 
   if (!first) {
@@ -50,14 +50,29 @@ export async function FlightResults({ date, from, to }: { date: string; from: st
               </div>
             </div>
             <div className="border-divider dark:border-divider-dark grid grid-cols-2 gap-3 border-t pt-4 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-6">
+              <p
+                className={
+                  flight.seatsLeft === 0
+                    ? 'text-danger col-span-2 text-xs font-semibold'
+                    : flight.seatsLeft <= 4
+                      ? 'text-warning col-span-2 text-xs font-semibold'
+                      : 'text-muted col-span-2 text-xs font-medium'
+                }
+              >
+                {flight.seatsLeft === 0
+                  ? 'Sold out on this date'
+                  : `${flight.seatsLeft} seat${flight.seatsLeft === 1 ? '' : 's'} left`}
+              </p>
               <FareOption
                 description="Seat at the gate"
+                disabled={flight.seatsLeft === 0}
                 fare="Basic"
                 href={createBookingHref(flight.id, 'baggage', DEFAULT_BOOKING_DRAFT, date, 'Basic')}
                 price={flight.basicFare}
               />
               <FareOption
                 description="Choose your seat, add extras"
+                disabled={flight.seatsLeft === 0}
                 fare="Flex"
                 href={createBookingHref(flight.id, 'baggage', DEFAULT_BOOKING_DRAFT, date, 'Flex')}
                 price={flight.flexFare}
@@ -72,25 +87,42 @@ export async function FlightResults({ date, from, to }: { date: string; from: st
 
 function FareOption({
   description,
+  disabled,
   fare,
   href,
   price,
 }: {
   description: string;
+  disabled: boolean;
   fare: Fare;
   href: Route;
   price: number;
 }) {
-  return (
-    <PrefetchLink
-      className="border-divider hover:border-accent/40 hover:bg-card dark:border-divider-dark dark:hover:bg-card-dark flex flex-col gap-1 rounded-xl border p-3 text-left transition-colors"
-      data-testid={`fare-${fare.toLowerCase()}`}
-      href={href}
-    >
+  const className = 'border-divider dark:border-divider-dark flex flex-col gap-1 rounded-xl border p-3 text-left';
+  const content = (
+    <>
       <span className="flex items-center justify-between text-sm font-semibold">
         {fare} <span className="tabular-nums">{formatPrice(price)}</span>
       </span>
       <span className="text-muted text-xs">{description}</span>
+    </>
+  );
+
+  if (disabled) {
+    return (
+      <div aria-disabled className={`${className} opacity-40`} data-testid={`fare-${fare.toLowerCase()}`}>
+        {content}
+      </div>
+    );
+  }
+
+  return (
+    <PrefetchLink
+      className={`${className} hover:border-accent/40 hover:bg-card dark:hover:bg-card-dark transition-colors`}
+      data-testid={`fare-${fare.toLowerCase()}`}
+      href={href}
+    >
+      {content}
     </PrefetchLink>
   );
 }
@@ -120,6 +152,7 @@ export function FlightResultsSkeleton() {
               </div>
             </div>
             <div className="border-divider dark:border-divider-dark grid grid-cols-2 gap-3 border-t pt-4 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-6">
+              <Skeleton className="col-span-2 my-0.5 h-3 w-20" />
               <Skeleton className="skeleton-subtle h-[3.75rem] rounded-xl" />
               <Skeleton className="skeleton-subtle h-[3.75rem] rounded-xl" />
             </div>

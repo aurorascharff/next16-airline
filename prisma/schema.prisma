@@ -56,7 +56,6 @@ model Seat {
   flightId String
   label    String
   price    Int
-  status   String
   type     String
 
   flight    Flight     @relation(fields: [flightId], references: [id], onDelete: Cascade)

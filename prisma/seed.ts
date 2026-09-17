@@ -79,22 +79,22 @@ const routes: Route[] = [
 ];
 
 const seatPlan = [
-  ['10A', 28, 'available', 'extra-legroom'],
-  ['10B', 28, 'occupied', 'extra-legroom'],
-  ['10C', 28, 'available', 'extra-legroom'],
-  ['10D', 28, 'available', 'extra-legroom'],
-  ['11A', 14, 'occupied', 'standard'],
-  ['11B', 14, 'available', 'standard'],
-  ['11C', 14, 'available', 'standard'],
-  ['11D', 14, 'occupied', 'standard'],
-  ['12A', 14, 'available', 'standard'],
-  ['12B', 14, 'available', 'standard'],
-  ['12C', 14, 'occupied', 'standard'],
-  ['12D', 14, 'available', 'standard'],
-  ['13A', 14, 'available', 'standard'],
-  ['13B', 14, 'occupied', 'standard'],
-  ['13C', 14, 'available', 'standard'],
-  ['13D', 14, 'available', 'standard'],
+  ['10A', 28, 'extra-legroom'],
+  ['10B', 28, 'extra-legroom'],
+  ['10C', 28, 'extra-legroom'],
+  ['10D', 28, 'extra-legroom'],
+  ['11A', 14, 'standard'],
+  ['11B', 14, 'standard'],
+  ['11C', 14, 'standard'],
+  ['11D', 14, 'standard'],
+  ['12A', 14, 'standard'],
+  ['12B', 14, 'standard'],
+  ['12C', 14, 'standard'],
+  ['12D', 14, 'standard'],
+  ['13A', 14, 'standard'],
+  ['13B', 14, 'standard'],
+  ['13C', 14, 'standard'],
+  ['13D', 14, 'standard'],
 ] as const;
 
 const extraPlan = [
@@ -136,11 +136,10 @@ function flightData(route: Route, index: 0 | 1) {
     id,
     originCode: route.origin,
     seats: {
-      create: seatPlan.map(([label, price, status, type]) => ({
+      create: seatPlan.map(([label, price, type]) => ({
         id: `${id}-${label}`,
         label,
         price,
-        status,
         type,
       })),
     },

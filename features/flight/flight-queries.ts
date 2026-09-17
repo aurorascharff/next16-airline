@@ -9,15 +9,28 @@ import { prisma } from '@/lib/db';
 import { delay } from '@/lib/utils';
 import { flightTags } from './flight-cache';
 import { toSeat } from './types/flight';
-import type { FlightOffer } from './types/flight';
+import type { FlightOffer, FlightResult } from './types/flight';
 
 const flightInclude = {
+  _count: { select: { seats: true } },
   destination: true,
   origin: true,
 } as const;
 
-export async function searchFlights(from: string, to: string) {
-  return searchFlightsCached(from, to, await isSlowEnabled());
+export async function searchFlights(from: string, to: string, date: string): Promise<FlightResult[]> {
+  const flights = await searchFlightsCached(from, to, await isSlowEnabled());
+  if (flights.length === 0) return [];
+
+  const booked = await prisma.booking.groupBy({
+    _count: { _all: true },
+    by: ['flightId'],
+    where: { date, flightId: { in: flights.map(flight => flight.id) } },
+  });
+  const bookedByFlight = new Map(booked.map(row => [row.flightId, row._count._all]));
+  return flights.map(({ _count, ...flight }) => ({
+    ...flight,
+    seatsLeft: Math.max(0, _count.seats - (bookedByFlight.get(flight.id) ?? 0)),
+  }));
 }
 
 async function searchFlightsCached(from: string, to: string, slow: boolean) {
@@ -107,7 +120,7 @@ async function getFlightOfferCached(flightId: string, date: string, fare: Fare, 
   cacheTag(flightTags.offer(flightId));
 
   await delay(1300, slow);
-  const [flight, booked] = await Promise.all([
+  const [flight, bookings] = await Promise.all([
     prisma.flight.findUnique({
       include: {
         extras: { orderBy: { price: 'asc' } },
@@ -115,13 +128,11 @@ async function getFlightOfferCached(flightId: string, date: string, fare: Fare, 
       },
       where: { id: flightId },
     }),
-    date
-      ? prisma.booking.findMany({ select: { seatId: true }, where: { date, flightId, seatId: { not: null } } })
-      : Promise.resolve([]),
+    prisma.booking.findMany({ select: { seatId: true }, where: { date, flightId } }),
   ]);
   if (!flight) notFound();
 
-  const taken = new Set(booked.map(booking => booking.seatId));
+  const taken = new Set(bookings.map(booking => booking.seatId));
   const flex = fare === 'Flex';
   return {
     bagPrice: flight.bagPrice,
@@ -130,7 +141,8 @@ async function getFlightOfferCached(flightId: string, date: string, fare: Fare, 
     extras: flex ? flight.extras : [],
     fare,
     hold: null,
-    seats: flex ? flight.seats.map(seat => toSeat(seat, taken.has(seat.id) ? 'occupied' : undefined)) : [],
+    seats: flex ? flight.seats.map(seat => toSeat(seat, taken.has(seat.id) ? 'occupied' : 'available')) : [],
+    seatsLeft: Math.max(0, flight.seats.length - bookings.length),
   };
 }
 
