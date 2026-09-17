@@ -1,11 +1,12 @@
 import { ArrowLeft } from 'lucide-react';
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 import { AnimatedSuspense } from '@/components/ui/animated-suspense';
 import ErrorBoundary from '@/components/ui/error-boundary';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
-import { parseBookingDraft, parseDate, parseFare } from '@/features/booking/booking-search-params';
-import { isBookingStep } from '@/features/booking/booking-steps';
 import { BookingExperience, BookingExperienceSkeleton } from '@/features/booking/components/booking-experience';
+import { parseBookingDraft, parseDate, parseFare } from '@/features/booking/utils/search-params';
+import { isBookingStep } from '@/features/booking/utils/steps';
 import type { Metadata } from 'next';
 
 export async function generateMetadata({ params }: PageProps<'/book/[flightId]/[step]'>): Promise<Metadata> {
@@ -27,20 +28,24 @@ export default function BookingPage({ params, searchParams }: PageProps<'/book/[
         <h2 className="mt-1 text-xl">Build your journey</h2>
       </div>
       <ErrorBoundary title="The booking could not be loaded">
-        <AnimatedSuspense fallback={<BookingExperienceSkeleton />}>
-          {Promise.all([params, searchParams]).then(([{ flightId, step }, values]) => {
+        <Suspense fallback={<BookingExperienceSkeleton step="baggage" />}>
+          {params.then(({ flightId, step }) => {
             if (!isBookingStep(step)) notFound();
             return (
-              <BookingExperience
-                date={parseDate(values.date)}
-                draft={parseBookingDraft(values)}
-                fare={parseFare(values.fare)}
-                flightId={flightId}
-                step={step}
-              />
+              <AnimatedSuspense fallback={<BookingExperienceSkeleton step={step} />}>
+                {searchParams.then(values => (
+                  <BookingExperience
+                    date={parseDate(values.date)}
+                    draft={parseBookingDraft(values)}
+                    fare={parseFare(values.fare)}
+                    flightId={flightId}
+                    step={step}
+                  />
+                ))}
+              </AnimatedSuspense>
             );
           })}
-        </AnimatedSuspense>
+        </Suspense>
       </ErrorBoundary>
     </main>
   );

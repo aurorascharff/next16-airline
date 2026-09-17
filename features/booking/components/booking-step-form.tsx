@@ -19,10 +19,10 @@ import { PrefetchLink } from '@/components/ui/prefetch-link';
 import type { Extra, Flight, FlightOffer } from '@/features/flight/types/flight';
 import { cn, formatPrice } from '@/lib/utils';
 import { confirmBooking } from '../booking-actions';
-import { createBookingHref } from '../booking-search-params';
-import { nextBookingStep, previousBookingStep } from '../booking-steps';
-import type { Fare } from '../booking-search-params';
+import { createBookingHref } from '../utils/search-params';
+import { nextBookingStep, previousBookingStep } from '../utils/steps';
 import type { BookingDraft, BookingStep } from '../types/booking';
+import type { Fare } from '../utils/search-params';
 
 const titles: Record<BookingStep, { eyebrow: string; title: string }> = {
   baggage: { eyebrow: 'Pack your way', title: 'What are you bringing?' },

@@ -1,4 +1,4 @@
-import type { BookingStep } from './types/booking';
+import type { BookingStep } from '../types/booking';
 
 export const BOOKING_STEPS: BookingStep[] = ['baggage', 'seats', 'extras', 'review'];
 

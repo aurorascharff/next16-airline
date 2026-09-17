@@ -1,4 +1,4 @@
-import type { BookingDraft, BookingStep } from './types/booking';
+import type { BookingDraft, BookingStep } from '../types/booking';
 import type { Route } from 'next';
 
 export const DEFAULT_BOOKING_DRAFT: BookingDraft = {

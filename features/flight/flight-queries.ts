@@ -2,7 +2,7 @@ import 'server-only';
 
 import { cacheLife, cacheTag } from 'next/cache';
 import { notFound } from 'next/navigation';
-import type { Fare } from '@/features/booking/booking-search-params';
+import type { Fare } from '@/features/booking/utils/search-params';
 import { isSlowEnabled } from '@/features/demo/demo-queries';
 import { prisma } from '@/lib/db';
 import { delay } from '@/lib/utils';

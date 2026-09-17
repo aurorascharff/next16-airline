@@ -24,6 +24,10 @@ The architecture follows the [Next.js App Architecture](https://github.com/auror
 - **[View Transitions](https://nextjs.org/docs/app/guides/view-transitions)** cross-fade streamed content into place while the header, tab bar, and demo toolbar stay pinned.
 - **Demo controls** outline Client Components, toggle prefetching and simulated latency, and simulate going offline so the behavior can be compared directly.
 
+## Try the skipped step
+
+Whether a flight has a seat map is only known once the provider returns its offer. Waypoint fetches that offer once, shares it across every step, and marks steps that don't exist as skipped. Pick the **Basic** fare on any result to see the flow drop Seats and Extras, then compare with **Delays** on and **Prefetch** off versus on in the demo toolbar.
+
 ## Getting started
 
 Waypoint runs on Postgres. Set `DATABASE_URL` in `.env.local`, then:

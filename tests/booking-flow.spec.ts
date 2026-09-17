@@ -21,7 +21,11 @@ test.describe('Booking flow (/book/[flightId]/[step])', () => {
 
   test('a Basic fare skips the seat and extras steps', async ({ page }) => {
     await page.goto('/book/wp-21/baggage?date=2026-11-12&fare=Basic');
-    await expect(page.getByRole('list', { name: 'Booking progress' }).getByRole('listitem')).toHaveCount(2);
+    const steps = page.getByRole('list', { name: 'Booking progress' }).getByRole('listitem');
+    await expect(steps).toHaveCount(4);
+    await expect(
+      steps.filter({ has: page.locator('[data-skipped]') }).or(steps.and(page.locator('[data-skipped]'))),
+    ).toHaveCount(2);
     await page.getByTestId('booking-next').filter({ visible: true }).click();
     await page.waitForURL(url => url.pathname === '/book/wp-21/review');
 

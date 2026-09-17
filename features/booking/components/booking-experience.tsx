@@ -3,11 +3,11 @@ import { redirect } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getFlight, getFlightOffer } from '@/features/flight/flight-queries';
 import { formatDate } from '@/lib/utils';
-import { createBookingHref } from '../booking-search-params';
-import { getAvailableSteps, nextBookingStep } from '../booking-steps';
+import { createBookingHref } from '../utils/search-params';
+import { BOOKING_STEPS, getAvailableSteps, nextBookingStep } from '../utils/steps';
 import { BookingStepForm } from './booking-step-form';
-import type { Fare } from '../booking-search-params';
 import type { BookingDraft, BookingStep } from '../types/booking';
+import type { Fare } from '../utils/search-params';
 
 const stepLabels: Record<BookingStep, string> = {
   baggage: 'Baggage',
@@ -36,45 +36,10 @@ export async function BookingExperience({
     const fallback = nextBookingStep(steps, step === 'seats' ? 'baggage' : 'seats') ?? 'review';
     redirect(createBookingHref(flightId, fallback, draft, date, fare));
   }
-  const activeIndex = steps.indexOf(step);
 
   return (
     <div data-testid="booking-experience">
-      <ol
-        aria-label="Booking progress"
-        className="mb-5 grid gap-2"
-        style={{ gridTemplateColumns: `repeat(${steps.length}, minmax(0, 1fr))` }}
-      >
-        {steps.map((item, index) => {
-          const complete = index < activeIndex;
-          const reached = complete || item === step;
-          return (
-            <li className="min-w-0" key={item}>
-              <div className="mb-2 flex items-center gap-2">
-                <span
-                  className={
-                    reached
-                      ? 'bg-accent grid size-6 shrink-0 place-items-center rounded-full text-xs font-bold text-white'
-                      : 'bg-card text-muted dark:bg-card-dark grid size-6 shrink-0 place-items-center rounded-full text-xs font-bold'
-                  }
-                >
-                  {complete ? <Check className="size-3.5" /> : index + 1}
-                </span>
-                <span
-                  className={
-                    reached ? 'text-sm font-semibold max-sm:hidden' : 'text-muted text-sm font-medium max-sm:hidden'
-                  }
-                >
-                  {stepLabels[item]}
-                </span>
-              </div>
-              <div
-                className={reached ? 'bg-accent h-1 rounded-full' : 'bg-divider dark:bg-divider-dark h-1 rounded-full'}
-              />
-            </li>
-          );
-        })}
-      </ol>
+      <BookingProgress available={steps} step={step} />
 
       <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_19rem]">
         <BookingStepForm date={date} draft={draft} flight={flight} offer={offer} step={step} steps={steps} />
@@ -124,20 +89,53 @@ export async function BookingExperience({
   );
 }
 
-export function BookingExperienceSkeleton() {
+export function BookingProgress({ available, step }: { available?: BookingStep[]; step: BookingStep }) {
+  const activeIndex = BOOKING_STEPS.indexOf(step);
+
+  return (
+    <ol aria-label="Booking progress" className="mb-5 grid grid-cols-4 gap-2">
+      {BOOKING_STEPS.map((item, index) => {
+        const skipped = available !== undefined && !available.includes(item);
+        const complete = index < activeIndex && !skipped;
+        const reached = complete || item === step;
+        return (
+          <li className="min-w-0" data-skipped={skipped || undefined} key={item}>
+            <div className="mb-2 flex items-center gap-2">
+              <span
+                className={
+                  reached
+                    ? 'bg-accent grid size-6 shrink-0 place-items-center rounded-full text-xs font-bold text-white'
+                    : 'bg-card text-muted dark:bg-card-dark grid size-6 shrink-0 place-items-center rounded-full text-xs font-bold'
+                }
+              >
+                {complete ? <Check className="size-3.5" /> : index + 1}
+              </span>
+              <span
+                className={
+                  skipped
+                    ? 'text-muted text-sm font-medium line-through max-sm:hidden'
+                    : reached
+                      ? 'text-sm font-semibold max-sm:hidden'
+                      : 'text-muted text-sm font-medium max-sm:hidden'
+                }
+              >
+                {stepLabels[item]}
+              </span>
+            </div>
+            <div
+              className={reached ? 'bg-accent h-1 rounded-full' : 'bg-divider dark:bg-divider-dark h-1 rounded-full'}
+            />
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+export function BookingExperienceSkeleton({ step }: { step: BookingStep }) {
   return (
     <div>
-      <div className="mb-5 grid grid-cols-4 gap-2">
-        {Array.from({ length: 4 }).map((_, index) => (
-          <div key={index}>
-            <div className="mb-2 flex items-center gap-2">
-              <Skeleton className="skeleton-subtle size-6 shrink-0 rounded-full" />
-              <Skeleton className="my-[3px] h-3.5 w-16 max-sm:hidden" />
-            </div>
-            <Skeleton className="skeleton-subtle h-1 rounded-full" />
-          </div>
-        ))}
-      </div>
+      <BookingProgress step={step} />
       <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_19rem]">
         <div className="border-divider dark:border-divider-dark shadow-soft overflow-hidden rounded-2xl border bg-white dark:bg-black">
           <div className="p-5 sm:p-6">
