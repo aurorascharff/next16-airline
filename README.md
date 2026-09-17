@@ -48,7 +48,9 @@ pnpm run prisma.seed
 pnpm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser. There is no login: every browser gets a session cookie on first visit, like an airline basket. Search a route from Oslo or Copenhagen and book a flight. Every flight has 16 real seats per date: bookings take them, holds block them for ten minutes, and a full flight is sold out until `pnpm run prisma.reset` reseats it. Two demo trips are shared by every session; the trips and holds you create stay with yours, and any booking can be retrieved on My trips with its reference and passenger last name. Open a private window to act as another traveler. You can browse the data with `pnpm run prisma.studio`, or wipe and re-seed the database with `pnpm run prisma.reset`.
+Open [http://localhost:3000](http://localhost:3000) in your browser. You can browse the data with `pnpm run prisma.studio`, or wipe and re-seed the database with `pnpm run prisma.reset`.
+
+There is no login: each browser gets its own session on first visit, so open a private window to act as a second traveler. Two demo trips are shared by every session, the trips you book stay with yours, and any booking can be found on My trips by reference and last name.
 
 <details>
 <summary>Run locally without Postgres</summary>

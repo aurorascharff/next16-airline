@@ -1,10 +1,10 @@
 import { ArrowRight } from 'lucide-react';
+import { BrandMark } from '@/components/ui/brand-mark';
 import { buttonClasses } from '@/components/ui/button-classes';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Stat, StatSkeleton } from '@/components/ui/stat';
-import { WaypointMark } from '@/components/ui/waypoint-mark';
 import { RouteLine, RouteLineSkeleton } from '@/features/flight/components/route-line';
 import { formatDate, formatPrice } from '@/lib/utils';
 import { getBookings } from '../booking-queries';
@@ -39,7 +39,7 @@ export async function TripsList() {
             <div className="p-5 sm:p-6">
               <div className="flex items-center justify-between gap-4">
                 <span className="flex items-center gap-2 text-sm font-semibold">
-                  <WaypointMark className="text-accent size-5" /> {booking.passenger}
+                  <BrandMark className="text-accent size-5" /> {booking.passenger}
                 </span>
                 <span className="text-gray font-mono text-[12px] leading-4">{booking.flight.flightNumber}</span>
               </div>

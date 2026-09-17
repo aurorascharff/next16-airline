@@ -1,9 +1,9 @@
 import { ThemeToggle } from '@/components/theme/theme-toggle';
+import { BrandMark } from '@/components/ui/brand-mark';
 import { GitHubIcon } from '@/components/ui/github-icon';
 import { IconButton } from '@/components/ui/icon-button';
 import { NavLink } from '@/components/ui/nav-link';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
-import { WaypointMark } from '@/components/ui/waypoint-mark';
 
 const navLinkClass =
   'rounded-full px-4 py-2 text-sm font-medium transition-colors text-muted hover:bg-card hover:text-black dark:hover:bg-card-dark dark:hover:text-white aria-[current=page]:bg-card aria-[current=page]:text-black dark:aria-[current=page]:bg-card-dark dark:aria-[current=page]:text-white';
@@ -20,7 +20,7 @@ export function SiteHeader() {
           className="flex items-center gap-2 text-lg font-bold tracking-tight"
           href="/"
         >
-          <WaypointMark className="text-accent size-7" />
+          <BrandMark className="text-accent size-7" />
           <span>Waypoint</span>
         </PrefetchLink>
         <nav aria-label="Primary" className="hidden items-center gap-1 md:flex">

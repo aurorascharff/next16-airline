@@ -10,9 +10,9 @@
   --color-surface-dark: #121212;
   --color-surface: #fafafa;
 
-  --color-accent: #2563eb;
-  --color-accent-hover: #1d4ed8;
-  --color-accent-fade: #2563eb22;
+  --color-accent: #1b50ff;
+  --color-accent-hover: #1340d1;
+  --color-accent-fade: #214fff22;
   --color-success: #0fa958;
   --color-danger: #e54848;
   --color-warning: #f5a524;
@@ -34,9 +34,9 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 .dark {
-  --color-accent: #3b82f6;
-  --color-accent-hover: #2563eb;
-  --color-accent-fade: #3b82f622;
+  --color-accent: #3d6bff;
+  --color-accent-hover: #1b50ff;
+  --color-accent-fade: #3d6bff22;
 }
 
 @layer base {
@@ -128,7 +128,7 @@
   }
 }
 
-@keyframes waypoint-mark-enter {
+@keyframes mark-enter {
   from {
     opacity: 0;
     stroke-dashoffset: 80;
@@ -139,9 +139,9 @@
   }
 }
 
-.waypoint-mark-enter path {
+.mark-enter path {
   stroke-dasharray: 80;
-  animation: waypoint-mark-enter 420ms ease-out both;
+  animation: mark-enter 420ms ease-out both;
 }
 
 :root {
@@ -303,7 +303,7 @@ html.boundary-mode :is([data-component], [data-sonner-toast]) {
     animation-delay: 0s !important;
   }
   .skeleton-animation,
-  .waypoint-mark-enter path {
+  .mark-enter path {
     animation: none !important;
   }
 }
