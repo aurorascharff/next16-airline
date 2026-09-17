@@ -21,7 +21,7 @@ test.describe('Search page (/search)', () => {
     await expect(page.getByTestId('route-suggestion')).toHaveCount(3);
     await page.getByTestId('route-suggestion').filter({ hasText: 'Lisbon' }).click();
     await page.waitForURL(url => url.searchParams.get('to') === 'LIS');
-    await expect(page.getByLabel('To').filter({ visible: true })).toHaveValue('LIS');
+    await expect(page.getByLabel('To').filter({ visible: true }).last()).toHaveValue('LIS');
     await expect(page.getByRole('heading', { level: 2, name: 'CPH to LIS' })).toBeVisible();
   });
 

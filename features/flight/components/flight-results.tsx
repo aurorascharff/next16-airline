@@ -7,13 +7,26 @@ import { createBookingHref, DEFAULT_BOOKING_DRAFT } from '@/features/booking/boo
 import { formatPrice } from '@/lib/utils';
 import { searchFlights } from '../flight-queries';
 
-export async function FlightResults({ date, from, to }: { date: string; from: string; to: string }) {
-  const flights = await searchFlights(from, to);
+export async function FlightResults({
+  date,
+  fare,
+  from,
+  to,
+}: {
+  date: string;
+  fare?: string;
+  from: string;
+  to: string;
+}) {
+  const flights = await searchFlights(from, to, fare);
   const [first] = flights;
 
   if (!first) {
     return (
-      <EmptyState body="Waypoint does not fly this route yet. Try another destination." title="No flights found" />
+      <EmptyState
+        body="No flights match this route and fare. Try another fare or destination."
+        title="No flights found"
+      />
     );
   }
 

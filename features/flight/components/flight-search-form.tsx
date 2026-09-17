@@ -3,13 +3,16 @@ import { Button } from '@/components/ui/button';
 import { Input, Select } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getAirports } from '@/features/airport/airport-queries';
+import { FARES } from '@/features/booking/booking-search-params';
 
 export async function FlightSearchForm({
   date = '',
+  fare = '',
   from = 'OSL',
   to = '',
 }: {
   date?: string;
+  fare?: string;
   from?: string;
   to?: string;
 }) {
@@ -20,7 +23,7 @@ export async function FlightSearchForm({
   return (
     <form
       action="/search"
-      className="border-divider dark:border-divider-dark shadow-soft shadow-soft grid gap-3 rounded-2xl border bg-white p-4 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-end dark:bg-black"
+      className="border-divider dark:border-divider-dark shadow-soft grid gap-3 rounded-2xl border bg-white p-4 sm:grid-cols-[1fr_1fr_1fr_1fr_auto] sm:items-end dark:bg-black"
       method="get"
     >
       <label className="grid gap-1.5 text-xs font-semibold">
@@ -48,6 +51,17 @@ export async function FlightSearchForm({
         Departure
         <Input defaultValue={date} name="date" type="date" />
       </label>
+      <label className="grid gap-1.5 text-xs font-semibold">
+        Fare
+        <Select defaultValue={fare} name="fare">
+          <option value="">Any fare</option>
+          {FARES.map(option => (
+            <option key={option} value={option}>
+              {option === 'Flex' ? 'Flex · seat map and extras' : 'Basic · seat at the gate'}
+            </option>
+          ))}
+        </Select>
+      </label>
       <Button className="h-10" type="submit">
         Search flights <ArrowRight className="size-4" />
       </Button>
@@ -57,8 +71,8 @@ export async function FlightSearchForm({
 
 export function FlightSearchFormSkeleton() {
   return (
-    <div className="border-divider dark:border-divider-dark shadow-soft shadow-soft grid gap-3 rounded-2xl border bg-white p-4 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-end dark:bg-black">
-      {['From', 'To', 'Departure'].map(label => (
+    <div className="border-divider dark:border-divider-dark shadow-soft grid gap-3 rounded-2xl border bg-white p-4 sm:grid-cols-[1fr_1fr_1fr_1fr_auto] sm:items-end dark:bg-black">
+      {['From', 'To', 'Departure', 'Fare'].map(label => (
         <div className="grid gap-1.5" key={label}>
           <Skeleton className="my-0.5 h-3 w-14" />
           <Skeleton className="skeleton-subtle h-10 rounded-md" />
