@@ -1,8 +1,11 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   cacheComponents: true,
-  cacheMaxMemorySize: 0,
+  experimental: {
+    inlineCss: true,
+    useOffline: true,
+  },
   partialPrefetching: true,
   reactCompiler: true,
   typedRoutes: true,

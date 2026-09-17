@@ -41,15 +41,15 @@ export async function BookingExperience({
                 <span
                   className={
                     complete || active
-                      ? 'bg-primary text-on-primary grid size-6 shrink-0 place-items-center rounded-full text-xs font-bold'
-                      : 'bg-card text-muted dark:bg-card-dark dark:text-muted-dark grid size-6 shrink-0 place-items-center rounded-full text-xs font-bold'
+                      ? 'bg-accent text-white grid size-6 shrink-0 place-items-center rounded-full text-xs font-bold'
+                      : 'bg-card text-muted dark:bg-card-dark grid size-6 shrink-0 place-items-center rounded-full text-xs font-bold'
                   }
                 >
                   {complete ? <Check className="size-3.5" /> : index + 1}
                 </span>
                 <span className="text-sm font-semibold max-sm:hidden">{stepLabels[item]}</span>
               </div>
-              <div className={complete || active ? 'bg-primary h-1 rounded-full' : 'bg-divider dark:bg-divider-dark h-1 rounded-full'} />
+              <div className={complete || active ? 'bg-accent h-1 rounded-full' : 'bg-divider dark:bg-divider-dark h-1 rounded-full'} />
             </li>
           );
         })}
@@ -63,8 +63,8 @@ export async function BookingExperience({
           prefetchEnabled={prefetchEnabled}
           step={step}
         />
-        <aside className="border-divider bg-surface dark:border-divider-dark dark:bg-surface-dark overflow-hidden rounded-3xl border lg:sticky lg:top-20">
-          <div className="bg-primary p-5 text-white">
+        <aside className="border-divider bg-surface dark:border-divider-dark dark:bg-black overflow-hidden rounded-2xl border lg:sticky lg:top-20">
+          <div className="bg-accent p-5 text-white">
             <div className="flex items-center justify-between text-xs font-semibold tracking-[0.16em] text-white/65 uppercase">
               <span>{booking.flight.flightNumber}</span>
               <span>{booking.cabin}</span>
@@ -87,18 +87,18 @@ export async function BookingExperience({
           </div>
           <div className="space-y-4 p-5">
             <div>
-              <p className="text-muted dark:text-muted-dark text-xs font-semibold tracking-wide uppercase">Passenger</p>
+              <p className="text-muted text-xs font-semibold tracking-wide uppercase">Passenger</p>
               <p className="mt-1 text-sm font-semibold">{booking.passenger}</p>
             </div>
             <div className="flex items-start gap-3">
-              <Clock3 className="text-primary mt-0.5 size-4" />
+              <Clock3 className="text-accent mt-0.5 size-4" />
               <div>
                 <p className="text-sm font-semibold">{booking.flight.duration}</p>
-                <p className="text-muted dark:text-muted-dark mt-0.5 text-xs">Direct · {booking.flight.date}</p>
+                <p className="text-muted mt-0.5 text-xs">Direct · {booking.flight.date}</p>
               </div>
             </div>
             <div className="border-divider dark:border-divider-dark border-t pt-5">
-              <p className="text-muted dark:text-muted-dark text-xs font-semibold tracking-wide uppercase">Booking</p>
+              <p className="text-muted text-xs font-semibold tracking-wide uppercase">Booking</p>
               <p className="mt-1 text-sm font-semibold">{booking.reference}</p>
             </div>
           </div>
@@ -120,8 +120,8 @@ export function BookingExperienceSkeleton() {
         ))}
       </div>
       <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_19rem]">
-        <Skeleton className="h-[31rem] rounded-3xl" />
-        <Skeleton className="h-[22rem] rounded-3xl" />
+        <Skeleton className="h-[31rem] rounded-2xl" />
+        <Skeleton className="h-[22rem] rounded-2xl" />
       </div>
     </div>
   );

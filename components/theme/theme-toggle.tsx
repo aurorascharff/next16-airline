@@ -48,8 +48,8 @@ function ThemeButton({
       className={cn(
         'rounded-full p-1.5 transition-colors',
         active
-          ? 'bg-card text-ink dark:bg-card-dark dark:text-white'
-          : 'text-muted hover:text-ink dark:text-muted-dark dark:hover:text-white',
+          ? 'bg-card text-black dark:bg-card-dark dark:text-white'
+          : 'text-muted hover:text-black dark:hover:text-white',
       )}
       onClick={onClick}
       type="button"

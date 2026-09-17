@@ -11,19 +11,19 @@ export async function TripsList() {
     <div className="grid gap-3">
       {bookings.map(booking => (
         <Link
-          className="border-divider bg-surface hover:border-primary/40 dark:border-divider-dark dark:bg-surface-dark flex items-center gap-4 rounded-2xl border p-4 transition-colors"
+          className="border-divider bg-surface hover:border-accent/40 dark:border-divider-dark dark:bg-black flex items-center gap-4 rounded-xl border p-4 transition-colors"
           href={createBookingHref(booking.id, 'baggage', DEFAULT_BOOKING_DRAFT)}
           key={booking.id}
           prefetch={true}
         >
-          <span className="bg-primary/10 text-primary grid size-10 place-items-center rounded-xl">
+          <span className="bg-accent/10 text-accent grid size-10 place-items-center rounded-xl">
             <Plane className="size-5" />
           </span>
           <span className="min-w-0 flex-1">
             <span className="block text-sm font-semibold">
               {booking.flight.departureCity} to {booking.flight.arrivalCity}
             </span>
-            <span className="text-muted dark:text-muted-dark mt-0.5 block text-xs">
+            <span className="text-muted mt-0.5 block text-xs">
               {booking.flight.date} · {booking.reference}
             </span>
           </span>
@@ -35,5 +35,5 @@ export async function TripsList() {
 }
 
 export function TripsListSkeleton() {
-  return <Skeleton className="h-20 rounded-2xl" />;
+  return <Skeleton className="h-20 rounded-xl" />;
 }

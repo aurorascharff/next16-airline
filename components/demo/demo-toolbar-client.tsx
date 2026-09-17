@@ -22,8 +22,8 @@ function ToggleButton({ active, className, icon, label, pending, ...props }: Tog
     <button
       {...props}
       className={cn(
-        'flex items-center gap-1.5 px-3 py-1.5 transition-colors focus-visible:bg-primary/10 focus-visible:outline-none',
-        active ? 'text-primary' : 'text-muted dark:text-muted-dark',
+        'flex items-center gap-1.5 px-3 py-1.5 transition-colors focus-visible:bg-accent/10 focus-visible:outline-none',
+        active ? 'text-accent' : 'text-muted',
         pending && 'cursor-not-allowed opacity-70',
         className,
       )}
@@ -90,7 +90,7 @@ export function DemoToolbarClient({
   const guide = Ariakit.useDialogStore();
 
   return (
-    <div className="border-divider bg-surface/85 dark:border-divider-dark dark:bg-surface-dark/85 fixed right-4 bottom-4 z-50 flex items-center overflow-hidden rounded-full border text-xs font-medium shadow-sm backdrop-blur-md">
+    <div className="border-divider bg-white/80 dark:border-divider-dark dark:bg-black/80 fixed right-4 bottom-4 z-50 flex items-center overflow-hidden rounded-full border text-xs font-medium shadow-sm backdrop-blur-md">
       <CookieToggle
         enabled={prefetchEnabled}
         label="Prefetch"
@@ -109,7 +109,7 @@ export function DemoToolbarClient({
       <Divider />
       <Ariakit.DialogDisclosure
         aria-label="How this demo works"
-        className="text-muted hover:text-ink focus-visible:bg-primary/10 dark:text-muted-dark flex items-center px-3 py-1.5 transition-colors focus-visible:outline-none dark:hover:text-white"
+        className="text-muted hover:text-black focus-visible:bg-accent/10 flex items-center px-3 py-1.5 transition-colors focus-visible:outline-none dark:hover:text-white"
         store={guide}
       >
         <CircleHelp className="size-3.5" />
@@ -146,29 +146,29 @@ function DemoGuideDialog({
   return (
     <Ariakit.Dialog
       backdrop={<div className="fixed inset-0 z-40 bg-black/55 backdrop-blur-sm" />}
-      className="border-divider bg-surface dark:border-divider-dark dark:bg-surface-dark fixed top-1/2 left-1/2 z-50 max-h-[85vh] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl border p-6 shadow-2xl outline-none"
+      className="border-divider bg-surface dark:border-divider-dark dark:bg-black fixed top-1/2 left-1/2 z-50 max-h-[85vh] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl border p-6 shadow-2xl outline-none"
       store={store}
       unmountOnHide
     >
       <Ariakit.DialogHeading className="text-lg font-bold">How this demo works</Ariakit.DialogHeading>
-      <Ariakit.DialogDescription className="text-muted dark:text-muted-dark mt-2 text-sm leading-relaxed">
+      <Ariakit.DialogDescription className="text-muted mt-2 text-sm leading-relaxed">
         Waypoint is a multi-step airline flow where choices live in the URL and one cached provider offer is reused
         across baggage, seats, extras, and review.
       </Ariakit.DialogDescription>
       <div className="mt-6 flex flex-col gap-4">
         {details.map(detail => (
           <div className="flex items-start gap-3" key={detail.name}>
-            <detail.Icon className={cn('mt-0.5 size-4 shrink-0', detail.on ? 'text-primary' : 'text-muted')} />
+            <detail.Icon className={cn('mt-0.5 size-4 shrink-0', detail.on ? 'text-accent' : 'text-muted')} />
             <div>
               <p className="text-sm font-semibold">{detail.name}</p>
-              <p className="text-muted dark:text-muted-dark mt-1 text-sm leading-relaxed">{detail.text}</p>
+              <p className="text-muted mt-1 text-sm leading-relaxed">{detail.text}</p>
             </div>
           </div>
         ))}
       </div>
       <div className="border-divider dark:border-divider-dark mt-6 flex items-center justify-between border-t pt-4">
         <a
-          className="text-primary text-sm font-medium hover:underline"
+          className="text-accent text-sm font-medium hover:underline"
           href="https://nextjs.org/docs/app/guides/optimizing-prefetching"
           rel="noreferrer"
           target="_blank"

@@ -56,9 +56,9 @@ export function BookingStepForm({
   const total = calculateTotal(offer, optimisticDraft);
 
   return (
-    <section className="border-divider bg-surface dark:border-divider-dark dark:bg-surface-dark overflow-hidden rounded-3xl border">
+    <section className="border-divider bg-surface dark:border-divider-dark dark:bg-black overflow-hidden rounded-2xl border">
       <div className="p-5 sm:p-6">
-        <p className="text-primary text-sm font-semibold">{titles[step].eyebrow}</p>
+        <p className="text-accent text-sm font-semibold">{titles[step].eyebrow}</p>
         <h1 className="mt-1.5 text-2xl font-semibold tracking-[-0.03em] sm:text-3xl">{titles[step].title}</h1>
         <div className="mt-6">
           {step === 'baggage' && (
@@ -71,13 +71,13 @@ export function BookingStepForm({
       </div>
       <div className="border-divider bg-card/60 dark:border-divider-dark dark:bg-card-dark/45 flex flex-col gap-4 border-t p-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div>
-          <p className="text-muted dark:text-muted-dark text-xs font-medium">Trip total</p>
+          <p className="text-muted text-xs font-medium">Trip total</p>
           <p className="text-xl font-semibold">€{total}</p>
         </div>
         <div className="flex items-center gap-3">
           {previousStep ? (
             <Link
-              className="border-divider hover:bg-surface dark:border-divider-dark dark:hover:bg-surface-dark flex h-11 items-center gap-2 rounded-full border px-5 text-sm font-semibold transition-colors"
+              className="border-divider hover:bg-surface dark:border-divider-dark dark:hover:bg-black flex h-11 items-center gap-2 rounded-full border px-5 text-sm font-semibold transition-colors"
               href={createBookingHref(booking.id, previousStep, optimisticDraft)}
               scroll={false}
             >
@@ -85,7 +85,7 @@ export function BookingStepForm({
             </Link>
           ) : (
             <Link
-              className="border-divider hover:bg-surface dark:border-divider-dark dark:hover:bg-surface-dark flex h-11 items-center gap-2 rounded-full border px-5 text-sm font-semibold transition-colors"
+              className="border-divider hover:bg-surface dark:border-divider-dark dark:hover:bg-black flex h-11 items-center gap-2 rounded-full border px-5 text-sm font-semibold transition-colors"
               href="/"
             >
               <ArrowLeft className="size-4" /> Exit
@@ -93,7 +93,7 @@ export function BookingStepForm({
           )}
           {canContinue ? (
             <Link
-              className="bg-primary hover:bg-primary-hover text-on-primary flex h-11 items-center gap-2 rounded-full px-6 text-sm font-semibold shadow-[0_8px_24px_rgb(36_91_255/0.25)] transition-colors"
+              className="bg-accent hover:bg-accent-hover text-white flex h-11 items-center gap-2 rounded-full px-6 text-sm font-semibold transition-colors"
               data-testid="booking-next"
               href={nextHref}
               prefetch={prefetchEnabled ? true : null}
@@ -101,7 +101,7 @@ export function BookingStepForm({
               {step === 'review' ? 'Confirm trip' : 'Continue'} <ArrowRight className="size-4" />
             </Link>
           ) : (
-            <span className="bg-card text-muted dark:bg-card-dark dark:text-muted-dark flex h-11 cursor-not-allowed items-center gap-2 rounded-full px-6 text-sm font-semibold">
+            <span className="bg-card text-muted dark:bg-card-dark flex h-11 cursor-not-allowed items-center gap-2 rounded-full px-6 text-sm font-semibold">
               Select a seat <ArrowRight className="size-4" />
             </span>
           )}
@@ -129,22 +129,22 @@ function BaggageOptions({
             <button
               aria-pressed={draft.bags === count}
               className={cn(
-                'relative rounded-2xl border p-3.5 text-left transition-colors',
+                'relative rounded-xl border p-3.5 text-left transition-colors',
                 draft.bags === count
-                  ? 'border-primary bg-primary/5 dark:bg-primary/10'
+                  ? 'border-accent bg-accent/5 dark:bg-accent/10'
                   : 'border-divider hover:bg-card/70 dark:border-divider-dark dark:hover:bg-card-dark/70',
               )}
               key={count}
               onClick={() => updateDraft({ bags: count })}
               type="button"
             >
-              <Luggage className={cn('mb-4 size-5', draft.bags === count ? 'text-primary' : 'text-muted')} />
+              <Luggage className={cn('mb-4 size-5', draft.bags === count ? 'text-accent' : 'text-muted')} />
               <p className="font-semibold">{count === 0 ? 'No bag' : `${count} bag${count > 1 ? 's' : ''}`}</p>
-              <p className="text-muted dark:text-muted-dark mt-1 text-xs">
+              <p className="text-muted mt-1 text-xs">
                 {count === 0 ? 'Travel light' : `23 kg · €${offer.bagPrice * count}`}
               </p>
               {draft.bags === count && (
-                <span className="bg-primary text-on-primary absolute top-3 right-3 grid size-5 place-items-center rounded-full">
+                <span className="bg-accent text-white absolute top-3 right-3 grid size-5 place-items-center rounded-full">
                   <Check className="size-3" />
                 </span>
               )}
@@ -155,22 +155,22 @@ function BaggageOptions({
       <button
         aria-pressed={draft.carryOn}
         className={cn(
-          'flex w-full items-center gap-4 rounded-2xl border p-4 text-left transition-colors',
+          'flex w-full items-center gap-4 rounded-xl border p-4 text-left transition-colors',
           draft.carryOn
-            ? 'border-primary bg-primary/5 dark:bg-primary/10'
+            ? 'border-accent bg-accent/5 dark:bg-accent/10'
             : 'border-divider hover:bg-card/70 dark:border-divider-dark dark:hover:bg-card-dark/70',
         )}
         onClick={() => updateDraft({ carryOn: !draft.carryOn })}
         type="button"
       >
-        <div className="bg-mint/20 grid size-11 place-items-center rounded-xl">
+        <div className="bg-accent/10 grid size-11 place-items-center rounded-xl">
           <BriefcaseBusiness className="size-5" />
         </div>
         <div className="flex-1">
           <p className="font-semibold">Cabin bag</p>
-          <p className="text-muted dark:text-muted-dark mt-1 text-xs">One 8 kg bag included with Flex</p>
+          <p className="text-muted mt-1 text-xs">One 8 kg bag included with Flex</p>
         </div>
-        <span className={cn('grid size-6 place-items-center rounded-full border', draft.carryOn && 'border-primary bg-primary text-white')}>
+        <span className={cn('grid size-6 place-items-center rounded-full border', draft.carryOn && 'border-accent bg-accent text-white')}>
           {draft.carryOn && <Check className="size-3.5" />}
         </span>
       </button>
@@ -190,17 +190,17 @@ function SeatOptions({
   return (
     <div className="mx-auto max-w-lg">
       <div className="mb-5 flex items-center justify-between text-xs">
-        <span className="text-muted dark:text-muted-dark flex items-center gap-2">
+        <span className="text-muted flex items-center gap-2">
           <span className="border-divider dark:border-divider-dark size-4 rounded border" /> Available
         </span>
-        <span className="text-muted dark:text-muted-dark flex items-center gap-2">
+        <span className="text-muted flex items-center gap-2">
           <span className="bg-card dark:bg-card-dark size-4 rounded" /> Occupied
         </span>
-        <span className="text-primary flex items-center gap-2">
-          <span className="bg-primary size-4 rounded" /> Selected
+        <span className="text-accent flex items-center gap-2">
+          <span className="bg-accent size-4 rounded" /> Selected
         </span>
       </div>
-      <div className="border-divider bg-canvas/60 dark:border-divider-dark dark:bg-canvas-dark/60 rounded-[2.5rem] border px-7 pt-10 pb-7">
+      <div className="border-divider bg-surface/60 dark:border-divider-dark dark:bg-surface-dark/60 rounded-2xl border px-7 pt-10 pb-7">
         <div className="border-divider dark:border-divider-dark mx-auto mb-8 h-7 w-3/4 rounded-t-[50%] border-t" />
         <div className="grid grid-cols-[1fr_1fr_2rem_1fr_1fr] gap-2">
           {offer.seats.map((seat, index) => (
@@ -211,10 +211,10 @@ function SeatOptions({
                 'relative grid aspect-square place-items-center rounded-lg border text-xs font-bold transition-transform',
                 index % 4 === 2 && 'col-start-4',
                 seat.status === 'occupied'
-                  ? 'bg-card text-muted dark:bg-card-dark dark:text-muted-dark cursor-not-allowed border-transparent'
-                  : 'border-divider bg-surface hover:-translate-y-0.5 dark:border-divider-dark dark:bg-surface-dark',
-                draft.seat === seat.id && 'border-primary bg-primary text-white dark:bg-primary',
-                seat.type === 'extra-legroom' && seat.status === 'available' && draft.seat !== seat.id && 'border-mint',
+                  ? 'bg-card text-muted dark:bg-card-dark cursor-not-allowed border-transparent'
+                  : 'border-divider bg-surface hover:-translate-y-0.5 dark:border-divider-dark dark:bg-black',
+                draft.seat === seat.id && 'border-accent bg-accent text-white dark:bg-accent',
+                seat.type === 'extra-legroom' && seat.status === 'available' && draft.seat !== seat.id && 'border-success',
               )}
               disabled={seat.status === 'occupied'}
               key={seat.id}
@@ -227,8 +227,8 @@ function SeatOptions({
           ))}
         </div>
       </div>
-      <p className="text-muted dark:text-muted-dark mt-4 text-center text-xs">
-        Extra-legroom seats are highlighted in mint.
+      <p className="text-muted mt-4 text-center text-xs">
+        Extra-legroom seats are highlighted in green.
       </p>
     </div>
   );
@@ -251,9 +251,9 @@ function ExtraOptions({
           <button
             aria-pressed={selected}
             className={cn(
-              'flex items-center gap-4 rounded-2xl border p-4 text-left transition-colors',
+              'flex items-center gap-4 rounded-xl border p-4 text-left transition-colors',
               selected
-                ? 'border-primary bg-primary/5 dark:bg-primary/10'
+                ? 'border-accent bg-accent/5 dark:bg-accent/10'
                 : 'border-divider hover:bg-card/70 dark:border-divider-dark dark:hover:bg-card-dark/70',
             )}
             key={extra.id}
@@ -270,9 +270,9 @@ function ExtraOptions({
                 <p className="font-semibold">{extra.label}</p>
                 <p className="font-semibold">€{extra.price}</p>
               </div>
-              <p className="text-muted dark:text-muted-dark mt-1 text-sm leading-5">{extra.description}</p>
+              <p className="text-muted mt-1 text-sm leading-5">{extra.description}</p>
             </div>
-            <span className={cn('grid size-6 shrink-0 place-items-center rounded-full border', selected && 'border-primary bg-primary text-white')}>
+            <span className={cn('grid size-6 shrink-0 place-items-center rounded-full border', selected && 'border-accent bg-accent text-white')}>
               {selected && <Check className="size-3.5" />}
             </span>
           </button>
@@ -285,7 +285,7 @@ function ExtraOptions({
 function ExtraIcon({ extra, index }: { extra: Extra; index: number }) {
   const Icon = index === 0 ? ShieldCheck : index === 1 ? Sparkles : Leaf;
   return (
-    <div className="bg-coral/12 text-coral grid size-11 shrink-0 place-items-center rounded-xl">
+    <div className="bg-accent/10 text-accent grid size-11 shrink-0 place-items-center rounded-xl">
       <Icon className="size-5" />
       <span className="sr-only">{extra.label}</span>
     </div>
@@ -310,7 +310,7 @@ function Review({ booking, draft, offer }: { booking: Booking; draft: BookingDra
           <span className="text-sm font-semibold">€{row.value}</span>
         </div>
       ))}
-      <div className="bg-mint/15 mt-5 flex items-start gap-3 rounded-2xl p-4">
+      <div className="bg-success/10 mt-5 flex items-start gap-3 rounded-xl p-4">
         <ShieldCheck className="mt-0.5 size-5 shrink-0" />
         <p className="text-sm leading-6">Your fare can be changed without a fee. Any fare difference still applies.</p>
       </div>

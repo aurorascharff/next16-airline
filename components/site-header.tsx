@@ -9,10 +9,10 @@ export async function SiteHeader() {
   const [current, users] = await Promise.all([getCurrentUser(), getDemoUsers()]);
 
   return (
-    <header className="border-divider/80 bg-canvas/85 dark:border-divider-dark/80 dark:bg-canvas-dark/85 sticky top-0 z-40 border-b backdrop-blur-xl">
+    <header className="border-divider/80 bg-surface/85 dark:border-divider-dark/80 dark:bg-surface-dark/85 sticky top-0 z-40 border-b backdrop-blur-xl">
       <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link className="flex items-center gap-2.5 font-semibold tracking-tight" href="/">
-          <BrandMark className="text-primary size-7" />
+          <BrandMark className="text-accent size-7" />
           <span>Waypoint</span>
         </Link>
         <nav aria-label="Primary" className="hidden items-center gap-1 md:flex">
@@ -35,7 +35,7 @@ export async function SiteHeader() {
         <div className="flex items-center gap-2">
           <a
             aria-label="View source on GitHub"
-            className="text-muted hover:text-ink dark:text-muted-dark rounded-full p-1.5 transition-colors dark:hover:text-white"
+            className="text-muted hover:text-black rounded-full p-1.5 transition-colors dark:hover:text-white"
             href="https://github.com/aurorascharff/next16-airline"
             rel="noopener noreferrer"
             target="_blank"
