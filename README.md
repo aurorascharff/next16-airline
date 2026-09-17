@@ -24,13 +24,18 @@ The architecture follows the [Next.js App Architecture](https://github.com/auror
 - **[View Transitions](https://nextjs.org/docs/app/guides/view-transitions)** cross-fade streamed content into place while the header, tab bar, and demo toolbar stay pinned.
 - **Demo controls** outline Client Components, toggle prefetching and simulated latency, and simulate going offline so the behavior can be compared directly.
 
-## The pattern
+## Purpose of this demo
 
-Multi-step flows often have steps whose existence depends on data. In a booking, whether there is a seat map or an extras step is only known once the provider's offer for that flight, date, and fare comes back. The common solution checks on the Next button, shows a spinner, and fetches the same offer again on the next page.
+A booking has steps whose existence depends on data. Whether there is a seat map or an extras step is only known once the offer for that flight, date, and fare comes back. The usual fix checks on the Next button, shows a spinner, and fetches the offer again on the next page.
 
-This demo solves it with one cached offer: the same `'use cache'` read decides which steps exist and renders them, and the step plan is written into the URL so the step bar in the layout needs no data of its own. Because everything a step needs is cached and keyed by the URL, Continue and Back are `prefetch={true}` links and the next step is ready before the click. The one thing that must be live, who is holding which seat right now, sits behind `unstable_navigation()` in its own private cache, so it stays out of the prefetch and streams in on the actual navigation. Picking a seat holds the booking for five minutes and invalidates only that hold layer, and confirming re-validates against the database.
+This demo shows the alternative:
 
-Try it: choose the **Basic** fare on any result to see Seats and Extras drop out, then compare **Delays** on with **Prefetch** off and on in the demo toolbar.
+- One cached offer decides which steps exist and renders them.
+- The step plan lives in the URL, so the step bar in the layout needs no data.
+- Every step is cached and keyed by the URL, so Continue and Back are prefetched and ready before the click.
+- Only the live part, who is holding a seat right now, streams in after the navigation.
+
+Try it: pick the **Basic** fare on any result to see Seats and Extras drop out, then compare **Delays** on with **Prefetch** off and on in the demo toolbar.
 
 ## Getting started
 
