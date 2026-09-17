@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Booking {
+  id        String @id
+  passenger String
+  reference String @unique
+  cabin     String
+  baseFare  Int
+  bagPrice  Int
+  currency  String @default("EUR")
+
+  flight Flight?
+  seats  Seat[]
+  extras Extra[]
+}
+
+model Flight {
+  id               String @id
+  bookingId        String @unique
+  flightNumber     String
+  departureAirport String
+  departureCity    String
+  departureTime    String
+  arrivalAirport   String
+  arrivalCity      String
+  arrivalTime      String
+  date             String
+  duration         String
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+}
+
+model Seat {
+  id        String @id
+  bookingId String
+  label     String
+  price     Int
+  status    String
+  type      String
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+}
+
+model Extra {
+  id          String @id
+  bookingId   String
+  label       String
+  description String
+  price       Int
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+}

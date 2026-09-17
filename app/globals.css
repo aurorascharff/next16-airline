@@ -1,26 +1,84 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-canvas: #f4f6f3;
+  --color-canvas-dark: #071019;
+  --color-surface: #ffffff;
+  --color-surface-dark: #0d1823;
+  --color-card: #edf1ed;
+  --color-card-dark: #14222e;
+  --color-divider: #dce3dd;
+  --color-divider-dark: #223341;
+  --color-ink: #102117;
+  --color-muted: #64736a;
+  --color-muted-dark: #94a49a;
+  --color-primary: #245bff;
+  --color-primary-hover: #1649dc;
+  --color-on-primary: #ffffff;
+  --color-coral: #ff785a;
+  --color-mint: #5ed6b3;
+  --color-sky: #b8ddff;
+  --color-skeleton: #e4e9e4;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  border-color: var(--color-divider);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--color-canvas);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100dvh;
+  background:
+    radial-gradient(circle at 8% 0%, rgb(94 214 179 / 0.12), transparent 28rem),
+    var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  text-rendering: optimizeLegibility;
+}
+
+html.dark {
+  background: var(--color-canvas-dark);
+}
+
+.dark body {
+  background:
+    radial-gradient(circle at 8% 0%, rgb(36 91 255 / 0.14), transparent 30rem),
+    var(--color-canvas-dark);
+  color: white;
+}
+
+.dark * {
+  border-color: var(--color-divider-dark);
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: rgb(36 91 255 / 0.2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }

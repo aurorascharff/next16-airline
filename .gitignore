@@ -12,6 +12,8 @@
 
 # testing
 /coverage
+test-results/*
+playwright-report
 
 # next.js
 /.next/
@@ -39,3 +41,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# generated database files
+/generated/
+prisma/dev.db
+prisma/dev.db-journal
