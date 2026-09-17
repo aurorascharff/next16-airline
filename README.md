@@ -24,9 +24,13 @@ The architecture follows the [Next.js App Architecture](https://github.com/auror
 - **[View Transitions](https://nextjs.org/docs/app/guides/view-transitions)** cross-fade streamed content into place while the header, tab bar, and demo toolbar stay pinned.
 - **Demo controls** outline Client Components, toggle prefetching and simulated latency, and simulate going offline so the behavior can be compared directly.
 
-## Try the skipped step
+## The problem
 
-Whether a flight has a seat map is only known once the provider returns its offer. Waypoint fetches that offer once, shares it across every step, and marks steps that don't exist as skipped. Pick the **Basic** fare on any result to see the flow drop Seats and Extras, then compare with **Delays** on and **Prefetch** off versus on in the demo toolbar.
+A multi-step booking flow has steps that only exist sometimes. Whether a flight offers a seat map or extras is decided by the provider's offer for that flight, date, and fare, so the flow can't know its own shape up front. The usual fix is to call the provider when the user presses Next to see whether the next step exists, show a spinner, and then call it again on the next page to render it. Two requests, one of them blocking, and the answer can still go stale between them.
+
+Waypoint treats the offer as one cached read shared by every step. The step bar always shows all four steps; once the offer arrives, steps that don't exist for this fare fade out and Continue points at the next real one. With Prefetch on, the next step is fetched, offer included, before the click. Picking a seat holds it for ten minutes, so nobody is pulled back from Review because someone else was faster. Confirming re-validates against the database and invalidates the offer for everyone, so a seat taken or held by one traveler shows as unavailable for the next.
+
+To try it: pick the **Basic** fare on any result and watch Seats and Extras drop out. Then turn **Delays** on and **Prefetch** off in the demo toolbar, and compare with Prefetch on.
 
 ## Getting started
 

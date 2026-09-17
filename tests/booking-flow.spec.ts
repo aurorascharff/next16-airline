@@ -13,6 +13,7 @@ test.describe('Booking flow (/book/[flightId]/[step])', () => {
 
     await page.getByRole('button', { exact: true, name: 'Seat 10C' }).click();
     await expect(page).toHaveURL(/seat=wp-21-10C/);
+    await expect(page.getByTestId('seat-hold')).toContainText('Seat 10C held for');
     await page.getByTestId('booking-next').filter({ visible: true }).click();
     await page.waitForURL(url => url.pathname === '/book/wp-21/extras');
     await expect(page).toHaveURL(/bags=1/);

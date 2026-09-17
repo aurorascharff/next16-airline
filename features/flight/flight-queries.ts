@@ -4,6 +4,7 @@ import { cacheLife, cacheTag } from 'next/cache';
 import { notFound } from 'next/navigation';
 import type { Fare } from '@/features/booking/utils/search-params';
 import { isSlowEnabled } from '@/features/demo/demo-queries';
+import { getCurrentUser } from '@/features/user/user-queries';
 import { prisma } from '@/lib/db';
 import { delay } from '@/lib/utils';
 import { flightTags } from './flight-cache';
@@ -80,8 +81,27 @@ async function getFlightCached(id: string, slow: boolean) {
   return flight;
 }
 
-export async function getFlightOffer(flightId: string, date: string, fare: Fare) {
-  return getFlightOfferCached(flightId, date, fare, await isSlowEnabled());
+export async function getFlightOffer(flightId: string, date: string, fare: Fare): Promise<FlightOffer> {
+  const [user, offer] = await Promise.all([
+    getCurrentUser(),
+    getFlightOfferCached(flightId, date, fare, await isSlowEnabled()),
+  ]);
+  if (fare !== 'Flex') return offer;
+
+  const holds = await prisma.seatHold.findMany({
+    select: { expiresAt: true, seatId: true, userId: true },
+    where: { date, expiresAt: { gt: new Date() }, flightId },
+  });
+  const own = holds.find(hold => hold.userId === user?.id);
+  const heldByOthers = new Set(holds.filter(hold => hold.userId !== user?.id).map(hold => hold.seatId));
+
+  return {
+    ...offer,
+    hold: own ? { expiresAt: own.expiresAt.toISOString(), seatId: own.seatId } : null,
+    seats: offer.seats.map(seat =>
+      seat.status === 'available' && heldByOthers.has(seat.id) ? { ...seat, status: 'held' } : seat,
+    ),
+  };
 }
 
 async function getFlightOfferCached(flightId: string, date: string, fare: Fare, slow: boolean): Promise<FlightOffer> {
@@ -112,7 +132,8 @@ async function getFlightOfferCached(flightId: string, date: string, fare: Fare, 
     currency: flight.currency,
     extras: flex ? flight.extras : [],
     fare,
-    seats: flex ? flight.seats.map(seat => toSeat(seat, taken.has(seat.id))) : [],
+    hold: null,
+    seats: flex ? flight.seats.map(seat => toSeat(seat, taken.has(seat.id) ? 'occupied' : undefined)) : [],
   };
 }
 

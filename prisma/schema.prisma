@@ -13,7 +13,8 @@ model User {
   name      String
   createdAt DateTime @default(now())
 
-  bookings Booking[]
+  bookings  Booking[]
+  seatHolds SeatHold[]
 }
 
 model Airport {
@@ -47,6 +48,7 @@ model Flight {
   seats       Seat[]
   extras      Extra[]
   bookings    Booking[]
+  seatHolds   SeatHold[]
 
   @@index([originCode, destinationCode])
 }
@@ -59,8 +61,9 @@ model Seat {
   status   String
   type     String
 
-  flight   Flight    @relation(fields: [flightId], references: [id], onDelete: Cascade)
-  bookings Booking[]
+  flight    Flight     @relation(fields: [flightId], references: [id], onDelete: Cascade)
+  bookings  Booking[]
+  seatHolds SeatHold[]
 
   @@index([flightId])
 }
@@ -76,6 +79,22 @@ model Extra {
   bookings Booking[]
 
   @@index([flightId])
+}
+
+model SeatHold {
+  id        String   @id @default(cuid())
+  flightId  String
+  date      String
+  seatId    String
+  userId    String
+  expiresAt DateTime
+
+  flight Flight @relation(fields: [flightId], references: [id], onDelete: Cascade)
+  seat   Seat   @relation(fields: [seatId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([flightId, date, seatId])
+  @@index([userId])
 }
 
 model Booking {

@@ -8,6 +8,8 @@ import { verifyAuth } from '@/features/user/user-queries';
 import { prisma } from '@/lib/db';
 import { bookingTags } from './booking-cache';
 
+export const SEAT_HOLD_MINUTES = 10;
+
 export type ConfirmBookingState = { ok: false; error: string } | null;
 
 const confirmSchema = z.object({
@@ -44,12 +46,9 @@ export async function confirmBooking(_state: ConfirmBookingState, formData: Form
   const seat = flex && input.seat ? flight.seats.find(item => item.id === input.seat) : undefined;
   if (input.seat && !seat) return { error: 'Choose a seat on this flight.', ok: false };
   if (seat?.status === 'occupied') return { error: `Seat ${seat.label} is already taken.`, ok: false };
-  if (seat && input.date) {
-    const taken = await prisma.booking.findFirst({
-      select: { id: true },
-      where: { date: input.date, flightId: flight.id, seatId: seat.id },
-    });
-    if (taken) return { error: `Seat ${seat.label} was just booked by another traveler. Pick another one.`, ok: false };
+  if (seat) {
+    const conflict = await seatConflict(flight.id, input.date, seat.id, user.id);
+    if (conflict) return { error: `Seat ${seat.label} ${conflict}. Pick another one.`, ok: false };
   }
 
   const extraIds = new Set(input.extras.split(',').filter(Boolean));
@@ -76,9 +75,42 @@ export async function confirmBooking(_state: ConfirmBookingState, formData: Form
     select: { id: true },
   });
 
+  await prisma.seatHold.deleteMany({ where: { date: input.date, flightId: flight.id, userId: user.id } });
   updateTag(bookingTags.user(user.id));
   updateTag(flightTags.offer(flight.id));
   redirect(`/trips/${booking.id}?confirmed=1`);
+}
+
+async function seatConflict(flightId: string, date: string, seatId: string, userId: string) {
+  const [booked, hold] = await Promise.all([
+    prisma.booking.findFirst({ select: { id: true }, where: { date, flightId, seatId } }),
+    prisma.seatHold.findFirst({
+      select: { userId: true },
+      where: { date, expiresAt: { gt: new Date() }, flightId, seatId, userId: { not: userId } },
+    }),
+  ]);
+  if (booked) return 'was just booked by another traveler';
+  if (hold) return 'is being held by another traveler';
+  return null;
+}
+
+export async function holdSeat(flightId: string, date: string, seatId: string) {
+  const user = await verifyAuth();
+  const seat = await prisma.seat.findFirst({ where: { flightId, id: seatId } });
+  if (!seat || seat.status === 'occupied') return { error: 'That seat is not available.', ok: false as const };
+
+  const conflict = await seatConflict(flightId, date, seatId, user.id);
+  if (conflict) return { error: `Seat ${seat.label} ${conflict}.`, ok: false as const };
+
+  const expiresAt = new Date(Date.now() + SEAT_HOLD_MINUTES * 60_000);
+  await prisma.$transaction([
+    prisma.seatHold.deleteMany({
+      where: { OR: [{ date, flightId, userId: user.id }, { expiresAt: { lte: new Date() } }] },
+    }),
+    prisma.seatHold.create({ data: { date, expiresAt, flightId, seatId, userId: user.id } }),
+  ]);
+  updateTag(flightTags.offer(flightId));
+  return { expiresAt: expiresAt.toISOString(), ok: true as const };
 }
 
 export async function cancelBooking(bookingId: string) {

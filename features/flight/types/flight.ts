@@ -8,7 +8,7 @@ import type {
 
 export type Flight = FlightRecord & { destination: Airport; origin: Airport };
 
-export type SeatStatus = 'available' | 'occupied';
+export type SeatStatus = 'available' | 'occupied' | 'held';
 export type SeatType = 'standard' | 'extra-legroom';
 export type Seat = Omit<SeatRecord, 'status' | 'type'> & { status: SeatStatus; type: SeatType };
 export type Extra = ExtraRecord;
@@ -19,13 +19,16 @@ export type FlightOffer = {
   currency: string;
   extras: Extra[];
   fare: Fare;
+  hold: SeatHold | null;
   seats: Seat[];
 };
 
-export function toSeat(seat: SeatRecord, booked = false): Seat {
+export type SeatHold = { expiresAt: string; seatId: string };
+
+export function toSeat(seat: SeatRecord, status?: SeatStatus): Seat {
   return {
     ...seat,
-    status: booked || seat.status === 'occupied' ? 'occupied' : 'available',
+    status: status ?? (seat.status === 'occupied' ? 'occupied' : 'available'),
     type: seat.type === 'extra-legroom' ? 'extra-legroom' : 'standard',
   };
 }

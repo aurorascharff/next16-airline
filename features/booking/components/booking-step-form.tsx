@@ -12,15 +12,18 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { startTransition, useActionState, useOptimistic } from 'react';
+import { startTransition, useActionState, useOptimistic, useRef, useState } from 'react';
+import { toast } from 'sonner';
 import { Boundary } from '@/components/internal/boundary';
 import { Button } from '@/components/ui/button';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
+import { Spinner } from '@/components/ui/spinner';
 import type { Extra, Flight, FlightOffer } from '@/features/flight/types/flight';
 import { cn, formatPrice } from '@/lib/utils';
-import { confirmBooking } from '../booking-actions';
+import { confirmBooking, holdSeat } from '../booking-actions';
 import { createBookingHref } from '../utils/search-params';
 import { nextBookingStep, previousBookingStep } from '../utils/steps';
+import { SeatHoldTimer } from './seat-hold-timer';
 import type { BookingDraft, BookingStep } from '../types/booking';
 import type { Fare } from '../utils/search-params';
 
@@ -64,6 +67,31 @@ export function BookingStepForm({
     });
   }
 
+  const [pendingSeat, setPendingSeat] = useOptimistic('');
+  const [holdExpiresAt, setHoldExpiresAt] = useState(offer.hold?.expiresAt ?? null);
+  const latestSeat = useRef('');
+
+  function selectSeat(seatId: string) {
+    latestSeat.current = seatId;
+    startTransition(async () => {
+      updateOptimisticDraft({ seat: seatId });
+      setPendingSeat(seatId);
+      router.replace(createBookingHref(flight.id, step, { ...optimisticDraft, seat: seatId }, date, offer.fare), {
+        scroll: false,
+      });
+      const result = await holdSeat(flight.id, date, seatId);
+      if (result.ok) {
+        setHoldExpiresAt(result.expiresAt);
+      } else if (latestSeat.current === seatId) {
+        toast.error(result.error);
+        router.replace(createBookingHref(flight.id, step, { ...optimisticDraft, seat: '' }, date, offer.fare), {
+          scroll: false,
+        });
+      }
+    });
+  }
+
+  const heldSeat = offer.seats.find(seat => seat.id === optimisticDraft.seat);
   const nextStep = nextBookingStep(steps, step);
   const previousStep = previousBookingStep(steps, step);
   const canContinue = step !== 'seats' || Boolean(optimisticDraft.seat);
@@ -77,7 +105,9 @@ export function BookingStepForm({
           <h1 className="mt-1.5 text-2xl sm:text-3xl">{titles[step].title}</h1>
           <div className="mt-6">
             {step === 'baggage' && <BaggageOptions draft={optimisticDraft} offer={offer} updateDraft={updateDraft} />}
-            {step === 'seats' && <SeatOptions draft={optimisticDraft} offer={offer} updateDraft={updateDraft} />}
+            {step === 'seats' && (
+              <SeatOptions draft={optimisticDraft} offer={offer} onSelect={selectSeat} pendingSeat={pendingSeat} />
+            )}
             {step === 'extras' && <ExtraOptions draft={optimisticDraft} offer={offer} updateDraft={updateDraft} />}
             {step === 'review' && <Review draft={optimisticDraft} flight={flight} offer={offer} />}
           </div>
@@ -88,6 +118,7 @@ export function BookingStepForm({
             <p className="text-xl font-semibold tabular-nums" data-testid="trip-total">
               {formatPrice(total)}
             </p>
+            {heldSeat && holdExpiresAt && <SeatHoldTimer expiresAt={holdExpiresAt} seatLabel={heldSeat.label} />}
           </div>
           <div className="flex items-center gap-3">
             {previousStep ? (
@@ -226,7 +257,17 @@ function BaggageOptions({ draft, offer, updateDraft }: StepProps) {
   );
 }
 
-function SeatOptions({ draft, offer, updateDraft }: StepProps) {
+function SeatOptions({
+  draft,
+  offer,
+  onSelect,
+  pendingSeat,
+}: {
+  draft: BookingDraft;
+  offer: FlightOffer;
+  onSelect: (seatId: string) => void;
+  pendingSeat: string;
+}) {
   return (
     <div className="mx-auto max-w-lg">
       <div className="text-muted mb-5 flex items-center justify-between text-xs">
@@ -234,10 +275,10 @@ function SeatOptions({ draft, offer, updateDraft }: StepProps) {
           <span className="border-divider dark:border-divider-dark size-4 rounded border" /> Available
         </span>
         <span className="flex items-center gap-2">
-          <span className="bg-card dark:bg-card-dark size-4 rounded" /> Occupied
+          <span className="bg-card dark:bg-card-dark size-4 rounded" /> Taken or held
         </span>
         <span className="text-accent flex items-center gap-2">
-          <span className="bg-accent size-4 rounded" /> Selected
+          <span className="bg-accent size-4 rounded" /> Yours
         </span>
       </div>
       <div className="border-divider bg-surface dark:border-divider-dark dark:bg-surface-dark rounded-2xl border px-7 pt-10 pb-7">
@@ -245,33 +286,38 @@ function SeatOptions({ draft, offer, updateDraft }: StepProps) {
         <div className="grid grid-cols-[1fr_1fr_2rem_1fr_1fr] gap-2">
           {offer.seats.map((seat, index) => {
             const selected = draft.seat === seat.id;
-            const occupied = seat.status === 'occupied';
+            const blocked = seat.status !== 'available';
+            const pending = pendingSeat === seat.id;
             return (
               <button
-                aria-label={`Seat ${seat.label}${occupied ? ', occupied' : ''}`}
+                aria-busy={pending || undefined}
+                aria-label={`Seat ${seat.label}${seat.status === 'occupied' ? ', occupied' : seat.status === 'held' ? ', held by another traveler' : ''}`}
                 aria-pressed={selected}
                 className={cn(
                   'relative grid aspect-square place-items-center rounded-lg border text-xs font-bold transition-transform',
                   index % 4 === 2 && 'col-start-4',
-                  occupied
+                  blocked
                     ? 'bg-card text-muted dark:bg-card-dark cursor-not-allowed border-transparent'
-                    : 'border-divider dark:border-divider-dark bg-white dark:bg-black',
-                  seat.type === 'extra-legroom' && !occupied && !selected && 'border-success dark:border-success',
+                    : 'border-divider dark:border-divider-dark bg-white hover:-translate-y-0.5 dark:bg-black',
+                  seat.type === 'extra-legroom' && !blocked && !selected && 'border-success dark:border-success',
                   selected && 'border-accent bg-accent dark:bg-accent text-white',
+                  pending && 'opacity-80',
                 )}
-                disabled={occupied}
+                disabled={blocked}
                 key={seat.id}
-                onClick={() => updateDraft({ seat: seat.id })}
+                onClick={() => onSelect(seat.id)}
                 type="button"
               >
-                <Armchair className="mb-3 size-4" />
+                {pending ? <Spinner className="mb-3 size-4" /> : <Armchair className="mb-3 size-4" />}
                 <span className="absolute bottom-1.5">{seat.label}</span>
               </button>
             );
           })}
         </div>
       </div>
-      <p className="text-muted mt-4 text-center text-xs">Extra-legroom seats are outlined in green.</p>
+      <p className="text-muted mt-4 text-center text-xs">
+        Extra-legroom seats are outlined in green. Picking a seat holds it for you for 10 minutes.
+      </p>
     </div>
   );
 }
