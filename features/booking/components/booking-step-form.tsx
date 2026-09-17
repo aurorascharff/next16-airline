@@ -71,7 +71,7 @@ export function BookingStepForm({
 
   return (
     <Boundary label="BookingStepForm">
-      <section className="border-divider dark:border-divider-dark overflow-hidden rounded-2xl border bg-white dark:bg-black">
+      <section className="border-divider dark:border-divider-dark shadow-soft overflow-hidden rounded-2xl border bg-white dark:bg-black">
         <div className="p-5 sm:p-6">
           <p className="text-accent text-sm font-semibold">{titles[step].eyebrow}</p>
           <h1 className="mt-1.5 text-2xl sm:text-3xl">{titles[step].title}</h1>

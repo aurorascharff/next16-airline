@@ -33,7 +33,7 @@ export async function FlightResults({ date, from, to }: { date: string; from: st
       <ul className="grid gap-3">
         {flights.map(flight => (
           <li
-            className="border-divider dark:border-divider-dark grid gap-5 rounded-2xl border bg-white p-5 sm:grid-cols-[1fr_auto] sm:items-center dark:bg-black"
+            className="border-divider dark:border-divider-dark shadow-soft grid gap-5 rounded-2xl border bg-white p-5 sm:grid-cols-[1fr_auto] sm:items-center dark:bg-black"
             data-testid="flight-result"
             key={flight.id}
           >
@@ -98,7 +98,7 @@ export function FlightResultsSkeleton() {
       <div className="grid gap-3">
         {Array.from({ length: 2 }).map((_, index) => (
           <div
-            className="border-divider dark:border-divider-dark grid gap-5 rounded-2xl border bg-white p-5 sm:grid-cols-[1fr_auto] sm:items-center dark:bg-black"
+            className="border-divider dark:border-divider-dark shadow-soft grid gap-5 rounded-2xl border bg-white p-5 sm:grid-cols-[1fr_auto] sm:items-center dark:bg-black"
             key={index}
           >
             <div className="flex items-center gap-4">

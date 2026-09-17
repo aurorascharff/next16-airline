@@ -1,5 +1,5 @@
 import { ArrowRight, Plane } from 'lucide-react';
-import { PrefetchLink } from '@/components/ui/prefetch-link';
+import { HoverPrefetchLink } from '@/components/ui/hover-prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { createSearchHref } from '@/features/booking/booking-search-params';
 import { formatPrice } from '@/lib/utils';
@@ -17,8 +17,8 @@ export async function RouteSuggestions({ date, from }: { date: string; from: str
       <ul className="grid gap-3 sm:grid-cols-3">
         {routes.map(route => (
           <li key={route.destination.code}>
-            <PrefetchLink
-              className="border-divider hover:border-accent/40 dark:border-divider-dark group flex h-full flex-col justify-between gap-6 rounded-2xl border bg-white p-5 transition-colors dark:bg-black"
+            <HoverPrefetchLink
+              className="border-divider hover:border-accent/40 dark:border-divider-dark group shadow-soft flex h-full flex-col justify-between gap-6 rounded-2xl border bg-white p-5 transition-[border-color,box-shadow,transform] transition-colors hover:-translate-y-0.5 hover:shadow-md dark:bg-black"
               data-testid="route-suggestion"
               href={createSearchHref(from, route.destination.code, date)}
             >
@@ -34,7 +34,7 @@ export async function RouteSuggestions({ date, from }: { date: string; from: str
                 <span className="text-sm font-semibold tabular-nums">from {formatPrice(route.fromFare)}</span>
                 <ArrowRight className="text-muted group-hover:text-accent size-4 transition-colors" />
               </div>
-            </PrefetchLink>
+            </HoverPrefetchLink>
           </li>
         ))}
       </ul>
@@ -52,7 +52,7 @@ export function RouteSuggestionsSkeleton() {
       <div className="grid gap-3 sm:grid-cols-3">
         {Array.from({ length: 3 }).map((_, index) => (
           <div
-            className="border-divider dark:border-divider-dark flex flex-col justify-between gap-6 rounded-2xl border bg-white p-5 dark:bg-black"
+            className="border-divider dark:border-divider-dark shadow-soft flex flex-col justify-between gap-6 rounded-2xl border bg-white p-5 dark:bg-black"
             key={index}
           >
             <div>

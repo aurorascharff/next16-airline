@@ -75,7 +75,7 @@ export async function BookingExperience({
 
       <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_19rem]">
         <BookingStepForm date={date} draft={draft} flight={flight} offer={offer} step={step} steps={steps} />
-        <aside className="border-divider dark:border-divider-dark overflow-hidden rounded-2xl border bg-white lg:sticky lg:top-20 dark:bg-black">
+        <aside className="border-divider dark:border-divider-dark shadow-soft overflow-hidden rounded-2xl border bg-white lg:sticky lg:top-20 dark:bg-black">
           <div className="bg-card dark:bg-card-dark p-5">
             <div className="text-muted flex items-center justify-between text-xs font-semibold tracking-wide uppercase">
               <span>{flight.flightNumber}</span>
@@ -136,7 +136,7 @@ export function BookingExperienceSkeleton() {
         ))}
       </div>
       <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_19rem]">
-        <div className="border-divider dark:border-divider-dark overflow-hidden rounded-2xl border bg-white dark:bg-black">
+        <div className="border-divider dark:border-divider-dark shadow-soft overflow-hidden rounded-2xl border bg-white dark:bg-black">
           <div className="p-5 sm:p-6">
             <Skeleton className="h-5 w-28" />
             <Skeleton className="mt-1.5 h-8 w-72 sm:h-9" />
@@ -174,7 +174,7 @@ export function BookingExperienceSkeleton() {
             </div>
           </div>
         </div>
-        <aside className="border-divider dark:border-divider-dark overflow-hidden rounded-2xl border bg-white dark:bg-black">
+        <aside className="border-divider dark:border-divider-dark shadow-soft overflow-hidden rounded-2xl border bg-white dark:bg-black">
           <div className="bg-card dark:bg-card-dark p-5">
             <div className="flex items-center justify-between">
               <Skeleton className="h-4 w-12" />

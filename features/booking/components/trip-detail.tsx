@@ -19,7 +19,7 @@ export async function TripDetail({ bookingId, confirmed }: { bookingId: string; 
 
   return (
     <div className="mx-auto max-w-4xl">
-      <div className="border-divider dark:border-divider-dark overflow-hidden rounded-2xl border bg-white dark:bg-black">
+      <div className="border-divider dark:border-divider-dark shadow-soft overflow-hidden rounded-2xl border bg-white dark:bg-black">
         <div className={confirmed ? 'bg-success/10 p-7 sm:p-10' : 'bg-card dark:bg-card-dark p-7 sm:p-10'}>
           {confirmed ? (
             <p className="text-success flex items-center gap-2 text-sm font-semibold" data-testid="trip-confirmed">
@@ -122,7 +122,7 @@ function Detail({ icon, label, value }: { icon: React.ReactNode; label: string; 
 export function TripDetailSkeleton() {
   return (
     <div className="mx-auto max-w-4xl">
-      <div className="border-divider dark:border-divider-dark overflow-hidden rounded-2xl border bg-white dark:bg-black">
+      <div className="border-divider dark:border-divider-dark shadow-soft overflow-hidden rounded-2xl border bg-white dark:bg-black">
         <div className="bg-card dark:bg-card-dark p-7 sm:p-10">
           <Skeleton className="h-5 w-32" />
           <Skeleton className="mt-4 h-10 w-80 sm:h-12" />

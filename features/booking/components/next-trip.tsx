@@ -10,7 +10,7 @@ export async function NextTrip() {
   if (!booking) {
     return (
       <PrefetchLink
-        className="border-divider hover:border-accent/40 dark:border-divider-dark group flex items-center gap-4 rounded-2xl border bg-white p-4 transition-colors sm:p-5 dark:bg-black"
+        className="border-divider hover:border-accent/40 dark:border-divider-dark group shadow-soft flex items-center gap-4 rounded-2xl border bg-white p-4 transition-[border-color,box-shadow,transform] transition-colors hover:-translate-y-0.5 hover:shadow-md sm:p-5 dark:bg-black"
         data-testid="no-trip"
         href="/search"
       >
@@ -29,7 +29,7 @@ export async function NextTrip() {
 
   return (
     <PrefetchLink
-      className="border-divider hover:border-accent/40 dark:border-divider-dark group flex items-center gap-4 rounded-2xl border bg-white p-4 transition-colors sm:p-5 dark:bg-black"
+      className="border-divider hover:border-accent/40 dark:border-divider-dark group shadow-soft flex items-center gap-4 rounded-2xl border bg-white p-4 transition-[border-color,box-shadow,transform] transition-colors hover:-translate-y-0.5 hover:shadow-md sm:p-5 dark:bg-black"
       data-testid="next-trip"
       href={`/trips/${booking.id}`}
     >
@@ -52,7 +52,7 @@ export async function NextTrip() {
 
 export function NextTripSkeleton() {
   return (
-    <div className="border-divider dark:border-divider-dark flex items-center gap-4 rounded-2xl border bg-white p-4 sm:p-5 dark:bg-black">
+    <div className="border-divider dark:border-divider-dark shadow-soft flex items-center gap-4 rounded-2xl border bg-white p-4 sm:p-5 dark:bg-black">
       <Skeleton className="skeleton-subtle size-11 shrink-0 rounded-lg" />
       <div className="min-w-0 flex-1">
         <Skeleton className="h-4 w-24" />

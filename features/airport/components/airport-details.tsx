@@ -12,7 +12,7 @@ export async function AirportDetails({ slug }: { slug: string }) {
 
   return (
     <article>
-      <div className="border-divider dark:border-divider-dark grid overflow-hidden rounded-2xl border bg-white lg:grid-cols-[1.05fr_0.95fr] dark:bg-black">
+      <div className="border-divider dark:border-divider-dark shadow-soft grid overflow-hidden rounded-2xl border bg-white lg:grid-cols-[1.05fr_0.95fr] dark:bg-black">
         <div className="p-7 sm:p-10">
           <p className="text-accent flex items-center gap-2 text-sm font-semibold">
             <MapPin className="size-4" /> {airport.country}
@@ -38,7 +38,7 @@ export async function AirportDetails({ slug }: { slug: string }) {
               {routes.map(route => (
                 <li key={route.origin.code}>
                   <PrefetchLink
-                    className="border-divider hover:border-accent/40 dark:border-divider-dark flex items-center justify-between gap-4 rounded-xl border bg-white px-4 py-3 text-sm transition-colors dark:bg-black"
+                    className="border-divider hover:border-accent/40 dark:border-divider-dark flex items-center justify-between gap-4 rounded-xl border bg-white px-4 py-3 text-sm transition-[border-color,box-shadow,transform] transition-colors hover:-translate-y-0.5 hover:shadow-md dark:bg-black"
                     href={createSearchHref(route.origin.code, airport.code)}
                   >
                     <span>
@@ -62,7 +62,7 @@ export async function AirportDetails({ slug }: { slug: string }) {
 export function AirportDetailsSkeleton() {
   return (
     <div>
-      <div className="border-divider dark:border-divider-dark grid overflow-hidden rounded-2xl border bg-white lg:grid-cols-[1.05fr_0.95fr] dark:bg-black">
+      <div className="border-divider dark:border-divider-dark shadow-soft grid overflow-hidden rounded-2xl border bg-white lg:grid-cols-[1.05fr_0.95fr] dark:bg-black">
         <div className="p-7 sm:p-10">
           <Skeleton className="h-5 w-24" />
           <Skeleton className="mt-6 h-10 w-56 sm:h-12" />

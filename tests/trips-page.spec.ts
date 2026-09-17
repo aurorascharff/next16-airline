@@ -7,7 +7,7 @@ test.describe('Trips page (/trips)', () => {
     await expect(cards).toHaveCount(2);
     await expect(cards.first()).toContainText('OSL');
     await expect(cards.first()).toContainText('Barcelona');
-    await expect(cards.first()).toContainText('Seat 10A');
+    await expect(cards.first()).toContainText('10A');
     await expect(cards.first()).toContainText('WAY204');
     await expect(page.getByText('Amsterdam')).toHaveCount(0);
     await expect(

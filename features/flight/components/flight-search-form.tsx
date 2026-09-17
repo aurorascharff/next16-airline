@@ -20,7 +20,7 @@ export async function FlightSearchForm({
   return (
     <form
       action="/search"
-      className="border-divider dark:border-divider-dark shadow-soft grid gap-3 rounded-2xl border bg-white p-4 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-end dark:bg-black"
+      className="border-divider dark:border-divider-dark shadow-soft shadow-soft grid gap-3 rounded-2xl border bg-white p-4 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-end dark:bg-black"
       method="get"
     >
       <label className="grid gap-1.5 text-xs font-semibold">
@@ -57,7 +57,7 @@ export async function FlightSearchForm({
 
 export function FlightSearchFormSkeleton() {
   return (
-    <div className="border-divider dark:border-divider-dark shadow-soft grid gap-3 rounded-2xl border bg-white p-4 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-end dark:bg-black">
+    <div className="border-divider dark:border-divider-dark shadow-soft shadow-soft grid gap-3 rounded-2xl border bg-white p-4 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-end dark:bg-black">
       {['From', 'To', 'Departure'].map(label => (
         <div className="grid gap-1.5" key={label}>
           <Skeleton className="h-4 w-14" />

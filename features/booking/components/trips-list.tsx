@@ -4,7 +4,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { WaypointMark } from '@/components/ui/waypoint-mark';
-import { boardingTime, formatDate, formatPrice } from '@/lib/utils';
+import { formatDate, formatPrice } from '@/lib/utils';
 import { getBookings } from '../booking-queries';
 
 export async function TripsList() {
@@ -12,7 +12,7 @@ export async function TripsList() {
 
   if (bookings.length === 0) {
     return (
-      <EmptyState body="Book a flight and your boarding pass will show up here." title="No trips yet">
+      <EmptyState body="Book a flight and your ticket will show up here." title="No trips yet">
         <PrefetchLink className={buttonClasses({ variant: 'secondary' })} href="/">
           Search flights
         </PrefetchLink>
@@ -25,7 +25,7 @@ export async function TripsList() {
       {bookings.map(booking => (
         <li key={booking.id}>
           <PrefetchLink
-            className="border-divider hover:border-accent/40 dark:border-divider-dark group relative grid overflow-hidden rounded-2xl border bg-white transition-colors sm:grid-cols-[1fr_15rem] dark:bg-black"
+            className="border-divider hover:border-accent/40 dark:border-divider-dark group shadow-soft relative grid overflow-hidden rounded-2xl border bg-white transition-[border-color,box-shadow,transform] transition-colors hover:-translate-y-0.5 hover:shadow-md sm:grid-cols-[1fr_15rem] dark:bg-black"
             data-testid="trip-card"
             href={`/trips/${booking.id}`}
           >
@@ -35,7 +35,7 @@ export async function TripsList() {
                   <WaypointMark className="text-accent size-5" /> Waypoint
                 </span>
                 <span className="text-muted text-xs font-semibold tracking-wide uppercase">
-                  {booking.flight.flightNumber} · {formatDate(booking.date)}
+                  {booking.flight.flightNumber}
                 </span>
               </div>
               <div className="mt-6 flex items-end gap-4">
@@ -66,8 +66,8 @@ export async function TripsList() {
               </div>
               <dl className="mt-6 grid grid-cols-3 gap-4 text-sm">
                 <div>
-                  <dt className="text-muted text-xs font-semibold tracking-wide uppercase">Boarding</dt>
-                  <dd className="mt-1 font-semibold">{boardingTime(booking.flight.departureTime)}</dd>
+                  <dt className="text-muted text-xs font-semibold tracking-wide uppercase">Date</dt>
+                  <dd className="mt-1 font-semibold">{formatDate(booking.date)}</dd>
                 </div>
                 <div>
                   <dt className="text-muted text-xs font-semibold tracking-wide uppercase">Cabin</dt>
@@ -96,15 +96,12 @@ export async function TripsList() {
                   </dd>
                 </div>
               </dl>
-              <div>
-                <div
-                  aria-hidden
-                  className="h-10 w-full rounded-sm bg-[repeating-linear-gradient(90deg,currentColor_0_2px,transparent_2px_4px,currentColor_4px_5px,transparent_5px_8px,currentColor_8px_11px,transparent_11px_13px)] text-black/70 dark:text-white/70"
-                />
-                <div className="mt-2 flex items-center justify-between">
-                  <span className="text-muted font-mono text-xs tracking-widest">{booking.reference}</span>
-                  <ArrowRight className="text-muted group-hover:text-accent size-4 transition-colors" />
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-muted text-xs font-semibold tracking-wide uppercase">Reference</p>
+                  <p className="mt-1 font-mono text-sm tracking-widest">{booking.reference}</p>
                 </div>
+                <ArrowRight className="text-muted group-hover:text-accent size-4 transition-colors" />
               </div>
             </div>
           </PrefetchLink>
@@ -117,7 +114,7 @@ export async function TripsList() {
 export function TripsListSkeleton() {
   return (
     <div className="grid gap-5">
-      <div className="border-divider dark:border-divider-dark grid overflow-hidden rounded-2xl border bg-white sm:grid-cols-[1fr_15rem] dark:bg-black">
+      <div className="border-divider dark:border-divider-dark shadow-soft grid overflow-hidden rounded-2xl border bg-white sm:grid-cols-[1fr_15rem] dark:bg-black">
         <div className="p-5 sm:p-6">
           <div className="flex items-center justify-between gap-4">
             <Skeleton className="h-5 w-24" />
@@ -159,12 +156,12 @@ export function TripsListSkeleton() {
               <Skeleton className="mt-1 h-8 w-16" />
             </div>
           </div>
-          <div>
-            <Skeleton className="skeleton-subtle h-10 w-full rounded-sm" />
-            <div className="mt-2 flex items-center justify-between">
-              <Skeleton className="h-4 w-20" />
-              <Skeleton className="size-4" />
+          <div className="flex items-center justify-between">
+            <div>
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="mt-1 h-5 w-20" />
             </div>
+            <Skeleton className="size-4" />
           </div>
         </div>
       </div>
