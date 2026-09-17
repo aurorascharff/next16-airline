@@ -7,9 +7,12 @@ import { sqlitePath } from '../lib/database-url';
 const url = sqlitePath(process.env.DATABASE_URL ?? './prisma/waypoint.db');
 const prisma = new PrismaClient({ adapter: new PrismaBetterSqlite3({ url }) });
 
+// Demo travelers. The first two start with an upcoming trip; the others start empty.
 const users = [
-  { accent: '#245bff', id: 'aurora', initials: 'AS', name: 'Aurora Scharff' },
-  { accent: '#0f9f78', id: 'sam', initials: 'SS', name: 'Sam Selikoff' },
+  { accent: '#245bff', id: 'vex', initials: 'V', name: 'Vex' },
+  { accent: '#0f9f78', id: 'quill', initials: 'Q', name: 'Quill' },
+  { accent: '#7c3aed', id: 'onyx', initials: 'O', name: 'Onyx' },
+  { accent: '#e11d48', id: 'wren', initials: 'W', name: 'Wren' },
 ];
 
 const airports = [
@@ -165,7 +168,7 @@ async function main() {
       reference: 'WAY204',
       seatId: 'wp-21-10A',
       total: 218 + 34 + 28 + 32,
-      userId: 'aurora',
+      userId: 'vex',
     },
   });
   await prisma.booking.create({
@@ -177,7 +180,7 @@ async function main() {
       reference: 'WAY318',
       seatId: 'wp-61-11B',
       total: 118 + 14,
-      userId: 'sam',
+      userId: 'quill',
     },
   });
 }

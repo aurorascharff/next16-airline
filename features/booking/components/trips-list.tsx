@@ -1,5 +1,5 @@
 import { ArrowRight, Armchair, Luggage, Plane } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { buttonClasses } from '@/components/ui/button-classes';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -12,9 +12,9 @@ export async function TripsList() {
   if (bookings.length === 0) {
     return (
       <EmptyState body="Book a flight and it will show up here with your seat, bags, and extras." title="No trips yet">
-        <Button render={<PrefetchLink href="/" />} variant="secondary">
+        <PrefetchLink className={buttonClasses({ variant: 'secondary' })} href="/">
           Search flights
-        </Button>
+        </PrefetchLink>
       </EmptyState>
     );
   }

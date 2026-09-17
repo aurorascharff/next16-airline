@@ -1,5 +1,5 @@
 import { ArrowLeft, ArrowRight, MapPin, Plane } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { buttonClasses } from '@/components/ui/button-classes';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { createSearchHref } from '@/features/booking/booking-search-params';
@@ -36,9 +36,9 @@ export async function AirportDetails({ slug }: { slug: string }) {
             <p className="mt-2 text-4xl font-semibold">{airport.code}</p>
           </div>
           {airport.hub ? (
-            <Button render={<PrefetchLink href="/" />} variant="secondary">
+            <PrefetchLink className={buttonClasses({ variant: 'secondary' })} href="/">
               Search flights from {airport.city} <ArrowRight className="size-4" />
-            </Button>
+            </PrefetchLink>
           ) : (
             <ul className="grid gap-2">
               {routes.map(route => (

@@ -1,5 +1,5 @@
 import { Plane } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { buttonClasses } from '@/components/ui/button-classes';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -61,11 +61,12 @@ export async function FlightResults({ date, from, to }: { date: string; from: st
                 <p className="text-muted text-xs font-medium">{flight.cabin} · cabin bag included</p>
                 <p className="text-xl font-semibold tabular-nums">{formatPrice(flight.baseFare)}</p>
               </div>
-              <Button
-                render={<PrefetchLink href={createBookingHref(flight.id, 'baggage', DEFAULT_BOOKING_DRAFT, date)} />}
+              <PrefetchLink
+                className={buttonClasses()}
+                href={createBookingHref(flight.id, 'baggage', DEFAULT_BOOKING_DRAFT, date)}
               >
                 Select
-              </Button>
+              </PrefetchLink>
             </div>
           </li>
         ))}
