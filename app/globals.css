@@ -261,3 +261,23 @@ html.boundary-mode :is([data-component], [data-sonner-toast]) {
     animation: none !important;
   }
 }
+
+@keyframes plane-fly {
+  from {
+    translate: -2.5rem -50%;
+  }
+  to {
+    translate: var(--plane-distance, 20rem) -50%;
+  }
+}
+
+.plane-fly {
+  animation: plane-fly 1.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plane-fly {
+    animation: none;
+    translate: calc(var(--plane-distance, 20rem) / 2.5) -50%;
+  }
+}

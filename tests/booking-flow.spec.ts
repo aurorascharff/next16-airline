@@ -9,7 +9,9 @@ test.describe('Booking flow (/book/[flightId]/[step])', () => {
     await page.getByTestId('booking-next').filter({ visible: true }).click();
     await page.waitForURL(url => url.pathname === '/book/wp-21/seats');
     await expect(page.getByRole('heading', { level: 1, name: 'Choose your seat' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Select a seat' })).toBeDisabled();
+    await page.getByTestId('booking-next').filter({ visible: true }).click();
+    await expect(page.getByText('Pick a seat first.')).toBeVisible();
+    await expect(page).toHaveURL(url => url.pathname === '/book/wp-21/seats');
 
     await page.getByRole('button', { exact: true, name: 'Seat 10C' }).click();
     await expect(page).toHaveURL(/seat=wp-21-10C/);
@@ -24,11 +26,11 @@ test.describe('Booking flow (/book/[flightId]/[step])', () => {
     await page.goto('/book/wp-21/baggage?date=2026-11-12&fare=Basic');
     const steps = page.getByRole('list', { name: 'Booking progress' }).getByRole('listitem');
     await expect(steps).toHaveCount(4);
-    await expect(
-      steps.filter({ has: page.locator('[data-skipped]') }).or(steps.and(page.locator('[data-skipped]'))),
-    ).toHaveCount(2);
+    await expect(steps.and(page.locator('[data-skipped]'))).toHaveCount(0);
     await page.getByTestId('booking-next').filter({ visible: true }).click();
     await page.waitForURL(url => url.pathname === '/book/wp-21/review');
+    await expect(page).toHaveURL(/steps=baggage%2Creview/);
+    await expect(steps.and(page.locator('[data-skipped]'))).toHaveCount(2);
 
     await page.goto('/book/wp-21/seats?date=2026-11-12&fare=Basic');
     await page.waitForURL(url => url.pathname === '/book/wp-21/review');
@@ -47,7 +49,8 @@ test.describe('Booking flow (/book/[flightId]/[step])', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Review and confirm' })).toBeVisible();
     await expect(page.getByTestId('trip-total')).toHaveText('€395');
 
-    await page.getByLabel('Full name as on passport').fill('Test Traveler');
+    await page.getByLabel('First name').fill('Test');
+    await page.getByLabel('Last name').fill('Traveler');
     await page.getByTestId('booking-confirm').filter({ visible: true }).click();
     await page.waitForURL(url => url.pathname.startsWith('/trips/') && url.searchParams.get('confirmed') === '1');
     await expect(page.getByTestId('trip-confirmed')).toBeVisible();

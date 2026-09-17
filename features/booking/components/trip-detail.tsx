@@ -1,4 +1,5 @@
 import { Armchair, CalendarDays, CheckCircle2, Luggage, Plane, Sparkles } from 'lucide-react';
+import { DotSeparator } from '@/components/ui/dot-separator';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatDate, formatPrice } from '@/lib/utils';
@@ -30,8 +31,8 @@ export async function TripHeader({
       <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
         See you in {booking.flight.destination.city}.
       </h1>
-      <p className="text-muted mt-3 text-sm">
-        {booking.passenger} · Booking reference{' '}
+      <p className="text-muted mt-3 flex items-center gap-1.5 text-sm">
+        {booking.passenger} <DotSeparator /> Booking reference{' '}
         <span className="font-semibold text-black dark:text-white">{booking.reference}</span>
       </p>
     </>
@@ -110,7 +111,7 @@ export async function TripSummary({ bookingId, reference }: { bookingId: string;
       <Detail
         icon={<Luggage className="size-4" />}
         label="Baggage"
-        value={`${booking.bags} checked · ${booking.carryOn ? 'cabin bag' : 'no cabin bag'}`}
+        value={`${booking.bags} checked, ${booking.carryOn ? 'cabin bag' : 'no cabin bag'}`}
       />
       <Detail
         icon={<Sparkles className="size-4" />}
@@ -165,7 +166,7 @@ export async function TripReceipt({ bookingId, reference }: { bookingId: string;
         {booking.userId ? (
           <CancelTripButton bookingId={booking.id} destination={flight.destination.city} />
         ) : (
-          <p className="text-muted text-sm">Demo trip · cannot be cancelled</p>
+          <p className="text-muted text-sm">Demo trip, cannot be cancelled</p>
         )}
       </div>
     </>

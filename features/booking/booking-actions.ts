@@ -10,7 +10,7 @@ import { bookingTags } from './booking-cache';
 import { createBookingHref, parseSteps } from './utils/search-params';
 import type { BookingDraft } from './types/booking';
 
-const SEAT_HOLD_MINUTES = 10;
+const SEAT_HOLD_MINUTES = 5;
 
 export type ConfirmBookingState = { ok: false; error: string } | null;
 
@@ -23,8 +23,9 @@ const confirmSchema = z.object({
     .or(z.literal('')),
   extras: z.string(),
   fare: z.enum(['Basic', 'Flex']),
+  firstName: z.string().trim().min(1, 'Enter the passenger first name.').max(40),
   flightId: z.string().min(1),
-  passenger: z.string().trim().min(2, 'Enter the passenger name.').max(80),
+  lastName: z.string().trim().min(2, 'Enter the passenger last name.').max(40),
   seat: z.string(),
   steps: z.string().default(''),
 });
@@ -54,7 +55,7 @@ export async function confirmBooking(_state: ConfirmBookingState, formData: Form
   if (seat) {
     const conflict = await seatConflict(flight.id, input.date, seat.id, sessionId);
     if (conflict) {
-      updateTag(flightTags.offer(flight.id));
+      updateTag(flightTags.holds(flight.id));
       const steps = parseSteps(input.steps);
       const draft: BookingDraft = {
         bags: input.bags,
@@ -84,7 +85,7 @@ export async function confirmBooking(_state: ConfirmBookingState, formData: Form
       date: input.date,
       extras: { connect: extras.map(extra => ({ id: extra.id })) },
       flightId: flight.id,
-      passenger: input.passenger,
+      passenger: `${input.firstName} ${input.lastName}`,
       reference: createReference(),
       seatId: seat?.id,
       total,
@@ -96,6 +97,7 @@ export async function confirmBooking(_state: ConfirmBookingState, formData: Form
   await prisma.seatHold.deleteMany({ where: { date: input.date, flightId: flight.id, userId: sessionId } });
   updateTag(bookingTags.user(sessionId));
   updateTag(flightTags.offer(flight.id));
+  updateTag(flightTags.holds(flight.id));
   redirect(`/trips/${booking.id}?confirmed=1`);
 }
 
@@ -114,13 +116,14 @@ async function seatConflict(flightId: string, date: string, seatId: string, user
 
 export async function holdSeat(flightId: string, date: string, seatId: string) {
   const sessionId = await verifySession();
-  await ensureTraveler(sessionId);
-  const seat = await prisma.seat.findFirst({ where: { flightId, id: seatId } });
+  const [seat, conflict] = await Promise.all([
+    prisma.seat.findFirst({ where: { flightId, id: seatId } }),
+    seatConflict(flightId, date, seatId, sessionId),
+    ensureTraveler(sessionId),
+  ]);
   if (!seat) return { error: 'That seat is not available.', ok: false as const };
-
-  const conflict = await seatConflict(flightId, date, seatId, sessionId);
   if (conflict) {
-    updateTag(flightTags.offer(flightId));
+    updateTag(flightTags.holds(flightId));
     return { error: `Seat ${seat.label} is no longer available.`, ok: false as const };
   }
 
@@ -131,7 +134,7 @@ export async function holdSeat(flightId: string, date: string, seatId: string) {
     }),
     prisma.seatHold.create({ data: { date, expiresAt, flightId, seatId, userId: sessionId } }),
   ]);
-  updateTag(flightTags.offer(flightId));
+  updateTag(flightTags.holds(flightId));
   return { expiresAt: expiresAt.toISOString(), ok: true as const };
 }
 

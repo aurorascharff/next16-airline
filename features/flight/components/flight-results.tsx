@@ -1,4 +1,5 @@
 import { Plane } from 'lucide-react';
+import { DotSeparator } from '@/components/ui/dot-separator';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -42,7 +43,9 @@ export async function FlightResults({ date, from, to }: { date: string; from: st
                   <Plane className="text-accent size-4" />
                   <span className="bg-divider dark:bg-divider-dark h-px flex-1" />
                 </div>
-                <span className="text-muted text-xs">{flight.flightNumber} · Direct</span>
+                <span className="text-muted flex items-center gap-1.5 text-xs">
+                  {flight.flightNumber} <DotSeparator /> Direct
+                </span>
               </div>
               <div className="w-20 shrink-0 text-right">
                 <p className="text-2xl font-semibold tabular-nums">{flight.arrivalTime}</p>
@@ -137,7 +140,7 @@ export function FlightResultsSkeleton() {
             key={index}
           >
             <div className="flex items-center gap-4">
-              <div className="w-20 shrink-0">
+              <div className="flex w-20 shrink-0 flex-col">
                 <Skeleton className="my-1.5 h-5 w-16" />
                 <Skeleton className="mt-[6px] mb-0.5 h-3 w-8" />
               </div>
@@ -155,8 +158,8 @@ export function FlightResultsSkeleton() {
             </div>
             <div className="border-divider dark:border-divider-dark grid grid-cols-2 gap-3 border-t pt-4 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-6">
               <Skeleton className="col-span-2 my-0.5 h-3 w-20" />
-              <Skeleton className="skeleton-subtle h-[4.75rem] rounded-xl" />
-              <Skeleton className="skeleton-subtle h-[4.75rem] rounded-xl" />
+              <Skeleton className="skeleton-subtle h-[5.125rem] rounded-xl" />
+              <Skeleton className="skeleton-subtle h-[5.125rem] rounded-xl" />
             </div>
           </div>
         ))}

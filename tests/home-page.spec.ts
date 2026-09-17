@@ -15,7 +15,8 @@ test.describe('Home page (/)', () => {
     );
 
     await expect(page.getByRole('button', { name: 'Search flights' })).toBeVisible();
-    await expect(page.getByTestId('next-trip')).toContainText('Oslo to Barcelona');
+    await expect(page.getByTestId('next-trip')).toContainText('OSL');
+    await expect(page.getByTestId('next-trip')).toContainText('Barcelona');
     await expect(page.getByTestId('destination-card')).toHaveCount(3);
   });
 

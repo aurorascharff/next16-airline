@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { cacheLife, cacheTag, io } from 'next/cache';
+import { cacheLife, cacheTag, unstable_navigation } from 'next/cache';
 import { notFound } from 'next/navigation';
 import type { Fare } from '@/features/booking/utils/search-params';
 import { isSlowEnabled } from '@/features/demo/demo-queries';
@@ -9,7 +9,7 @@ import { prisma } from '@/lib/db';
 import { delay } from '@/lib/utils';
 import { flightTags } from './flight-cache';
 import { toSeat } from './types/flight';
-import type { FlightOffer, FlightResult } from './types/flight';
+import type { FlightOffer, FlightResult, SeatHold, SeatHolds } from './types/flight';
 
 const flightInclude = {
   _count: { select: { seats: true } },
@@ -18,8 +18,21 @@ const flightInclude = {
 } as const;
 
 export async function searchFlights(from: string, to: string, date: string): Promise<FlightResult[]> {
-  const flights = await searchFlightsCached(from, to, await isSlowEnabled());
+  return searchFlightsCached(from, to, date, await isSlowEnabled());
+}
+
+async function searchFlightsCached(from: string, to: string, date: string, slow: boolean): Promise<FlightResult[]> {
+  'use cache';
+  cacheLife('max');
+
+  await delay(1000, slow);
+  const flights = await prisma.flight.findMany({
+    include: flightInclude,
+    orderBy: { departureTime: 'asc' },
+    where: { destinationCode: to, originCode: from },
+  });
   if (flights.length === 0) return [];
+  cacheTag(...flights.map(flight => flightTags.offer(flight.id)));
 
   const booked = await prisma.booking.groupBy({
     _count: { _all: true },
@@ -31,18 +44,6 @@ export async function searchFlights(from: string, to: string, date: string): Pro
     ...flight,
     seatsLeft: Math.max(0, _count.seats - (bookedByFlight.get(flight.id) ?? 0)),
   }));
-}
-
-async function searchFlightsCached(from: string, to: string, slow: boolean) {
-  'use cache';
-  cacheLife('max');
-
-  await delay(1000, slow);
-  return prisma.flight.findMany({
-    include: flightInclude,
-    orderBy: { departureTime: 'asc' },
-    where: { destinationCode: to, originCode: from },
-  });
 }
 
 export async function getRoutesFrom(originCode: string) {
@@ -92,27 +93,48 @@ async function getFlightCached(id: string, slow: boolean) {
 }
 
 export async function getFlightOffer(flightId: string, date: string, fare: Fare): Promise<FlightOffer> {
-  const [sessionId, offer] = await Promise.all([
-    getSessionId(),
-    getFlightOfferCached(flightId, date, fare, await isSlowEnabled()),
-  ]);
-  if (fare !== 'Flex') return offer;
+  return getFlightOfferCached(flightId, date, fare, await isSlowEnabled());
+}
 
-  await io();
+export async function getSeatHolds(flightId: string, date: string): Promise<SeatHolds> {
+  await unstable_navigation();
+  return getSeatHoldsPrivate(flightId, date);
+}
+
+async function getSeatHoldsPrivate(flightId: string, date: string): Promise<SeatHolds> {
+  'use cache: private';
+  cacheLife({ expire: 300, revalidate: 30, stale: 30 });
+  cacheTag(flightTags.holds(flightId));
+
+  const sessionId = await getSessionId();
   const holds = await prisma.seatHold.findMany({
-    select: { expiresAt: true, seatId: true, userId: true },
+    select: { expiresAt: true, seat: { select: { label: true } }, seatId: true, userId: true },
     where: { date, expiresAt: { gt: new Date() }, flightId },
   });
   const own = holds.find(hold => hold.userId === sessionId);
-  const heldByOthers = new Set(holds.filter(hold => hold.userId !== sessionId).map(hold => hold.seatId));
-
   return {
-    ...offer,
-    hold: own ? { expiresAt: own.expiresAt.toISOString(), seatId: own.seatId } : null,
-    seats: offer.seats.map(seat =>
-      seat.status === 'available' && heldByOthers.has(seat.id) ? { ...seat, status: 'held' } : seat,
-    ),
+    heldByOthers: holds.filter(hold => hold.userId !== sessionId).map(hold => hold.seatId),
+    own: own ? toSeatHold(own) : null,
   };
+}
+
+export async function getOwnSeatHold(flightId: string): Promise<SeatHold | null> {
+  'use cache: private';
+  cacheLife({ expire: 300, revalidate: 30, stale: 30 });
+  cacheTag(flightTags.holds(flightId));
+
+  const sessionId = await getSessionId();
+  if (!sessionId) return null;
+  const hold = await prisma.seatHold.findFirst({
+    orderBy: { expiresAt: 'desc' },
+    select: { expiresAt: true, seat: { select: { label: true } }, seatId: true },
+    where: { expiresAt: { gt: new Date() }, flightId, userId: sessionId },
+  });
+  return hold ? toSeatHold(hold) : null;
+}
+
+function toSeatHold(hold: { expiresAt: Date; seat: { label: string }; seatId: string }): SeatHold {
+  return { expiresAt: hold.expiresAt.toISOString(), seatId: hold.seatId, seatLabel: hold.seat.label };
 }
 
 async function getFlightOfferCached(flightId: string, date: string, fare: Fare, slow: boolean): Promise<FlightOffer> {
@@ -141,7 +163,6 @@ async function getFlightOfferCached(flightId: string, date: string, fare: Fare, 
     currency: flight.currency,
     extras: flex ? flight.extras : [],
     fare,
-    hold: null,
     seats: flex ? flight.seats.map(seat => toSeat(seat, taken.has(seat.id) ? 'occupied' : 'available')) : [],
     seatsLeft: Math.max(0, flight.seats.length - bookings.length),
   };

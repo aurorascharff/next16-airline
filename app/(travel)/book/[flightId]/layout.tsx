@@ -22,14 +22,16 @@ export default function BookingLayout({ children, params }: LayoutProps<'/book/[
         <CurrentProgressBar />
       </Suspense>
       <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_19rem]" data-testid="booking-experience">
-        {children}
-        <ErrorBoundary title="Flight details unavailable">
-          <Suspense fallback={<FlightSummarySkeleton />}>
-            {params.then(({ flightId }) => (
-              <FlightSummary flightId={flightId} />
-            ))}
-          </Suspense>
-        </ErrorBoundary>
+        <div className="min-w-0">{children}</div>
+        <div className="lg:col-start-2 lg:row-start-1">
+          <ErrorBoundary title="Flight details unavailable">
+            <Suspense fallback={<FlightSummarySkeleton />}>
+              {params.then(({ flightId }) => (
+                <FlightSummary flightId={flightId} />
+              ))}
+            </Suspense>
+          </ErrorBoundary>
+        </div>
       </div>
     </main>
   );

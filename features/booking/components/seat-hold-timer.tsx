@@ -1,8 +1,6 @@
 'use client';
 
-import { Timer } from 'lucide-react';
 import { useSyncExternalStore } from 'react';
-import { Boundary } from '@/components/internal/boundary';
 
 function subscribe(callback: () => void) {
   const id = setInterval(callback, 1000);
@@ -17,27 +15,16 @@ function useNow() {
   );
 }
 
-export function SeatHoldTimer({ expiresAt, seatLabel }: { expiresAt: string; seatLabel: string }) {
+export function SeatHoldTimer({ expiresAt }: { expiresAt: string }) {
   const now = useNow();
-  if (!now) return null;
+  if (!now) return <span className="tabular-nums">5:00</span>;
 
   const seconds = Math.max(0, Math.floor((new Date(expiresAt).getTime() - now) / 1000));
-  const expired = seconds === 0;
-  const label = `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+  if (seconds === 0) return <span>0:00, it may be released</span>;
 
   return (
-    <Boundary label="SeatHoldTimer">
-      <p
-        className={
-          expired
-            ? 'text-danger flex items-center gap-1.5 text-xs font-semibold tracking-normal normal-case'
-            : 'text-accent flex items-center gap-1.5 text-xs font-semibold tracking-normal normal-case'
-        }
-        data-testid="seat-hold"
-      >
-        <Timer className="size-3.5" />
-        {expired ? `Hold expired · seat ${seatLabel} may be released` : `Booking held for ${label} · seat ${seatLabel}`}
-      </p>
-    </Boundary>
+    <span className="tabular-nums">
+      {Math.floor(seconds / 60)}:{String(seconds % 60).padStart(2, '0')}
+    </span>
   );
 }

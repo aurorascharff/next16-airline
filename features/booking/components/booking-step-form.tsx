@@ -12,18 +12,20 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { startTransition, useActionState, useOptimistic, useRef } from 'react';
+import { Suspense, startTransition, use, useActionState, useEffect, useOptimistic, useRef } from 'react';
 import { toast } from 'sonner';
 import { Boundary } from '@/components/internal/boundary';
 import { Button } from '@/components/ui/button';
+import { DotSeparator } from '@/components/ui/dot-separator';
+import { FlightOverlay, PlanePath } from '@/components/ui/flight-overlay';
 import { Input } from '@/components/ui/input';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
-import type { Extra, Flight, FlightOffer } from '@/features/flight/types/flight';
+import { Spinner } from '@/components/ui/spinner';
+import type { Extra, Flight, FlightOffer, SeatHolds } from '@/features/flight/types/flight';
 import { cn, formatPrice } from '@/lib/utils';
 import { confirmBooking, holdSeat } from '../booking-actions';
 import { createBookingHref } from '../utils/search-params';
 import { nextBookingStep, previousBookingStep } from '../utils/steps';
-import { SeatHoldTimer } from './seat-hold-timer';
 import type { BookingDraft, BookingStep } from '../types/booking';
 
 const titles: Record<BookingStep, { eyebrow: string; title: string }> = {
@@ -41,6 +43,7 @@ export function BookingStepForm({
   date,
   draft,
   flight,
+  holds,
   offer,
   step,
   steps,
@@ -48,12 +51,14 @@ export function BookingStepForm({
   date: string;
   draft: BookingDraft;
   flight: Flight;
+  holds?: Promise<SeatHolds>;
   offer: FlightOffer;
   step: BookingStep;
   steps: BookingStep[];
 }) {
   const router = useRouter();
-  const [confirmState, confirmAction] = useActionState(confirmBooking, null);
+  const [confirmState, confirmAction, confirming] = useActionState(confirmBooking, null);
+  useLeaveGuard(confirming);
   const [optimisticDraft, updateOptimisticDraft] = useOptimistic(draft, (current, patch: Partial<BookingDraft>) => ({
     ...current,
     ...patch,
@@ -94,7 +99,6 @@ export function BookingStepForm({
 
   const nextStep = nextBookingStep(steps, step);
   const previousStep = previousBookingStep(steps, step);
-  const canContinue = step !== 'seats' || Boolean(optimisticDraft.seat);
   const total = calculateTotal(offer, optimisticDraft);
 
   return (
@@ -103,21 +107,19 @@ export function BookingStepForm({
         action={confirmAction}
         className="border-divider dark:border-divider-dark shadow-soft overflow-hidden rounded-2xl border bg-white dark:bg-black"
       >
-        {offer.hold && (
-          <div className="border-divider dark:border-divider-dark bg-accent/5 border-b px-5 py-3 sm:px-6">
-            <SeatHoldTimer
-              expiresAt={offer.hold.expiresAt}
-              seatLabel={offer.seats.find(seat => seat.id === offer.hold?.seatId)?.label ?? ''}
-            />
-          </div>
-        )}
         <div className="p-5 sm:p-6">
           <p className="text-accent text-sm font-semibold">{titles[step].eyebrow}</p>
           <h1 className="mt-1.5 text-2xl sm:text-3xl">{titles[step].title}</h1>
           <div className="mt-6">
             {step === 'baggage' && <BaggageOptions draft={optimisticDraft} offer={offer} updateDraft={updateDraft} />}
-            {step === 'seats' && (
-              <SeatOptions draft={optimisticDraft} offer={offer} onSelect={selectSeat} pendingSeat={pendingSeat} />
+            {step === 'seats' && holds && (
+              <SeatOptions
+                draft={optimisticDraft}
+                holds={holds}
+                offer={offer}
+                onSelect={selectSeat}
+                pendingSeat={pendingSeat}
+              />
             )}
             {step === 'extras' && <ExtraOptions draft={optimisticDraft} offer={offer} updateDraft={updateDraft} />}
             {step === 'review' && (
@@ -139,51 +141,75 @@ export function BookingStepForm({
               {formatPrice(total)}
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            {previousStep ? (
-              <Button
-                render={
-                  <PrefetchLink
-                    href={createBookingHref(flight.id, previousStep, optimisticDraft, date, offer.fare, steps)}
-                    scroll={false}
-                  />
-                }
-                size="lg"
-                variant="secondary"
-              >
-                <ArrowLeft className="size-4" /> Back
-              </Button>
-            ) : (
-              <Button render={<PrefetchLink href="/search" />} size="lg" variant="secondary">
-                <ArrowLeft className="size-4" /> Exit
-              </Button>
-            )}
-            {!nextStep ? (
-              <Button data-testid="booking-confirm" size="lg" type="submit" variant="accent">
-                Confirm trip <ArrowRight className="size-4" />
-              </Button>
-            ) : canContinue ? (
-              <Button
-                data-testid="booking-next"
-                render={
-                  <PrefetchLink
-                    href={createBookingHref(flight.id, nextStep, optimisticDraft, date, offer.fare, steps)}
-                  />
-                }
-                size="lg"
-              >
-                Continue <ArrowRight className="size-4" />
-              </Button>
-            ) : (
-              <Button disabled size="lg">
-                Select a seat <ArrowRight className="size-4" />
-              </Button>
-            )}
-          </div>
+          {confirming ? (
+            <div aria-live="polite" className="flex h-11 items-center gap-3" role="status">
+              <PlanePath className="h-6 w-32" distance="9rem" iconClassName="size-4" />
+              <span className="text-sm font-semibold">Confirming your trip</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3">
+              {previousStep ? (
+                <Button
+                  render={
+                    <PrefetchLink
+                      href={createBookingHref(flight.id, previousStep, optimisticDraft, date, offer.fare, steps)}
+                      scroll={false}
+                    />
+                  }
+                  size="lg"
+                  variant="secondary"
+                >
+                  <ArrowLeft className="size-4" /> Back
+                </Button>
+              ) : (
+                <Button render={<PrefetchLink href="/search" />} size="lg" variant="secondary">
+                  <ArrowLeft className="size-4" /> Exit
+                </Button>
+              )}
+              {!nextStep ? (
+                <Button data-testid="booking-confirm" size="lg" type="submit" variant="accent">
+                  Confirm trip <ArrowRight className="size-4" />
+                </Button>
+              ) : step === 'seats' && (!optimisticDraft.seat || pendingSeat) ? (
+                <Button
+                  data-testid="booking-next"
+                  onClick={() =>
+                    pendingSeat ? toast('Please wait for your seat to confirm.') : toast.error('Pick a seat first.')
+                  }
+                  size="lg"
+                >
+                  Continue <ArrowRight className="size-4" />
+                </Button>
+              ) : (
+                <Button
+                  data-testid="booking-next"
+                  render={
+                    <PrefetchLink
+                      href={createBookingHref(flight.id, nextStep, optimisticDraft, date, offer.fare, steps)}
+                      scroll={false}
+                    />
+                  }
+                  size="lg"
+                >
+                  Continue <ArrowRight className="size-4" />
+                </Button>
+              )}
+            </div>
+          )}
         </div>
       </form>
+      <FlightOverlay label="Confirming your booking" open={confirming} />
     </Boundary>
   );
+}
+
+function useLeaveGuard(active: boolean) {
+  useEffect(() => {
+    if (!active) return;
+    const warn = (event: BeforeUnloadEvent) => event.preventDefault();
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [active]);
 }
 
 type StepProps = {
@@ -208,8 +234,14 @@ function BaggageOptions({ draft, offer, updateDraft }: StepProps) {
             >
               <Luggage className={cn('mb-4 size-5', draft.bags === count ? 'text-accent' : 'text-muted')} />
               <p className="font-semibold">{count === 0 ? 'No bag' : `${count} bag${count > 1 ? 's' : ''}`}</p>
-              <p className="text-muted mt-1 text-xs">
-                {count === 0 ? 'Travel light' : `23 kg · ${formatPrice(offer.bagPrice * count)}`}
+              <p className="text-muted mt-1 flex items-center gap-1.5 text-xs">
+                {count === 0 ? (
+                  'Travel light'
+                ) : (
+                  <>
+                    23 kg <DotSeparator /> {formatPrice(offer.bagPrice * count)}
+                  </>
+                )}
               </p>
               {draft.bags === count && (
                 <span className="bg-accent absolute top-3 right-3 grid size-5 place-items-center rounded-full text-white">
@@ -239,13 +271,17 @@ function BaggageOptions({ draft, offer, updateDraft }: StepProps) {
   );
 }
 
+const NO_HOLDS: SeatHolds = { heldByOthers: [], own: null };
+
 function SeatOptions({
   draft,
+  holds,
   offer,
   onSelect,
   pendingSeat,
 }: {
   draft: BookingDraft;
+  holds: Promise<SeatHolds>;
   offer: FlightOffer;
   onSelect: (seatId: string) => void;
   pendingSeat: string;
@@ -265,41 +301,70 @@ function SeatOptions({
       </div>
       <div className="border-divider bg-surface dark:border-divider-dark dark:bg-surface-dark rounded-2xl border px-7 pt-10 pb-7">
         <div className="border-divider dark:border-divider-dark mx-auto mb-8 h-7 w-3/4 rounded-t-[50%] border-t" />
-        <div className="grid grid-cols-[1fr_1fr_2rem_1fr_1fr] gap-2">
-          {offer.seats.map((seat, index) => {
-            const selected = draft.seat === seat.id;
-            const blocked = seat.status !== 'available';
-            const pending = pendingSeat === seat.id;
-            return (
-              <button
-                aria-busy={pending || undefined}
-                aria-label={`Seat ${seat.label}${seat.status === 'occupied' ? ', occupied' : seat.status === 'held' ? ', held by another traveler' : ''}`}
-                aria-pressed={selected}
-                className={cn(
-                  'relative grid aspect-square place-items-center rounded-lg border text-xs font-bold transition-transform',
-                  index % 4 === 2 && 'col-start-4',
-                  blocked
-                    ? 'bg-card text-muted dark:bg-card-dark cursor-not-allowed border-transparent'
-                    : 'border-divider dark:border-divider-dark bg-white hover:-translate-y-0.5 dark:bg-black',
-                  seat.type === 'extra-legroom' && !blocked && !selected && 'border-success dark:border-success',
-                  selected && 'border-accent bg-accent dark:bg-accent text-white',
-                  pending && 'animate-pulse opacity-60',
-                )}
-                disabled={blocked}
-                key={seat.id}
-                onClick={() => onSelect(seat.id)}
-                type="button"
-              >
-                <Armchair className="mb-3 size-4" />
-                <span className="absolute bottom-1.5">{seat.label}</span>
-              </button>
-            );
-          })}
-        </div>
+        <Suspense
+          fallback={
+            <SeatGrid draft={draft} holds={NO_HOLDS} offer={offer} onSelect={onSelect} pendingSeat={pendingSeat} />
+          }
+        >
+          <LiveSeatGrid draft={draft} holds={holds} offer={offer} onSelect={onSelect} pendingSeat={pendingSeat} />
+        </Suspense>
       </div>
-      <p className="text-muted mt-4 text-center text-xs">
-        Extra-legroom seats are outlined in green. Picking a seat holds it for you for 10 minutes.
+      <p aria-live="polite" className="text-muted mt-4 text-center text-xs">
+        {pendingSeat
+          ? `Holding seat ${offer.seats.find(seat => seat.id === pendingSeat)?.label ?? ''} for you…`
+          : 'Extra-legroom seats are outlined in green. Picking a seat holds your booking for 5 minutes.'}
       </p>
+    </div>
+  );
+}
+
+type SeatGridProps = {
+  draft: BookingDraft;
+  holds: SeatHolds;
+  offer: FlightOffer;
+  onSelect: (seatId: string) => void;
+  pendingSeat: string;
+};
+
+function LiveSeatGrid({ holds, ...props }: Omit<SeatGridProps, 'holds'> & { holds: Promise<SeatHolds> }) {
+  return <SeatGrid {...props} holds={use(holds)} />;
+}
+
+function SeatGrid({ draft, holds, offer, onSelect, pendingSeat }: SeatGridProps) {
+  const heldByOthers = new Set(holds.heldByOthers);
+
+  return (
+    <div className="grid grid-cols-[1fr_1fr_2rem_1fr_1fr] gap-2">
+      {offer.seats.map((seat, index) => {
+        const selected = draft.seat === seat.id;
+        const status = seat.status === 'available' && heldByOthers.has(seat.id) ? 'held' : seat.status;
+        const blocked = status !== 'available';
+        const pending = pendingSeat === seat.id;
+        return (
+          <button
+            aria-busy={pending || undefined}
+            aria-label={`Seat ${seat.label}${status === 'occupied' ? ', occupied' : status === 'held' ? ', held by another traveler' : ''}`}
+            aria-pressed={selected}
+            className={cn(
+              'relative grid aspect-square place-items-center rounded-lg border text-xs font-bold transition-transform',
+              index % 4 === 2 && 'col-start-4',
+              blocked
+                ? 'bg-card text-muted dark:bg-card-dark cursor-not-allowed border-transparent'
+                : 'border-divider dark:border-divider-dark bg-white hover:-translate-y-0.5 dark:bg-black',
+              seat.type === 'extra-legroom' && !blocked && !selected && 'border-success dark:border-success',
+              selected && 'border-accent bg-accent dark:bg-accent text-white',
+              pending && 'border-accent',
+            )}
+            disabled={blocked}
+            key={seat.id}
+            onClick={() => onSelect(seat.id)}
+            type="button"
+          >
+            {pending ? <Spinner className="mb-3 size-4" /> : <Armchair className="mb-3 size-4" />}
+            <span className="absolute bottom-1.5">{seat.label}</span>
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -393,12 +458,23 @@ function Review({
           {error}
         </p>
       )}
-      <fieldset className="grid gap-1.5">
+      <fieldset>
         <legend className="mb-3 text-sm font-semibold">Passenger</legend>
-        <label className="text-muted text-xs font-medium" htmlFor="confirm-passenger">
-          Full name as on passport
-        </label>
-        <Input autoComplete="name" className="max-w-md" id="confirm-passenger" name="passenger" required />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-1.5">
+            <label className="text-muted text-xs font-medium" htmlFor="confirm-first-name">
+              First name
+            </label>
+            <Input autoComplete="given-name" id="confirm-first-name" name="firstName" required />
+          </div>
+          <div className="grid gap-1.5">
+            <label className="text-muted text-xs font-medium" htmlFor="confirm-last-name">
+              Last name
+            </label>
+            <Input autoComplete="family-name" id="confirm-last-name" name="lastName" required />
+          </div>
+        </div>
+        <p className="text-muted mt-2 text-xs">As on the passport. The last name is what finds the booking later.</p>
       </fieldset>
       <input name="flightId" type="hidden" value={flight.id} />
       <input name="date" type="hidden" value={date} />

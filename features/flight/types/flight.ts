@@ -20,12 +20,12 @@ export type FlightOffer = {
   currency: string;
   extras: Extra[];
   fare: Fare;
-  hold: SeatHold | null;
   seats: Seat[];
   seatsLeft: number;
 };
 
-export type SeatHold = { expiresAt: string; seatId: string };
+export type SeatHold = { expiresAt: string; seatId: string; seatLabel: string };
+export type SeatHolds = { heldByOthers: string[]; own: SeatHold | null };
 
 export function toSeat(seat: SeatRecord, status: SeatStatus = 'available'): Seat {
   return {

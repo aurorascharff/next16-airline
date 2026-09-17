@@ -19,7 +19,7 @@ test.describe('Trips page (/trips)', () => {
     await page.goto('/trips/trip-default-barcelona');
     await expect(page.getByRole('heading', { level: 1, name: 'See you in Barcelona.' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Cancel trip' })).toHaveCount(0);
-    await expect(page.getByText('Demo trip · cannot be cancelled')).toBeVisible();
+    await expect(page.getByText('Demo trip, cannot be cancelled')).toBeVisible();
 
     await page.goto('/trips/trip-traveler-amsterdam');
     await expect(page.getByRole('heading', { level: 1, name: 'That journey does not exist.' })).toBeVisible();

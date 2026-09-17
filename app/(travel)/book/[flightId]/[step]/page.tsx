@@ -1,8 +1,7 @@
 import { notFound } from 'next/navigation';
 import { AnimatedSuspense } from '@/components/ui/animated-suspense';
-import ErrorBoundary from '@/components/ui/error-boundary';
 import { BookingStepPanel, BookingStepSkeleton } from '@/features/booking/components/booking-experience';
-import { parseBookingDraft, parseDate, parseFare, parseSteps } from '@/features/booking/utils/search-params';
+import { parseBookingDraft, parseDate, parseFare } from '@/features/booking/utils/search-params';
 import { isBookingStep } from '@/features/booking/utils/steps';
 import type { Metadata } from 'next';
 
@@ -20,17 +19,14 @@ export default function BookingStepPage({ params, searchParams }: PageProps<'/bo
       fare: parseFare(values.fare),
       flightId,
       step,
-      urlSteps: parseSteps(values.steps),
     };
   });
 
   return (
-    <ErrorBoundary title="The booking could not be loaded">
-      <AnimatedSuspense fallback={<BookingStepSkeleton />}>
-        {query.then(({ date, draft, fare, flightId, step, urlSteps }) => (
-          <BookingStepPanel date={date} draft={draft} fare={fare} flightId={flightId} step={step} urlSteps={urlSteps} />
-        ))}
-      </AnimatedSuspense>
-    </ErrorBoundary>
+    <AnimatedSuspense fallback={<BookingStepSkeleton />}>
+      {query.then(({ date, draft, fare, flightId, step }) => (
+        <BookingStepPanel date={date} draft={draft} fare={fare} flightId={flightId} step={step} />
+      ))}
+    </AnimatedSuspense>
   );
 }

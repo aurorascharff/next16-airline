@@ -28,7 +28,7 @@ The architecture follows the [Next.js App Architecture](https://github.com/auror
 
 Multi-step flows often have steps whose existence depends on data. In a booking, whether there is a seat map or an extras step is only known once the provider's offer for that flight, date, and fare comes back. The common solution checks on the Next button, shows a spinner, and fetches the same offer again on the next page.
 
-This demo solves it with one cached offer: the same `'use cache'` read decides which steps exist and renders them, Continue is a prefetched link so the next step is ready before the click, and the step bar shows every step up front with missing ones faded once the offer arrives. Freshness is handled where it matters: picking a seat holds it and invalidates the offer, and confirming re-validates against the database.
+This demo solves it with one cached offer: the same `'use cache'` read decides which steps exist and renders them, and the step plan is written into the URL so the step bar in the layout needs no data of its own. Because everything a step needs is cached and keyed by the URL, Continue and Back are `prefetch={true}` links and the next step is ready before the click. The one thing that must be live, who is holding which seat right now, sits behind `unstable_navigation()` in its own private cache, so it stays out of the prefetch and streams in on the actual navigation. Picking a seat holds the booking for five minutes and invalidates only that hold layer, and confirming re-validates against the database.
 
 Try it: choose the **Basic** fare on any result to see Seats and Extras drop out, then compare **Delays** on with **Prefetch** off and on in the demo toolbar.
 
