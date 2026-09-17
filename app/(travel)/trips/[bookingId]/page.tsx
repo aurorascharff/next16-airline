@@ -25,7 +25,7 @@ export default function TripPage({ params, searchParams }: PageProps<'/trips/[bo
   }));
 
   return (
-    <ViewTransition default="none" enter={{ 'booking-confirmed': 'trip-enter', default: 'none' }}>
+    <ViewTransition default="none" enter={{ 'booking-confirmed': 'slide-up', default: 'none' }}>
       <main className="mx-auto w-full max-w-4xl px-4 py-8 sm:px-6 sm:py-12">
         <PrefetchLink
           className="text-muted hover:text-accent mb-6 inline-flex items-center gap-2 text-sm font-semibold"

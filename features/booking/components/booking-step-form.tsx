@@ -1,17 +1,7 @@
 'use client';
 
-import {
-  Armchair,
-  ArrowLeft,
-  ArrowRight,
-  BriefcaseBusiness,
-  Check,
-  Leaf,
-  Luggage,
-  ShieldCheck,
-  Sparkles,
-} from 'lucide-react';
-import { usePathname, useRouter } from 'next/navigation';
+import { ArrowLeft, ArrowRight, BriefcaseBusiness, Check, Leaf, Luggage, ShieldCheck, Sparkles } from 'lucide-react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
   addTransitionType,
   startTransition,
@@ -30,12 +20,12 @@ import { PlanePath, useFlightOverlay } from '@/components/ui/flight-overlay';
 import { Input } from '@/components/ui/input';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Spinner } from '@/components/ui/spinner';
 import type { Extra, Flight, FlightOffer, SeatHolds } from '@/features/flight/types/flight';
 import { cn, formatPrice } from '@/lib/utils';
 import { confirmBooking, holdSeat } from '../booking-actions';
-import { createBookingHref } from '../utils/search-params';
+import { createBookingHref, parseBookingDraft } from '../utils/search-params';
 import { isBookingStep, nextBookingStep, previousBookingStep } from '../utils/steps';
+import { SeatMap } from './seat-map';
 import type { ConfirmBookingState } from '../booking-actions';
 import type { BookingDraft, BookingStep } from '../types/booking';
 
@@ -132,7 +122,7 @@ export function BookingStepForm({
           <div className="mt-6">
             {step === 'baggage' && <BaggageOptions draft={optimisticDraft} offer={offer} updateDraft={updateDraft} />}
             {step === 'seats' && holds && (
-              <SeatOptions
+              <SeatMap
                 draft={optimisticDraft}
                 holds={holds}
                 offer={offer}
@@ -289,104 +279,6 @@ function BaggageOptions({ draft, offer, updateDraft }: StepProps) {
   );
 }
 
-const NO_HOLDS: SeatHolds = { heldByOthers: [], own: null };
-
-function SeatOptions({
-  draft,
-  holds,
-  offer,
-  onSelect,
-  pendingSeat,
-}: {
-  draft: BookingDraft;
-  holds: Promise<SeatHolds>;
-  offer: FlightOffer;
-  onSelect: (seatId: string) => void;
-  pendingSeat: string;
-}) {
-  return (
-    <div className="mx-auto max-w-lg">
-      <div className="text-muted mb-5 flex items-center justify-between text-xs">
-        <span className="flex items-center gap-2">
-          <span className="border-divider dark:border-divider-dark size-4 rounded border" /> Available
-        </span>
-        <span className="flex items-center gap-2">
-          <span className="bg-card dark:bg-card-dark size-4 rounded" /> Taken or held
-        </span>
-        <span className="text-accent flex items-center gap-2">
-          <span className="bg-accent size-4 rounded" /> Yours
-        </span>
-      </div>
-      <div className="border-divider/70 bg-card/40 dark:border-divider-dark/70 dark:bg-card-dark/40 rounded-lg border px-7 pt-10 pb-7">
-        <div className="border-divider dark:border-divider-dark mx-auto mb-8 h-7 w-3/4 rounded-t-[50%] border-t" />
-        <Suspense
-          fallback={
-            <SeatGrid draft={draft} holds={NO_HOLDS} offer={offer} onSelect={onSelect} pendingSeat={pendingSeat} />
-          }
-        >
-          <LiveSeatGrid draft={draft} holds={holds} offer={offer} onSelect={onSelect} pendingSeat={pendingSeat} />
-        </Suspense>
-      </div>
-      <p aria-live="polite" className="text-muted mt-4 text-center text-xs">
-        {pendingSeat
-          ? `Holding seat ${offer.seats.find(seat => seat.id === pendingSeat)?.label ?? ''} for you…`
-          : 'Extra-legroom seats are outlined in green. Picking a seat holds your booking for 5 minutes.'}
-      </p>
-    </div>
-  );
-}
-
-type SeatGridProps = {
-  draft: BookingDraft;
-  holds: SeatHolds;
-  offer: FlightOffer;
-  onSelect: (seatId: string) => void;
-  pendingSeat: string;
-};
-
-function LiveSeatGrid({ holds, ...props }: Omit<SeatGridProps, 'holds'> & { holds: Promise<SeatHolds> }) {
-  return <SeatGrid {...props} holds={use(holds)} />;
-}
-
-function SeatGrid({ draft, holds, offer, onSelect, pendingSeat }: SeatGridProps) {
-  const heldByOthers = new Set(holds.heldByOthers);
-
-  return (
-    <div className="grid grid-cols-[1fr_1fr_2rem_1fr_1fr] gap-2">
-      {offer.seats.map((seat, index) => {
-        const selected = draft.seat === seat.id;
-        const status = seat.status === 'available' && heldByOthers.has(seat.id) ? 'held' : seat.status;
-        const blocked = status !== 'available';
-        const pending = pendingSeat === seat.id;
-        return (
-          <button
-            aria-busy={pending || undefined}
-            aria-label={`Seat ${seat.label}${status === 'occupied' ? ', occupied' : status === 'held' ? ', held by another traveler' : ''}`}
-            aria-pressed={selected}
-            className={cn(
-              'relative grid aspect-square place-items-center rounded-lg border text-xs font-bold transition-transform',
-              index % 4 === 2 && 'col-start-4',
-              blocked
-                ? 'bg-card text-muted dark:bg-card-dark cursor-not-allowed border-transparent'
-                : 'border-divider dark:border-divider-dark bg-white hover:-translate-y-0.5 dark:bg-black',
-              seat.type === 'extra-legroom' && !blocked && !selected && 'border-success dark:border-success',
-              selected && 'border-accent bg-accent dark:bg-accent text-white',
-              pending && 'border-accent',
-            )}
-            disabled={blocked}
-            key={seat.id}
-            onClick={() => onSelect(seat.id)}
-            type="button"
-          >
-            {pending ? <Spinner className="mb-3 size-4" /> : <Armchair className="mb-3 size-4" />}
-            <span className="absolute bottom-1.5">{seat.label}</span>
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
 function ExtraOptions({ draft, offer, updateDraft }: StepProps) {
   return (
     <div className="grid gap-3">
@@ -530,31 +422,34 @@ function calculateTotal(offer: FlightOffer, draft: BookingDraft) {
   return offer.baseFare + draft.bags * offer.bagPrice + seat + extras;
 }
 
-export function BookingStepSkeleton({ step }: { step: Promise<string> }) {
+type SkeletonQuery = { draft: BookingDraft; step: string };
+
+export function BookingStepSkeleton({ query }: { query: Promise<SkeletonQuery> }) {
   return (
     <Suspense
       fallback={
         <Suspense fallback={<StepSkeleton />}>
-          <PathnameStepSkeleton />
+          <UrlStepSkeleton />
         </Suspense>
       }
     >
-      <ResolvedStepSkeleton step={step} />
+      <ResolvedStepSkeleton query={query} />
     </Suspense>
   );
 }
 
-function ResolvedStepSkeleton({ step }: { step: Promise<string> }) {
-  const value = use(step);
-  return <StepSkeleton step={isBookingStep(value) ? value : undefined} />;
+function ResolvedStepSkeleton({ query }: { query: Promise<SkeletonQuery> }) {
+  const { draft, step } = use(query);
+  return <StepSkeleton draft={draft} step={isBookingStep(step) ? step : undefined} />;
 }
 
-function PathnameStepSkeleton() {
+function UrlStepSkeleton() {
   const step = usePathname().split('/').at(-1) ?? '';
-  return <StepSkeleton step={isBookingStep(step) ? step : undefined} />;
+  const draft = parseBookingDraft(Object.fromEntries(useSearchParams()));
+  return <StepSkeleton draft={draft} step={isBookingStep(step) ? step : undefined} />;
 }
 
-function StepSkeleton({ step }: { step?: BookingStep }) {
+function StepSkeleton({ draft, step }: { draft?: BookingDraft; step?: BookingStep }) {
   return (
     <div className="border-divider/70 dark:border-divider-dark/70 overflow-hidden rounded-lg border bg-white dark:bg-black">
       <div className="flex flex-col p-5 sm:p-6">
@@ -566,7 +461,7 @@ function StepSkeleton({ step }: { step?: BookingStep }) {
           ) : step === 'extras' ? (
             <ExtrasSkeleton />
           ) : step === 'review' ? (
-            <ReviewSkeleton />
+            <ReviewSkeleton rows={draft ? priceRowCount(draft) : 2} />
           ) : (
             <BaggageSkeleton />
           )}
@@ -624,7 +519,11 @@ function ExtrasSkeleton() {
   );
 }
 
-function ReviewSkeleton() {
+function priceRowCount(draft: BookingDraft) {
+  return 1 + (draft.bags ? 1 : 0) + (draft.seat ? 1 : 0) + draft.extras.length;
+}
+
+function ReviewSkeleton({ rows }: { rows: number }) {
   return (
     <div className="flex flex-col">
       <Skeleton className="my-[3px] h-3.5 w-24" />
@@ -639,10 +538,10 @@ function ReviewSkeleton() {
       <Skeleton className="mt-[10px] mb-0.5 h-3 w-72" />
       <Skeleton className="mt-[27px] mb-[3px] h-3.5 w-12" />
       <div className="mt-3 flex flex-col">
-        {Array.from({ length: 4 }).map((_, index) => (
+        {Array.from({ length: rows }).map((_, index) => (
           <div
             className={
-              index === 3
+              index === rows - 1
                 ? 'flex h-11 items-center justify-between'
                 : 'border-divider dark:border-divider-dark flex h-[45px] items-center justify-between border-b'
             }

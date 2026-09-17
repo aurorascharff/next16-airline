@@ -2,8 +2,8 @@ import { ArrowLeft } from 'lucide-react';
 import { Suspense } from 'react';
 import ErrorBoundary from '@/components/ui/error-boundary';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
-import { FlightSummary, FlightSummarySkeleton } from '@/features/booking/components/booking-experience';
 import { CurrentProgressBar, ProgressBar } from '@/features/booking/components/booking-progress';
+import { FlightSummary, FlightSummarySkeleton } from '@/features/booking/components/flight-summary';
 
 export default function BookingLayout({ children, params }: LayoutProps<'/book/[flightId]'>) {
   return (
