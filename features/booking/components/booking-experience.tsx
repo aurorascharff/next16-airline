@@ -6,6 +6,7 @@ import { formatDate } from '@/lib/utils';
 import { createBookingHref } from '../booking-search-params';
 import { getAvailableSteps, nextBookingStep } from '../booking-steps';
 import { BookingStepForm } from './booking-step-form';
+import type { Fare } from '../booking-search-params';
 import type { BookingDraft, BookingStep } from '../types/booking';
 
 const stepLabels: Record<BookingStep, string> = {
@@ -18,20 +19,22 @@ const stepLabels: Record<BookingStep, string> = {
 export async function BookingExperience({
   date,
   draft,
+  fare,
   flightId,
   step,
 }: {
   date: string;
   draft: BookingDraft;
+  fare: Fare;
   flightId: string;
   step: BookingStep;
 }) {
-  const [flight, offer] = await Promise.all([getFlight(flightId), getFlightOffer(flightId, date)]);
+  const [flight, offer] = await Promise.all([getFlight(flightId), getFlightOffer(flightId, date, fare)]);
   const steps = getAvailableSteps(offer);
 
   if (!steps.includes(step)) {
     const fallback = nextBookingStep(steps, step === 'seats' ? 'baggage' : 'seats') ?? 'review';
-    redirect(createBookingHref(flightId, fallback, draft, date));
+    redirect(createBookingHref(flightId, fallback, draft, date, fare));
   }
   const activeIndex = steps.indexOf(step);
 
@@ -79,7 +82,7 @@ export async function BookingExperience({
           <div className="bg-card dark:bg-card-dark p-5">
             <div className="text-muted flex items-center justify-between text-xs font-semibold tracking-wide uppercase">
               <span>{flight.flightNumber}</span>
-              <span>{flight.cabin}</span>
+              <span>{offer.fare}</span>
             </div>
             <div className="mt-5 flex items-center gap-3">
               <div>

@@ -21,6 +21,7 @@ import { cn, formatPrice } from '@/lib/utils';
 import { confirmBooking } from '../booking-actions';
 import { createBookingHref } from '../booking-search-params';
 import { nextBookingStep, previousBookingStep } from '../booking-steps';
+import type { Fare } from '../booking-search-params';
 import type { BookingDraft, BookingStep } from '../types/booking';
 
 const titles: Record<BookingStep, { eyebrow: string; title: string }> = {
@@ -59,7 +60,7 @@ export function BookingStepForm({
     const nextDraft = { ...optimisticDraft, ...patch };
     startTransition(() => {
       updateOptimisticDraft(patch);
-      router.replace(createBookingHref(flight.id, step, nextDraft, date), { scroll: false });
+      router.replace(createBookingHref(flight.id, step, nextDraft, date, offer.fare), { scroll: false });
     });
   }
 
@@ -93,7 +94,7 @@ export function BookingStepForm({
               <Button
                 render={
                   <PrefetchLink
-                    href={createBookingHref(flight.id, previousStep, optimisticDraft, date)}
+                    href={createBookingHref(flight.id, previousStep, optimisticDraft, date, offer.fare)}
                     scroll={false}
                   />
                 }
@@ -108,11 +109,13 @@ export function BookingStepForm({
               </Button>
             )}
             {!nextStep ? (
-              <ConfirmTripForm date={date} draft={optimisticDraft} flightId={flight.id} />
+              <ConfirmTripForm date={date} draft={optimisticDraft} fare={offer.fare} flightId={flight.id} />
             ) : canContinue ? (
               <Button
                 data-testid="booking-next"
-                render={<PrefetchLink href={createBookingHref(flight.id, nextStep, optimisticDraft, date)} />}
+                render={
+                  <PrefetchLink href={createBookingHref(flight.id, nextStep, optimisticDraft, date, offer.fare)} />
+                }
                 size="lg"
               >
                 Continue <ArrowRight className="size-4" />
@@ -129,13 +132,24 @@ export function BookingStepForm({
   );
 }
 
-function ConfirmTripForm({ date, draft, flightId }: { date: string; draft: BookingDraft; flightId: string }) {
+function ConfirmTripForm({
+  date,
+  draft,
+  fare,
+  flightId,
+}: {
+  date: string;
+  draft: BookingDraft;
+  fare: Fare;
+  flightId: string;
+}) {
   const [state, formAction] = useActionState(confirmBooking, null);
 
   return (
     <form action={formAction} className="flex flex-col items-end gap-2">
       <input name="flightId" type="hidden" value={flightId} />
       <input name="date" type="hidden" value={date} />
+      <input name="fare" type="hidden" value={fare} />
       <input name="bags" type="hidden" value={draft.bags} />
       <input name="carryOn" type="hidden" value={draft.carryOn ? '1' : '0'} />
       <input name="seat" type="hidden" value={draft.seat} />
@@ -204,7 +218,7 @@ function BaggageOptions({ draft, offer, updateDraft }: StepProps) {
         </div>
         <div className="flex-1">
           <p className="font-semibold">Cabin bag</p>
-          <p className="text-muted mt-1 text-xs">One 8 kg bag included with Flex</p>
+          <p className="text-muted mt-1 text-xs">One 8 kg bag included</p>
         </div>
         <Checkmark checked={draft.carryOn} />
       </button>
@@ -322,7 +336,7 @@ function Review({ draft, flight, offer }: { draft: BookingDraft; flight: Flight;
   const selectedSeat = offer.seats.find(seat => seat.id === draft.seat);
   const selectedExtras = offer.extras.filter(extra => draft.extras.includes(extra.id));
   const rows = [
-    { label: `${flight.cabin} fare`, value: offer.baseFare },
+    { label: `${offer.fare} fare`, value: offer.baseFare },
     ...(draft.bags
       ? [{ label: `${draft.bags} checked bag${draft.bags > 1 ? 's' : ''}`, value: offer.bagPrice * draft.bags }]
       : []),

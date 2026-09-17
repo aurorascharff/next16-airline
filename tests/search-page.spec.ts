@@ -30,8 +30,8 @@ test.describe('Search page (/search)', () => {
     await expect(page.getByTestId('flight-result')).toHaveCount(2);
 
     await instant(page, async () => {
-      await page.getByRole('link', { name: 'Select' }).first().click();
-      await page.waitForURL(url => url.pathname === '/book/wp-21/baggage');
+      await page.getByTestId('fare-flex').first().click();
+      await page.waitForURL(url => url.pathname === '/book/wp-21/baggage' && url.searchParams.get('fare') === 'Flex');
       await expect(page.getByRole('heading', { level: 2, name: 'Build your journey' })).toBeVisible();
       await expect(page.getByRole('heading', { level: 1, name: 'What are you bringing?' })).toBeVisible();
     });

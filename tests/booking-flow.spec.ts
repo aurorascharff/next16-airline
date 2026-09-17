@@ -19,14 +19,14 @@ test.describe('Booking flow (/book/[flightId]/[step])', () => {
     await expect(page).toHaveURL(/seat=wp-21-10C/);
   });
 
-  test('steps a flight does not offer are skipped', async ({ page }) => {
-    await page.goto('/book/wp-22/baggage?date=2026-11-12');
-    await expect(page.getByRole('list', { name: 'Booking progress' }).getByRole('listitem')).toHaveCount(3);
+  test('a Basic fare skips the seat and extras steps', async ({ page }) => {
+    await page.goto('/book/wp-21/baggage?date=2026-11-12&fare=Basic');
+    await expect(page.getByRole('list', { name: 'Booking progress' }).getByRole('listitem')).toHaveCount(2);
     await page.getByTestId('booking-next').filter({ visible: true }).click();
-    await page.waitForURL(url => url.pathname === '/book/wp-22/extras');
+    await page.waitForURL(url => url.pathname === '/book/wp-21/review');
 
-    await page.goto('/book/wp-61/extras?date=2026-11-12');
-    await page.waitForURL(url => url.pathname === '/book/wp-61/review');
+    await page.goto('/book/wp-21/seats?date=2026-11-12&fare=Basic');
+    await page.waitForURL(url => url.pathname === '/book/wp-21/review');
   });
 
   test('seats booked by another traveler on that date are occupied', async ({ page }) => {
@@ -38,15 +38,15 @@ test.describe('Booking flow (/book/[flightId]/[step])', () => {
   });
 
   test('confirming stores the trip in My trips, and cancelling removes it', async ({ page }) => {
-    await page.goto('/book/wp-41/review?date=2026-12-03&bags=2&carryOn=1&seat=wp-41-12A&extras=wp-41-lounge');
+    await page.goto('/book/wp-41/review?date=2026-12-03&fare=Flex&bags=2&carryOn=1&seat=wp-41-12A&extras=wp-41-lounge');
     await expect(page.getByRole('heading', { level: 1, name: 'Review your journey' })).toBeVisible();
-    await expect(page.getByTestId('trip-total')).toHaveText('€350');
+    await expect(page.getByTestId('trip-total')).toHaveText('€395');
 
     await page.getByTestId('booking-confirm').filter({ visible: true }).click();
     await page.waitForURL(url => url.pathname.startsWith('/trips/') && url.searchParams.get('confirmed') === '1');
     await expect(page.getByTestId('trip-confirmed')).toBeVisible();
     await expect(page.getByRole('heading', { level: 1, name: 'See you in Lisbon.' })).toBeVisible();
-    await expect(page.getByText('Total paid').locator('..')).toContainText('€350');
+    await expect(page.getByText('Total paid').locator('..')).toContainText('€395');
 
     await page.getByRole('link', { name: 'My trips' }).first().click();
     await page.waitForURL(url => url.pathname === '/trips');

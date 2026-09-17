@@ -9,7 +9,7 @@ export async function TripDetail({ bookingId, confirmed }: { bookingId: string; 
   const booking = await getBooking(bookingId);
   const { flight } = booking;
   const rows = [
-    { label: `${flight.cabin} fare`, value: flight.baseFare },
+    { label: `${booking.cabin} fare`, value: booking.cabin === 'Flex' ? flight.flexFare : flight.basicFare },
     ...(booking.bags
       ? [{ label: `${booking.bags} checked bag${booking.bags > 1 ? 's' : ''}`, value: flight.bagPrice * booking.bags }]
       : []),

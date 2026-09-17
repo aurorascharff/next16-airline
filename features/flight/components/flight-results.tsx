@@ -1,24 +1,15 @@
-import { Armchair, Plane, Sparkles } from 'lucide-react';
-import { buttonClasses } from '@/components/ui/button-classes';
+import { Plane } from 'lucide-react';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
+import type { Fare } from '@/features/booking/booking-search-params';
 import { createBookingHref, DEFAULT_BOOKING_DRAFT } from '@/features/booking/booking-search-params';
 import { formatPrice } from '@/lib/utils';
 import { searchFlights } from '../flight-queries';
+import type { Route } from 'next';
 
-export async function FlightResults({
-  date,
-  fare,
-  from,
-  to,
-}: {
-  date: string;
-  fare?: string;
-  from: string;
-  to: string;
-}) {
-  const flights = await searchFlights(from, to, fare);
+export async function FlightResults({ date, from, to }: { date: string; from: string; to: string }) {
+  const flights = await searchFlights(from, to);
   const [first] = flights;
 
   if (!first) {
@@ -35,7 +26,7 @@ export async function FlightResults({
       <ul className="grid gap-3">
         {flights.map(flight => (
           <li
-            className="border-divider dark:border-divider-dark shadow-soft grid gap-5 rounded-2xl border bg-white p-5 sm:grid-cols-[1fr_22rem] sm:items-center dark:bg-black"
+            className="border-divider dark:border-divider-dark shadow-soft grid gap-5 rounded-2xl border bg-white p-5 sm:grid-cols-[1fr_20rem] sm:items-center dark:bg-black"
             data-testid="flight-result"
             key={flight.id}
           >
@@ -58,32 +49,49 @@ export async function FlightResults({
                 <p className="text-muted text-xs">{flight.destination.code}</p>
               </div>
             </div>
-            <div className="border-divider dark:border-divider-dark flex items-center justify-between gap-5 border-t pt-4 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-6">
-              <div>
-                <p className="text-muted flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium">
-                  <span>{flight.cabin} · cabin bag included</span>
-                  <span className="flex items-center gap-1">
-                    <Armchair className="size-3.5" /> {flight._count.seats > 0 ? 'Choose your seat' : 'Seat at gate'}
-                  </span>
-                  {flight._count.extras > 0 && (
-                    <span className="flex items-center gap-1">
-                      <Sparkles className="size-3.5" /> Extras
-                    </span>
-                  )}
-                </p>
-                <p className="mt-1 text-xl font-semibold tabular-nums">{formatPrice(flight.baseFare)}</p>
-              </div>
-              <PrefetchLink
-                className={buttonClasses()}
-                href={createBookingHref(flight.id, 'baggage', DEFAULT_BOOKING_DRAFT, date)}
-              >
-                Select
-              </PrefetchLink>
+            <div className="border-divider dark:border-divider-dark grid grid-cols-2 gap-3 border-t pt-4 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-6">
+              <FareOption
+                description="Seat at the gate"
+                fare="Basic"
+                href={createBookingHref(flight.id, 'baggage', DEFAULT_BOOKING_DRAFT, date, 'Basic')}
+                price={flight.basicFare}
+              />
+              <FareOption
+                description="Choose your seat, add extras"
+                fare="Flex"
+                href={createBookingHref(flight.id, 'baggage', DEFAULT_BOOKING_DRAFT, date, 'Flex')}
+                price={flight.flexFare}
+              />
             </div>
           </li>
         ))}
       </ul>
     </section>
+  );
+}
+
+function FareOption({
+  description,
+  fare,
+  href,
+  price,
+}: {
+  description: string;
+  fare: Fare;
+  href: Route;
+  price: number;
+}) {
+  return (
+    <PrefetchLink
+      className="border-divider hover:border-accent/40 hover:bg-card dark:border-divider-dark dark:hover:bg-card-dark flex flex-col gap-1 rounded-xl border p-3 text-left transition-colors"
+      data-testid={`fare-${fare.toLowerCase()}`}
+      href={href}
+    >
+      <span className="flex items-center justify-between text-sm font-semibold">
+        {fare} <span className="tabular-nums">{formatPrice(price)}</span>
+      </span>
+      <span className="text-muted text-xs">{description}</span>
+    </PrefetchLink>
   );
 }
 
@@ -93,7 +101,7 @@ export function FlightResultsSkeleton() {
       <div className="grid gap-3">
         {Array.from({ length: 2 }).map((_, index) => (
           <div
-            className="border-divider dark:border-divider-dark shadow-soft grid gap-5 rounded-2xl border bg-white p-5 sm:grid-cols-[1fr_22rem] sm:items-center dark:bg-black"
+            className="border-divider dark:border-divider-dark shadow-soft grid gap-5 rounded-2xl border bg-white p-5 sm:grid-cols-[1fr_20rem] sm:items-center dark:bg-black"
             key={index}
           >
             <div className="flex items-center gap-4">
@@ -111,12 +119,9 @@ export function FlightResultsSkeleton() {
                 <Skeleton className="mt-[6px] mb-0.5 h-3 w-8" />
               </div>
             </div>
-            <div className="border-divider dark:border-divider-dark flex items-center justify-between gap-5 border-t pt-4 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-6">
-              <div>
-                <Skeleton className="my-0.5 h-3 w-44" />
-                <Skeleton className="mt-[10px] mb-1.5 h-4 w-14" />
-              </div>
-              <Skeleton className="skeleton-subtle h-9 w-20 rounded-full" />
+            <div className="border-divider dark:border-divider-dark grid grid-cols-2 gap-3 border-t pt-4 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-6">
+              <Skeleton className="skeleton-subtle h-[3.75rem] rounded-xl" />
+              <Skeleton className="skeleton-subtle h-[3.75rem] rounded-xl" />
             </div>
           </div>
         ))}

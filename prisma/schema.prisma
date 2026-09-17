@@ -37,8 +37,8 @@ model Flight {
   departureTime   String
   arrivalTime     String
   duration        String
-  cabin           String @default("Flex")
-  baseFare        Int
+  basicFare       Int
+  flexFare        Int
   bagPrice        Int
   currency        String @default("EUR")
 
@@ -84,6 +84,7 @@ model Booking {
   userId    String?
   flightId  String
   date      String
+  cabin     String
   bags      Int
   carryOn   Boolean
   seatId    String?

@@ -18,6 +18,7 @@ const confirmSchema = z.object({
     .regex(/^\d{4}-\d{2}-\d{2}$/)
     .or(z.literal('')),
   extras: z.string(),
+  fare: z.enum(['Basic', 'Flex']),
   flightId: z.string().min(1),
   seat: z.string(),
 });
@@ -39,7 +40,8 @@ export async function confirmBooking(_state: ConfirmBookingState, formData: Form
   });
   if (!flight) return { error: 'That flight is no longer available.', ok: false };
 
-  const seat = input.seat ? flight.seats.find(item => item.id === input.seat) : undefined;
+  const flex = input.fare === 'Flex';
+  const seat = flex && input.seat ? flight.seats.find(item => item.id === input.seat) : undefined;
   if (input.seat && !seat) return { error: 'Choose a seat on this flight.', ok: false };
   if (seat?.status === 'occupied') return { error: `Seat ${seat.label} is already taken.`, ok: false };
   if (seat && input.date) {
@@ -51,9 +53,9 @@ export async function confirmBooking(_state: ConfirmBookingState, formData: Form
   }
 
   const extraIds = new Set(input.extras.split(',').filter(Boolean));
-  const extras = flight.extras.filter(extra => extraIds.has(extra.id));
+  const extras = flex ? flight.extras.filter(extra => extraIds.has(extra.id)) : [];
   const total =
-    flight.baseFare +
+    (flex ? flight.flexFare : flight.basicFare) +
     input.bags * flight.bagPrice +
     (seat?.price ?? 0) +
     extras.reduce((sum, extra) => sum + extra.price, 0);
@@ -61,6 +63,7 @@ export async function confirmBooking(_state: ConfirmBookingState, formData: Form
   const booking = await prisma.booking.create({
     data: {
       bags: input.bags,
+      cabin: input.fare,
       carryOn: input.carryOn === '1',
       date: input.date,
       extras: { connect: extras.map(extra => ({ id: extra.id })) },

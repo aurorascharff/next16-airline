@@ -71,7 +71,7 @@ export async function TripsList() {
                 </div>
                 <div>
                   <dt className="text-muted text-xs font-semibold tracking-wide uppercase">Cabin</dt>
-                  <dd className="mt-1 font-semibold">{booking.flight.cabin}</dd>
+                  <dd className="mt-1 font-semibold">{booking.cabin}</dd>
                 </div>
                 <div>
                   <dt className="text-muted text-xs font-semibold tracking-wide uppercase">Bags</dt>

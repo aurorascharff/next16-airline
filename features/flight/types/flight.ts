@@ -1,3 +1,4 @@
+import type { Fare } from '@/features/booking/booking-search-params';
 import type {
   Airport,
   Extra as ExtraRecord,
@@ -17,6 +18,7 @@ export type FlightOffer = {
   baseFare: number;
   currency: string;
   extras: Extra[];
+  fare: Fare;
   seats: Seat[];
 };
 

@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { AnimatedSuspense } from '@/components/ui/animated-suspense';
 import ErrorBoundary from '@/components/ui/error-boundary';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
-import { parseBookingDraft, parseDate } from '@/features/booking/booking-search-params';
+import { parseBookingDraft, parseDate, parseFare } from '@/features/booking/booking-search-params';
 import { isBookingStep } from '@/features/booking/booking-steps';
 import { BookingExperience, BookingExperienceSkeleton } from '@/features/booking/components/booking-experience';
 import type { Metadata } from 'next';
@@ -34,6 +34,7 @@ export default function BookingPage({ params, searchParams }: PageProps<'/book/[
               <BookingExperience
                 date={parseDate(values.date)}
                 draft={parseBookingDraft(values)}
+                fare={parseFare(values.fare)}
                 flightId={flightId}
                 step={step}
               />

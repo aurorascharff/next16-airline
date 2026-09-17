@@ -30,12 +30,12 @@ async function getDestinationsCached(slow: boolean) {
 
   await delay(900, slow);
   const airports = await prisma.airport.findMany({
-    include: { arrivals: { orderBy: { baseFare: 'asc' }, select: { baseFare: true }, take: 1 } },
+    include: { arrivals: { orderBy: { basicFare: 'asc' }, select: { basicFare: true }, take: 1 } },
     orderBy: { city: 'asc' },
     where: { hub: false },
   });
 
-  return airports.map(({ arrivals, ...airport }) => ({ ...airport, fromFare: arrivals[0]?.baseFare ?? null }));
+  return airports.map(({ arrivals, ...airport }) => ({ ...airport, fromFare: arrivals[0]?.basicFare ?? null }));
 }
 
 export async function getAirport(slug: string) {

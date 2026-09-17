@@ -67,19 +67,18 @@ const airports = [
 
 type Route = {
   destination: string;
-  extras: boolean;
   fares: [number, number];
   minutes: number;
   number: number;
   origin: string;
 };
 const routes: Route[] = [
-  { destination: 'BCN', extras: true, fares: [218, 189], minutes: 210, number: 20, origin: 'OSL' },
-  { destination: 'AMS', extras: true, fares: [142, 129], minutes: 105, number: 30, origin: 'OSL' },
-  { destination: 'LIS', extras: true, fares: [236, 204], minutes: 215, number: 40, origin: 'OSL' },
-  { destination: 'BCN', extras: true, fares: [196, 171], minutes: 185, number: 50, origin: 'CPH' },
-  { destination: 'AMS', extras: false, fares: [118, 99], minutes: 90, number: 60, origin: 'CPH' },
-  { destination: 'LIS', extras: true, fares: [214, 188], minutes: 205, number: 70, origin: 'CPH' },
+  { destination: 'BCN', fares: [218, 189], minutes: 210, number: 20, origin: 'OSL' },
+  { destination: 'AMS', fares: [142, 129], minutes: 105, number: 30, origin: 'OSL' },
+  { destination: 'LIS', fares: [236, 204], minutes: 215, number: 40, origin: 'OSL' },
+  { destination: 'BCN', fares: [196, 171], minutes: 185, number: 50, origin: 'CPH' },
+  { destination: 'AMS', fares: [118, 99], minutes: 90, number: 60, origin: 'CPH' },
+  { destination: 'LIS', fares: [214, 188], minutes: 205, number: 70, origin: 'CPH' },
 ];
 
 const seatPlan = [
@@ -123,35 +122,30 @@ function flightData(route: Route, index: 0 | 1) {
   return {
     arrivalTime: time(departs + route.minutes),
     bagPrice: 34,
-    baseFare: route.fares[index],
-    cabin: index === 0 ? 'Flex' : 'Basic',
+    basicFare: route.fares[index],
     departureTime: time(departs),
     destinationCode: route.destination,
     duration: durationLabel(route.minutes),
     extras: {
-      create: route.extras
-        ? extraPlan.map(([extraId, label, description, price]) => ({
-            description,
-            id: `${id}-${extraId}`,
-            label,
-            price,
-          }))
-        : [],
+      create: extraPlan.map(([extraId, label, description, price]) => ({
+        description,
+        id: `${id}-${extraId}`,
+        label,
+        price,
+      })),
     },
+    flexFare: route.fares[index] + 45,
     flightNumber: `WP ${route.number + index + 1}`,
     id,
     originCode: route.origin,
     seats: {
-      create:
-        index === 0
-          ? seatPlan.map(([label, price, status, type]) => ({
-              id: `${id}-${label}`,
-              label,
-              price,
-              status,
-              type,
-            }))
-          : [],
+      create: seatPlan.map(([label, price, status, type]) => ({
+        id: `${id}-${label}`,
+        label,
+        price,
+        status,
+        type,
+      })),
     },
   };
 }
@@ -173,6 +167,7 @@ async function main() {
   await prisma.booking.create({
     data: {
       bags: 1,
+      cabin: 'Flex',
       carryOn: true,
       date: '2026-10-09',
       extras: { connect: [{ id: 'wp-21-lounge' }] },
@@ -180,12 +175,13 @@ async function main() {
       id: 'trip-default-barcelona',
       reference: 'WAY204',
       seatId: 'wp-21-10A',
-      total: 218 + 34 + 28 + 32,
+      total: 263 + 34 + 28 + 32,
     },
   });
   await prisma.booking.create({
     data: {
       bags: 0,
+      cabin: 'Flex',
       carryOn: true,
       date: '2026-10-23',
       extras: { connect: [{ id: 'wp-71-fast-track' }] },
@@ -193,20 +189,20 @@ async function main() {
       id: 'trip-default-lisbon',
       reference: 'WAY731',
       seatId: 'wp-71-10C',
-      total: 214 + 28 + 12,
+      total: 259 + 28 + 12,
     },
   });
 
   await prisma.booking.create({
     data: {
       bags: 0,
+      cabin: 'Basic',
       carryOn: true,
       date: '2026-10-05',
       flightId: 'wp-61',
       id: 'trip-traveler-amsterdam',
       reference: 'WAY318',
-      seatId: 'wp-61-11B',
-      total: 118 + 14,
+      total: 118,
       userId: 'traveler',
     },
   });
