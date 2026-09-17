@@ -24,13 +24,18 @@ The architecture follows the [Next.js App Architecture](https://github.com/auror
 - **[View Transitions](https://nextjs.org/docs/app/guides/view-transitions)** cross-fade streamed content into place while the header, tab bar, and demo toolbar stay pinned.
 - **Demo controls** outline Client Components, toggle prefetching and simulated latency, and simulate going offline so the behavior can be compared directly.
 
-## The problem
+## What this demo shows
 
-A multi-step booking flow has steps that only exist sometimes. Whether a flight offers a seat map or extras is decided by the provider's offer for that flight, date, and fare, so the flow can't know its own shape up front. The usual fix is to call the provider when the user presses Next to see whether the next step exists, show a spinner, and then call it again on the next page to render it. Two requests, one of them blocking, and the answer can still go stale between them.
+A booking flow where the next step might not exist. Whether a flight offers a seat map or extras is only known once the provider returns its offer for that flight, date, and fare. The naive fix checks on the Next button, blocks on a spinner, and fetches the same offer again on the next page.
 
-Waypoint treats the offer as one cached read shared by every step. The step bar always shows all four steps; once the offer arrives, steps that don't exist for this fare fade out and Continue points at the next real one. With Prefetch on, the next step is fetched, offer included, before the click. Picking a seat holds it for ten minutes, so nobody is pulled back from Review because someone else was faster. Confirming re-validates against the database and invalidates the offer for everyone, so a seat taken or held by one traveler shows as unavailable for the next.
+Waypoint shows the alternative:
 
-To try it: pick the **Basic** fare on any result and watch Seats and Extras drop out. Then turn **Delays** on and **Prefetch** off in the demo toolbar, and compare with Prefetch on.
+- **One cached offer, shared by every step.** Deciding which steps exist and rendering them use the same `'use cache'` read, so there is no second provider call.
+- **Prefetched steps.** Continue is a prefetched link, so the next step, offer included, is ready before the click.
+- **A stable step bar.** All steps render immediately; steps the fare doesn't have fade out once the offer arrives. Nothing blocks, nothing jumps.
+- **Fresh where it matters.** Picking a seat holds it for ten minutes and invalidates the offer for everyone. Confirming re-validates against the database, so cached reads stay fast and the write stays honest.
+
+Try it: choose the **Basic** fare on any result to see Seats and Extras drop out, then compare **Delays** on with **Prefetch** off and on in the demo toolbar.
 
 ## Getting started
 

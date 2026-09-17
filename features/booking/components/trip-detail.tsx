@@ -86,7 +86,9 @@ export function TripRouteSkeleton() {
       </div>
       <div className="flex flex-col items-center gap-1 sm:w-56">
         <Skeleton className="my-0.5 h-3 w-12" />
-        <Skeleton className="skeleton-subtle my-2 h-px w-full" />
+        <div className="flex h-5 w-full items-center">
+          <Skeleton className="skeleton-subtle h-px w-full" />
+        </div>
         <Skeleton className="my-0.5 h-3 w-12" />
       </div>
       <div className="flex flex-col sm:items-end">

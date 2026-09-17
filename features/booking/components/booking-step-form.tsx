@@ -28,10 +28,10 @@ import type { BookingDraft, BookingStep } from '../types/booking';
 import type { Fare } from '../utils/search-params';
 
 const titles: Record<BookingStep, { eyebrow: string; title: string }> = {
-  baggage: { eyebrow: 'Pack your way', title: 'What are you bringing?' },
-  extras: { eyebrow: 'Make it yours', title: 'Add something extra' },
-  review: { eyebrow: 'Almost there', title: 'Review your journey' },
-  seats: { eyebrow: 'Choose your place', title: 'Where would you like to sit?' },
+  baggage: { eyebrow: 'Step 1', title: 'Baggage' },
+  extras: { eyebrow: 'Step 3', title: 'Extras' },
+  review: { eyebrow: 'Step 4', title: 'Review and confirm' },
+  seats: { eyebrow: 'Step 2', title: 'Choose your seat' },
 };
 
 const optionClass = 'relative rounded-xl border p-4 text-left transition-colors';

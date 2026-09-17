@@ -32,8 +32,8 @@ test.describe('Search page (/search)', () => {
     await instant(page, async () => {
       await page.getByTestId('fare-flex').first().click();
       await page.waitForURL(url => url.pathname === '/book/wp-21/baggage' && url.searchParams.get('fare') === 'Flex');
-      await expect(page.getByRole('heading', { level: 2, name: 'Build your journey' })).toBeVisible();
-      await expect(page.getByRole('heading', { level: 1, name: 'What are you bringing?' })).toBeVisible();
+      await expect(page.getByRole('heading', { level: 2, name: 'Book your flight' })).toBeVisible();
+      await expect(page.getByRole('heading', { level: 1, name: 'Baggage' })).toBeVisible();
     });
 
     await expect(page.getByTestId('booking-experience')).toBeVisible();

@@ -106,7 +106,10 @@ export async function holdSeat(flightId: string, date: string, seatId: string) {
   if (!seat) return { error: 'That seat is not available.', ok: false as const };
 
   const conflict = await seatConflict(flightId, date, seatId, sessionId);
-  if (conflict) return { error: `Seat ${seat.label} ${conflict}.`, ok: false as const };
+  if (conflict) {
+    updateTag(flightTags.offer(flightId));
+    return { error: `Seat ${seat.label} is no longer available.`, ok: false as const };
+  }
 
   const expiresAt = new Date(Date.now() + SEAT_HOLD_MINUTES * 60_000);
   await prisma.$transaction([

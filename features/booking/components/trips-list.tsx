@@ -130,9 +130,11 @@ export function TripsListSkeleton() {
                 <Skeleton className="skeleton-subtle h-9 w-20" />
                 <Skeleton className="h-3 w-10" />
               </div>
-              <div className="flex flex-1 flex-col items-center gap-3 pb-3">
-                <Skeleton className="h-3 w-12" />
-                <Skeleton className="skeleton-subtle h-px w-full" />
+              <div className="flex flex-1 flex-col items-center gap-1 pb-2">
+                <Skeleton className="my-0.5 h-3 w-12" />
+                <div className="flex h-5 w-full items-center">
+                  <Skeleton className="skeleton-subtle h-px w-full" />
+                </div>
               </div>
               <div className="flex flex-col items-end gap-2">
                 <Skeleton className="h-3 w-16" />

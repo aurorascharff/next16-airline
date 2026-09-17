@@ -143,7 +143,9 @@ export function FlightResultsSkeleton() {
               </div>
               <div className="flex flex-1 flex-col items-center gap-1">
                 <Skeleton className="my-0.5 h-3 w-12" />
-                <Skeleton className="skeleton-subtle h-px w-full" />
+                <div className="flex h-4 w-full items-center">
+                  <Skeleton className="skeleton-subtle h-px w-full" />
+                </div>
                 <Skeleton className="my-0.5 h-3 w-24" />
               </div>
               <div className="flex w-20 shrink-0 flex-col items-end">

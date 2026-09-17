@@ -8,7 +8,7 @@ test.describe('Booking flow (/book/[flightId]/[step])', () => {
 
     await page.getByTestId('booking-next').filter({ visible: true }).click();
     await page.waitForURL(url => url.pathname === '/book/wp-21/seats');
-    await expect(page.getByRole('heading', { level: 1, name: 'Where would you like to sit?' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'Choose your seat' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Select a seat' })).toBeDisabled();
 
     await page.getByRole('button', { exact: true, name: 'Seat 10C' }).click();
@@ -44,7 +44,7 @@ test.describe('Booking flow (/book/[flightId]/[step])', () => {
 
   test('confirming stores the trip in My trips, and cancelling removes it', async ({ page }) => {
     await page.goto('/book/wp-41/review?date=2026-12-03&fare=Flex&bags=2&carryOn=1&seat=wp-41-12A&extras=wp-41-lounge');
-    await expect(page.getByRole('heading', { level: 1, name: 'Review your journey' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'Review and confirm' })).toBeVisible();
     await expect(page.getByTestId('trip-total')).toHaveText('€395');
 
     await page.getByLabel('Passenger name').fill('Test Traveler');

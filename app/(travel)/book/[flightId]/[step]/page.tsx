@@ -23,8 +23,8 @@ export default function BookingPage({ params, searchParams }: PageProps<'/book/[
         <ArrowLeft className="size-4" /> Flights
       </PrefetchLink>
       <div className="mb-5">
-        <p className="text-muted text-sm font-medium">Trip planner</p>
-        <h2 className="mt-1 text-xl">Build your journey</h2>
+        <p className="text-muted text-sm font-medium">Booking</p>
+        <h2 className="mt-1 text-xl">Book your flight</h2>
       </div>
       <ErrorBoundary title="The booking could not be loaded">
         <AnimatedSuspense fallback={<BookingExperienceSkeleton />}>
