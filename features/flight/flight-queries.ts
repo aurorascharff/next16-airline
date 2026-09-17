@@ -98,37 +98,39 @@ export async function getFlightOffer(flightId: string, date: string, fare: Fare)
 
 export async function getSeatHolds(flightId: string, date: string): Promise<SeatHolds> {
   await unstable_navigation();
-  return getSeatHoldsPrivate(flightId, date);
+  return getSeatHoldsForUser(flightId, date, await getSessionId());
 }
 
-async function getSeatHoldsPrivate(flightId: string, date: string): Promise<SeatHolds> {
-  'use cache: private';
-  cacheLife({ expire: 300, revalidate: 30, stale: 30 });
+async function getSeatHoldsForUser(flightId: string, date: string, userId: string | null): Promise<SeatHolds> {
+  'use cache';
+  cacheLife({ expire: 300, revalidate: 60, stale: 30 });
   cacheTag(flightTags.holds(flightId));
 
-  const sessionId = await getSessionId();
   const holds = await prisma.seatHold.findMany({
     select: { expiresAt: true, seat: { select: { label: true } }, seatId: true, userId: true },
     where: { date, expiresAt: { gt: new Date() }, flightId },
   });
-  const own = holds.find(hold => hold.userId === sessionId);
+  const own = holds.find(hold => hold.userId === userId);
   return {
-    heldByOthers: holds.filter(hold => hold.userId !== sessionId).map(hold => hold.seatId),
+    heldByOthers: holds.filter(hold => hold.userId !== userId).map(hold => hold.seatId),
     own: own ? toSeatHold(own) : null,
   };
 }
 
 export async function getOwnSeatHold(flightId: string): Promise<SeatHold | null> {
-  'use cache: private';
-  cacheLife({ expire: 300, revalidate: 30, stale: 30 });
+  const sessionId = await getSessionId();
+  return sessionId ? getOwnSeatHoldForUser(flightId, sessionId) : null;
+}
+
+async function getOwnSeatHoldForUser(flightId: string, userId: string): Promise<SeatHold | null> {
+  'use cache';
+  cacheLife({ expire: 300, revalidate: 60, stale: 30 });
   cacheTag(flightTags.holds(flightId));
 
-  const sessionId = await getSessionId();
-  if (!sessionId) return null;
   const hold = await prisma.seatHold.findFirst({
     orderBy: { expiresAt: 'desc' },
     select: { expiresAt: true, seat: { select: { label: true } }, seatId: true },
-    where: { expiresAt: { gt: new Date() }, flightId, userId: sessionId },
+    where: { expiresAt: { gt: new Date() }, flightId, userId },
   });
   return hold ? toSeatHold(hold) : null;
 }

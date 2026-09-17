@@ -21,7 +21,7 @@ export async function getBookings() {
 }
 
 async function getBookingsForUser(userId: string, slow: boolean): Promise<Booking[]> {
-  'use cache: remote';
+  'use cache';
   cacheLife('hours');
   cacheTag(bookingTags.user(userId));
 
@@ -44,7 +44,7 @@ export async function getBooking(id: string, reference = '') {
 }
 
 async function getBookingForUser(id: string, userId: string, reference: string, slow: boolean): Promise<Booking> {
-  'use cache: remote';
+  'use cache';
   cacheLife('hours');
   cacheTag(bookingTags.user(userId), bookingTags.detail(id));
 
