@@ -7,7 +7,7 @@ import { CurrentProgressBar, ProgressBar } from '@/features/booking/components/b
 
 export default function BookingLayout({ children, params }: LayoutProps<'/book/[flightId]'>) {
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+    <main className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-8">
       <PrefetchLink
         className="text-muted hover:text-accent mb-5 inline-flex items-center gap-2 text-sm font-semibold"
         href="/search"

@@ -17,7 +17,7 @@ export async function RouteSuggestions({ date, from }: { date: string; from: str
         {routes.map(route => (
           <li key={route.destination.code}>
             <HoverPrefetchLink
-              className="border-divider hover:border-accent/40 dark:border-divider-dark group shadow-soft flex h-full flex-col justify-between gap-6 rounded-2xl border bg-white p-5 transition-[border-color,box-shadow] transition-colors hover:shadow-md dark:bg-black"
+              className="border-divider/70 dark:border-divider-dark/70 group hover:bg-card/40 dark:hover:bg-card-dark/40 flex h-full flex-col justify-between gap-6 rounded-lg border bg-white p-5 transition-colors dark:bg-black"
               data-testid="route-suggestion"
               href={createSearchHref(from, route.destination.code, date)}
             >
@@ -47,7 +47,7 @@ export function RouteSuggestionsSkeleton() {
       <div className="grid gap-3 sm:grid-cols-3">
         {Array.from({ length: 3 }).map((_, index) => (
           <div
-            className="border-divider dark:border-divider-dark shadow-soft flex flex-col justify-between gap-6 rounded-2xl border bg-white p-5 dark:bg-black"
+            className="border-divider/70 dark:border-divider-dark/70 flex flex-col justify-between gap-6 rounded-lg border bg-white p-5 dark:bg-black"
             key={index}
           >
             <div>

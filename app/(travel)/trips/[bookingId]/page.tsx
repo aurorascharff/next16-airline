@@ -34,7 +34,7 @@ export default function TripPage({ params, searchParams }: PageProps<'/trips/[bo
           <ArrowLeft className="size-4" /> My trips
         </PrefetchLink>
         <ErrorBoundary title="This trip could not be loaded">
-          <div className="border-divider dark:border-divider-dark shadow-soft overflow-hidden rounded-2xl border bg-white dark:bg-black">
+          <div className="border-divider/70 dark:border-divider-dark/70 overflow-hidden rounded-lg border bg-white dark:bg-black">
             <div className="bg-card dark:bg-card-dark flex flex-col p-7 sm:p-10">
               <AnimatedSuspense fallback={<TripHeaderSkeleton />}>
                 {query.then(({ bookingId, confirmed, reference }) => (

@@ -41,7 +41,7 @@
 
 @layer base {
   body {
-    @apply selection:bg-accent bg-surface dark:bg-surface-dark font-sans text-black antialiased selection:text-white dark:text-white;
+    @apply selection:bg-accent bg-white font-sans text-black antialiased selection:text-white dark:bg-black dark:text-white;
   }
 
   h1 {

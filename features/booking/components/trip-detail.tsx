@@ -126,7 +126,7 @@ export function TripSummarySkeleton() {
   return (
     <div className="grid gap-4 sm:grid-cols-4">
       {Array.from({ length: 4 }).map((_, index) => (
-        <Skeleton className="skeleton-subtle h-[4.75rem] rounded-xl" key={index} />
+        <Skeleton className="skeleton-subtle h-[4.75rem] rounded-md" key={index} />
       ))}
     </div>
   );
@@ -199,7 +199,7 @@ export function TripReceiptSkeleton() {
 
 function Detail({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <div className="bg-card/60 dark:bg-card-dark/60 rounded-xl p-4">
+    <div className="bg-card/60 dark:bg-card-dark/60 rounded-md p-4">
       <div className="text-accent flex items-center gap-2 text-xs font-semibold tracking-wide uppercase">
         {icon} {label}
       </div>

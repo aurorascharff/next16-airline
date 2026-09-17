@@ -46,7 +46,7 @@ const titles: Record<BookingStep, { eyebrow: string; title: string }> = {
   seats: { eyebrow: 'Step 2', title: 'Choose your seat' },
 };
 
-const optionClass = 'relative rounded-xl border p-4 text-left transition-colors';
+const optionClass = 'relative rounded-md border p-4 text-left transition-colors';
 const optionSelected = 'border-accent bg-accent/5 dark:bg-accent/10';
 const optionIdle = 'border-divider hover:bg-card dark:border-divider-dark dark:hover:bg-card-dark';
 
@@ -124,7 +124,7 @@ export function BookingStepForm({
     <Boundary label="BookingStepForm">
       <form
         action={confirmAction}
-        className="border-divider dark:border-divider-dark shadow-soft overflow-hidden rounded-2xl border bg-white dark:bg-black"
+        className="border-divider/70 dark:border-divider-dark/70 overflow-hidden rounded-lg border bg-white dark:bg-black"
       >
         <div className="p-5 sm:p-6">
           <p className="text-accent text-sm font-semibold">{titles[step].eyebrow}</p>
@@ -317,7 +317,7 @@ function SeatOptions({
           <span className="bg-accent size-4 rounded" /> Yours
         </span>
       </div>
-      <div className="border-divider bg-surface dark:border-divider-dark dark:bg-surface-dark rounded-2xl border px-7 pt-10 pb-7">
+      <div className="border-divider/70 bg-card/40 dark:border-divider-dark/70 dark:bg-card-dark/40 rounded-lg border px-7 pt-10 pb-7">
         <div className="border-divider dark:border-divider-dark mx-auto mb-8 h-7 w-3/4 rounded-t-[50%] border-t" />
         <Suspense
           fallback={
@@ -472,7 +472,7 @@ function Review({
   return (
     <div className="space-y-6">
       {error && (
-        <p className="border-danger/30 bg-danger/10 text-danger rounded-xl border px-4 py-3 text-sm" role="alert">
+        <p className="border-danger/30 bg-danger/10 text-danger rounded-md border px-4 py-3 text-sm" role="alert">
           {error}
         </p>
       )}
@@ -514,7 +514,7 @@ function Review({
           </div>
         ))}
       </div>
-      <div className="bg-success/10 flex items-start gap-3 rounded-xl p-4">
+      <div className="bg-success/10 flex items-start gap-3 rounded-md p-4">
         <ShieldCheck className="text-success mt-0.5 size-5 shrink-0" />
         <p className="text-sm leading-6">Your fare can be changed without a fee. Any fare difference still applies.</p>
       </div>
@@ -556,7 +556,7 @@ function PathnameStepSkeleton() {
 
 function StepSkeleton({ step }: { step?: BookingStep }) {
   return (
-    <div className="border-divider dark:border-divider-dark shadow-soft overflow-hidden rounded-2xl border bg-white dark:bg-black">
+    <div className="border-divider/70 dark:border-divider-dark/70 overflow-hidden rounded-lg border bg-white dark:bg-black">
       <div className="flex flex-col p-5 sm:p-6">
         <Skeleton className="my-[3px] h-3.5 w-14" />
         <Skeleton className="mt-1.5 mb-1 h-8 w-56" />
@@ -592,10 +592,10 @@ function BaggageSkeleton() {
       <Skeleton className="my-[3px] h-3.5 w-32" />
       <div className="mt-3 grid gap-3 sm:grid-cols-3">
         {Array.from({ length: 3 }).map((_, index) => (
-          <Skeleton className="skeleton-subtle h-[7.125rem] rounded-xl" key={index} />
+          <Skeleton className="skeleton-subtle h-[7.125rem] rounded-md" key={index} />
         ))}
       </div>
-      <Skeleton className="skeleton-subtle mt-6 h-[4.875rem] rounded-xl" />
+      <Skeleton className="skeleton-subtle mt-6 h-[4.875rem] rounded-md" />
     </div>
   );
 }
@@ -608,7 +608,7 @@ function SeatsSkeleton() {
         <Skeleton className="h-3 w-24" />
         <Skeleton className="h-3 w-14" />
       </div>
-      <Skeleton className="skeleton-subtle mt-5 h-[34rem] rounded-2xl" />
+      <Skeleton className="skeleton-subtle mt-5 h-[34rem] rounded-lg" />
       <Skeleton className="mx-auto mt-[18px] mb-0.5 h-3 w-72" />
     </div>
   );
@@ -618,7 +618,7 @@ function ExtrasSkeleton() {
   return (
     <div className="grid gap-3">
       {Array.from({ length: 3 }).map((_, index) => (
-        <Skeleton className="skeleton-subtle h-[5.125rem] rounded-xl" key={index} />
+        <Skeleton className="skeleton-subtle h-[5.125rem] rounded-md" key={index} />
       ))}
     </div>
   );
@@ -653,7 +653,7 @@ function ReviewSkeleton() {
           </div>
         ))}
       </div>
-      <Skeleton className="skeleton-subtle mt-6 h-14 rounded-xl" />
+      <Skeleton className="skeleton-subtle mt-6 h-14 rounded-md" />
     </div>
   );
 }

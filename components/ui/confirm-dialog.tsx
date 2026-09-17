@@ -52,7 +52,7 @@ export function ConfirmDialog({
         backdrop={
           <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm" style={{ viewTransitionName: 'none' }} />
         }
-        className="border-divider dark:border-divider-dark fixed top-1/2 left-1/2 z-50 w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl border bg-white p-6 shadow-2xl outline-none dark:bg-black"
+        className="border-divider dark:border-divider-dark fixed top-1/2 left-1/2 z-50 w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-lg border bg-white p-6 shadow-2xl outline-none dark:bg-black"
         hideOnEscape={!isPending}
         hideOnInteractOutside={!isPending}
         style={{ viewTransitionName: 'none' }}

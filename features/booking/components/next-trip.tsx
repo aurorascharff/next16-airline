@@ -7,8 +7,8 @@ import { formatDate } from '@/lib/utils';
 import { getNextBooking } from '../booking-queries';
 
 const cardClass =
-  'border-divider dark:border-divider-dark shadow-soft grid gap-5 rounded-2xl border bg-white p-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:p-6 dark:bg-black';
-const linkClass = `${cardClass} hover:border-accent/40 group transition-[border-color,box-shadow] hover:shadow-md`;
+  'border-divider/70 dark:border-divider-dark/70 grid gap-5 rounded-lg border bg-white p-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:p-6 dark:bg-black';
+const linkClass = `${cardClass} group hover:bg-card/40 dark:hover:bg-card-dark/40 transition-colors`;
 const stubClass =
   'border-divider dark:border-divider-dark flex items-center gap-6 border-t border-dashed pt-5 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-6';
 

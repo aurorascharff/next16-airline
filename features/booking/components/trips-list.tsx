@@ -10,7 +10,7 @@ import { formatDate, formatPrice } from '@/lib/utils';
 import { getBookings } from '../booking-queries';
 
 const ticketClass =
-  'border-divider dark:border-divider-dark shadow-soft grid overflow-hidden rounded-2xl border bg-white sm:grid-cols-[1fr_15rem] dark:bg-black';
+  'border-divider/70 dark:border-divider-dark/70 grid overflow-hidden rounded-lg border bg-white sm:grid-cols-[1fr_15rem] dark:bg-black';
 const stubClass =
   'border-divider bg-card/60 dark:border-divider-dark dark:bg-card-dark/60 relative flex flex-col justify-between gap-6 border-t border-dashed p-5 sm:border-t-0 sm:border-l';
 
@@ -32,7 +32,7 @@ export async function TripsList() {
       {bookings.map(booking => (
         <li key={booking.id}>
           <PrefetchLink
-            className={`${ticketClass} hover:border-accent/40 group relative transition-[border-color,box-shadow] hover:shadow-md`}
+            className={`${ticketClass} group hover:bg-card/40 dark:hover:bg-card-dark/40 relative transition-colors`}
             data-testid="trip-card"
             href={`/trips/${booking.id}`}
           >
@@ -41,9 +41,7 @@ export async function TripsList() {
                 <span className="flex items-center gap-2 text-sm font-semibold">
                   <WaypointMark className="text-accent size-5" /> {booking.passenger}
                 </span>
-                <span className="text-muted text-xs font-semibold tracking-wide uppercase">
-                  {booking.flight.flightNumber}
-                </span>
+                <span className="text-gray font-mono text-[12px] leading-4">{booking.flight.flightNumber}</span>
               </div>
               <div className="mt-6">
                 <RouteLine flight={booking.flight} />
@@ -55,8 +53,8 @@ export async function TripsList() {
               </dl>
             </div>
             <div className={stubClass}>
-              <span className="bg-surface dark:bg-surface-dark border-divider dark:border-divider-dark absolute -top-3 left-1/2 hidden size-6 -translate-x-1/2 rounded-full border sm:top-auto sm:-left-3 sm:block sm:translate-x-0" />
-              <span className="bg-surface dark:bg-surface-dark border-divider dark:border-divider-dark absolute -bottom-3 -left-3 hidden size-6 rounded-full border sm:block" />
+              <span className="border-divider dark:border-divider-dark absolute -top-3 left-1/2 hidden size-6 -translate-x-1/2 rounded-full border bg-white sm:top-auto sm:-left-3 sm:block sm:translate-x-0 dark:bg-black" />
+              <span className="border-divider dark:border-divider-dark absolute -bottom-3 -left-3 hidden size-6 rounded-full border bg-white sm:block dark:bg-black" />
               <dl className="grid grid-cols-2 gap-4">
                 <Stat label="Seat" size="lg" value={booking.seat?.label ?? 'Gate'} />
                 <Stat label="Total" size="lg" value={formatPrice(booking.total)} />

@@ -14,7 +14,7 @@ export function FindBookingForm() {
     <Boundary label="FindBookingForm">
       <form
         action={formAction}
-        className="border-divider dark:border-divider-dark shadow-soft grid gap-3 rounded-2xl border bg-white p-4 sm:grid-cols-[1fr_1fr_auto] sm:items-end dark:bg-black"
+        className="border-divider/70 dark:border-divider-dark/70 grid gap-3 rounded-lg border bg-white p-4 sm:grid-cols-[1fr_1fr_auto] sm:items-end dark:bg-black"
       >
         <div className="grid gap-1.5 text-xs font-semibold">
           <label htmlFor="find-reference">Booking reference</label>

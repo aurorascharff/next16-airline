@@ -24,10 +24,10 @@ export async function FlightResults({ date, from, to }: { date: string; from: st
 
   return (
     <section>
-      <ul className="grid gap-3">
+      <ul className="border-divider/70 dark:border-divider-dark/70 divide-divider/70 dark:divide-divider-dark/70 divide-y rounded-lg border">
         {flights.map(flight => (
           <li
-            className="border-divider dark:border-divider-dark shadow-soft grid gap-5 rounded-2xl border bg-white p-5 sm:grid-cols-[1fr_20rem] sm:items-center dark:bg-black"
+            className="grid gap-5 px-5 py-4 sm:grid-cols-[1fr_20rem] sm:items-center"
             data-testid="flight-result"
             key={flight.id}
           >
@@ -43,7 +43,7 @@ export async function FlightResults({ date, from, to }: { date: string; from: st
                   <Plane className="text-accent size-4" />
                   <span className="bg-divider dark:bg-divider-dark h-px flex-1" />
                 </div>
-                <span className="text-muted flex items-center gap-1.5 text-xs">
+                <span className="text-gray flex items-center gap-1.5 font-mono text-[12px] leading-4">
                   {flight.flightNumber} <DotSeparator /> Direct
                 </span>
               </div>
@@ -101,7 +101,7 @@ function FareOption({
   href: Route;
   price: number;
 }) {
-  const className = 'border-divider dark:border-divider-dark flex flex-col gap-1 rounded-xl border p-3 text-left';
+  const className = 'border-divider dark:border-divider-dark flex flex-col gap-1 rounded-md border p-3 text-left';
   const content = (
     <>
       <span className="flex items-center justify-between text-sm font-semibold">
@@ -133,12 +133,9 @@ function FareOption({
 export function FlightResultsSkeleton() {
   return (
     <div>
-      <div className="grid gap-3">
+      <div className="border-divider/70 dark:border-divider-dark/70 divide-divider/70 dark:divide-divider-dark/70 divide-y rounded-lg border">
         {Array.from({ length: 2 }).map((_, index) => (
-          <div
-            className="border-divider dark:border-divider-dark shadow-soft grid gap-5 rounded-2xl border bg-white p-5 sm:grid-cols-[1fr_20rem] sm:items-center dark:bg-black"
-            key={index}
-          >
+          <div className="grid gap-5 px-5 py-4 sm:grid-cols-[1fr_20rem] sm:items-center" key={index}>
             <div className="flex items-center gap-4">
               <div className="flex w-20 shrink-0 flex-col">
                 <Skeleton className="my-1.5 h-5 w-16" />
@@ -158,8 +155,8 @@ export function FlightResultsSkeleton() {
             </div>
             <div className="border-divider dark:border-divider-dark grid grid-cols-2 gap-3 border-t pt-4 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-6">
               <Skeleton className="col-span-2 my-0.5 h-3 w-20" />
-              <Skeleton className="skeleton-subtle h-[5.125rem] rounded-xl" />
-              <Skeleton className="skeleton-subtle h-[5.125rem] rounded-xl" />
+              <Skeleton className="skeleton-subtle h-[5.125rem] rounded-md" />
+              <Skeleton className="skeleton-subtle h-[5.125rem] rounded-md" />
             </div>
           </div>
         ))}

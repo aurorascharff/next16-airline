@@ -49,12 +49,12 @@ export async function FlightSummary({ flightId }: { flightId: string }) {
   const flight = await getFlight(flightId);
 
   return (
-    <aside className="border-divider dark:border-divider-dark shadow-soft overflow-hidden rounded-2xl border bg-white lg:sticky lg:top-20 dark:bg-black">
+    <aside className="border-divider/70 dark:border-divider-dark/70 overflow-hidden rounded-lg border bg-white lg:sticky lg:top-20 dark:bg-black">
       <Suspense fallback={<HoldBannerSkeleton />}>
         <BookingHold flightId={flightId} />
       </Suspense>
       <div className="bg-card dark:bg-card-dark p-5">
-        <p className="text-muted text-xs font-semibold tracking-wide uppercase">{flight.flightNumber}</p>
+        <p className="text-gray font-mono text-[12px] leading-4">{flight.flightNumber}</p>
         <div className="mt-5">
           <RouteLine flight={flight} size="sm" />
         </div>
@@ -106,7 +106,7 @@ function DetailRowSkeleton() {
 
 export function FlightSummarySkeleton() {
   return (
-    <aside className="border-divider dark:border-divider-dark shadow-soft overflow-hidden rounded-2xl border bg-white dark:bg-black">
+    <aside className="border-divider/70 dark:border-divider-dark/70 overflow-hidden rounded-lg border bg-white dark:bg-black">
       <HoldBannerSkeleton />
       <div className="bg-card dark:bg-card-dark p-5">
         <div className="flex h-4 items-center">

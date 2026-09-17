@@ -6,31 +6,31 @@ import { FlightSearchForm, FlightSearchFormSkeleton } from '@/features/flight/co
 
 export default function HomePage() {
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
-      <section className="mx-auto max-w-3xl text-center">
-        <p className="text-accent text-sm font-semibold">Fly Waypoint</p>
-        <h1 className="mt-3 text-4xl font-semibold tracking-tight text-balance sm:text-5xl">Where to next?</h1>
-        <p className="text-muted mx-auto mt-4 max-w-xl text-base leading-7">
+    <main className="mx-auto w-full max-w-4xl px-4 py-6 sm:px-6 sm:py-8">
+      <section>
+        <p className="text-muted text-sm font-medium">Fly Waypoint</p>
+        <h1 className="mt-1 text-3xl">Where to next?</h1>
+        <p className="text-muted mt-2 max-w-xl text-sm leading-6">
           Direct flights from Oslo and Copenhagen. Pick a route, then shape the trip your way: bags, seat, and extras.
         </p>
       </section>
       <ErrorBoundary title="Search is unavailable">
-        <div className="mx-auto mt-8 max-w-4xl">
+        <div className="mt-6">
           <AnimatedSuspense fallback={<FlightSearchFormSkeleton />}>
             <FlightSearchForm />
           </AnimatedSuspense>
         </div>
       </ErrorBoundary>
       <ErrorBoundary title="Trips and destinations could not be loaded">
-        <section className="mt-10">
+        <section className="mt-8">
           <AnimatedSuspense fallback={<NextTripSkeleton />}>
             <NextTrip />
           </AnimatedSuspense>
         </section>
-        <section className="mt-10">
+        <section className="mt-8">
           <div className="mb-4">
             <p className="text-muted text-sm font-medium">Popular right now</p>
-            <h2 className="mt-1 text-2xl">Destinations</h2>
+            <h2 className="mt-1 text-xl">Destinations</h2>
           </div>
           <AnimatedSuspense fallback={<DestinationGridSkeleton />}>
             <DestinationGrid />
