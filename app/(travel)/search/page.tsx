@@ -21,22 +21,20 @@ export default function SearchPage({ searchParams }: PageProps<'/search'>) {
     <main className="mx-auto w-full max-w-4xl px-4 py-6 sm:px-6 sm:py-8">
       <p className="text-muted text-sm font-medium">Flights</p>
       <h1 className="mt-1">Find your next flight</h1>
-      <div className="mt-6">
-        <ErrorBoundary compact title="Search is unavailable">
+      <ErrorBoundary title="Flights could not be loaded">
+        <div className="mt-6">
           <AnimatedSuspense fallback={<FlightSearchFormSkeleton />}>
             {query.then(({ date, from, to }) => (
               <FlightSearchForm date={date} from={from} key={`${from}-${to}-${date}`} to={to} />
             ))}
           </AnimatedSuspense>
-        </ErrorBoundary>
-      </div>
-      <div className="mt-8">
-        <Suspense fallback={<SearchHeading />}>
-          {query.then(({ date, from, to }) => (
-            <SearchHeading date={date} from={from} to={to} />
-          ))}
-        </Suspense>
-        <ErrorBoundary title="Flights could not be loaded">
+        </div>
+        <div className="mt-8">
+          <Suspense fallback={<SearchHeading />}>
+            {query.then(({ date, from, to }) => (
+              <SearchHeading date={date} from={from} to={to} />
+            ))}
+          </Suspense>
           <Suspense fallback={<FlightResultsSkeleton />}>
             {query.then(({ date, from, to }) =>
               to ? (
@@ -50,8 +48,8 @@ export default function SearchPage({ searchParams }: PageProps<'/search'>) {
               ),
             )}
           </Suspense>
-        </ErrorBoundary>
-      </div>
+        </div>
+      </ErrorBoundary>
     </main>
   );
 }

@@ -4,24 +4,13 @@ import { catchError, type ErrorInfo } from 'next/error';
 import { Button } from '@/components/ui/button';
 import { WaypointMark } from '@/components/ui/waypoint-mark';
 
-function ErrorFallback(props: { title?: string; compact?: boolean }, { retry }: ErrorInfo) {
-  if (props.compact) {
-    return (
-      <div className="flex flex-col items-center gap-2 px-4 py-4 text-center">
-        <WaypointMark animated className="text-accent size-5" />
-        <p className="text-muted text-xs">{props.title ?? 'Something went wrong'}</p>
-        <Button size="sm" variant="secondary" onClick={() => retry()}>
-          Try again
-        </Button>
-      </div>
-    );
-  }
-
+function ErrorFallback(props: { title?: string }, { retry }: ErrorInfo) {
   return (
-    <div className="flex flex-col items-center gap-3 px-5 py-10 text-center">
-      <WaypointMark animated className="text-accent size-8" />
+    <div className="border-divider dark:border-divider-dark flex min-h-64 flex-col items-center justify-center gap-3 rounded-2xl border border-dashed px-5 py-10 text-center">
+      <WaypointMark className="text-divider dark:text-divider-dark size-8" />
       <p className="text-sm font-medium text-black dark:text-white">{props.title ?? 'Something went wrong'}</p>
-      <Button size="sm" variant="secondary" onClick={() => retry()}>
+      <p className="text-muted max-w-xs text-sm">This section could not be loaded.</p>
+      <Button onClick={() => retry()} size="sm" variant="secondary">
         Try again
       </Button>
     </div>
