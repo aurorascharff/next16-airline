@@ -11,7 +11,7 @@ import {
   ShieldCheck,
   Sparkles,
 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import {
   addTransitionType,
   startTransition,
@@ -29,12 +29,13 @@ import { DotSeparator } from '@/components/ui/dot-separator';
 import { PlanePath, useFlightOverlay } from '@/components/ui/flight-overlay';
 import { Input } from '@/components/ui/input';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Spinner } from '@/components/ui/spinner';
 import type { Extra, Flight, FlightOffer, SeatHolds } from '@/features/flight/types/flight';
 import { cn, formatPrice } from '@/lib/utils';
 import { confirmBooking, holdSeat } from '../booking-actions';
 import { createBookingHref } from '../utils/search-params';
-import { nextBookingStep, previousBookingStep } from '../utils/steps';
+import { isBookingStep, nextBookingStep, previousBookingStep } from '../utils/steps';
 import type { ConfirmBookingState } from '../booking-actions';
 import type { BookingDraft, BookingStep } from '../types/booking';
 
@@ -533,4 +534,121 @@ function calculateTotal(offer: FlightOffer, draft: BookingDraft) {
     .filter(item => draft.extras.includes(item.id))
     .reduce((total, item) => total + item.price, 0);
   return offer.baseFare + draft.bags * offer.bagPrice + seat + extras;
+}
+
+export function BookingStepSkeleton() {
+  return (
+    <Suspense fallback={<StepSkeleton />}>
+      <CurrentStepSkeleton />
+    </Suspense>
+  );
+}
+
+function CurrentStepSkeleton() {
+  const { step } = useParams<{ step: string }>();
+  return <StepSkeleton step={isBookingStep(step) ? step : undefined} />;
+}
+
+function StepSkeleton({ step }: { step?: BookingStep }) {
+  return (
+    <div className="border-divider dark:border-divider-dark shadow-soft overflow-hidden rounded-2xl border bg-white dark:bg-black">
+      <div className="flex flex-col p-5 sm:p-6">
+        <Skeleton className="my-[3px] h-3.5 w-14" />
+        <Skeleton className="mt-1.5 mb-1 h-8 w-56" />
+        <div className="mt-6">
+          {step === 'seats' ? (
+            <SeatsSkeleton />
+          ) : step === 'extras' ? (
+            <ExtrasSkeleton />
+          ) : step === 'review' ? (
+            <ReviewSkeleton />
+          ) : (
+            <BaggageSkeleton />
+          )}
+        </div>
+      </div>
+      <div className="border-divider bg-card/60 dark:border-divider-dark dark:bg-card-dark/45 flex items-center justify-between border-t p-4 sm:px-6">
+        <div className="flex flex-col">
+          <Skeleton className="my-0.5 h-3 w-14" />
+          <Skeleton className="mt-1 h-6 w-16" />
+        </div>
+        <div className="flex items-center gap-3">
+          <Skeleton className="skeleton-subtle h-11 w-24 rounded-full" />
+          <Skeleton className="skeleton-subtle h-11 w-32 rounded-full" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BaggageSkeleton() {
+  return (
+    <div className="flex flex-col">
+      <Skeleton className="my-[3px] h-3.5 w-32" />
+      <div className="mt-3 grid gap-3 sm:grid-cols-3">
+        {Array.from({ length: 3 }).map((_, index) => (
+          <Skeleton className="skeleton-subtle h-[7.125rem] rounded-xl" key={index} />
+        ))}
+      </div>
+      <Skeleton className="skeleton-subtle mt-6 h-[4.875rem] rounded-xl" />
+    </div>
+  );
+}
+
+function SeatsSkeleton() {
+  return (
+    <div className="mx-auto flex max-w-lg flex-col">
+      <div className="flex h-4 items-center justify-between">
+        <Skeleton className="h-3 w-20" />
+        <Skeleton className="h-3 w-24" />
+        <Skeleton className="h-3 w-14" />
+      </div>
+      <Skeleton className="skeleton-subtle mt-5 h-[34rem] rounded-2xl" />
+      <Skeleton className="mx-auto mt-[18px] mb-0.5 h-3 w-72" />
+    </div>
+  );
+}
+
+function ExtrasSkeleton() {
+  return (
+    <div className="grid gap-3">
+      {Array.from({ length: 3 }).map((_, index) => (
+        <Skeleton className="skeleton-subtle h-[5.125rem] rounded-xl" key={index} />
+      ))}
+    </div>
+  );
+}
+
+function ReviewSkeleton() {
+  return (
+    <div className="flex flex-col">
+      <Skeleton className="my-[3px] h-3.5 w-24" />
+      <div className="mt-3 grid gap-4 sm:grid-cols-2">
+        {Array.from({ length: 2 }).map((_, index) => (
+          <div className="flex flex-col" key={index}>
+            <Skeleton className="my-0.5 h-3 w-16" />
+            <Skeleton className="skeleton-subtle mt-1.5 h-10 rounded-lg" />
+          </div>
+        ))}
+      </div>
+      <Skeleton className="mt-[10px] mb-0.5 h-3 w-72" />
+      <Skeleton className="my-[3px] mt-6 h-3.5 w-12" />
+      <div className="mt-3 flex flex-col">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div
+            className={
+              index === 3
+                ? 'flex h-11 items-center justify-between'
+                : 'border-divider dark:border-divider-dark flex h-[45px] items-center justify-between border-b'
+            }
+            key={index}
+          >
+            <Skeleton className="h-3.5 w-28" />
+            <Skeleton className="h-3.5 w-12" />
+          </div>
+        ))}
+      </div>
+      <Skeleton className="skeleton-subtle mt-6 h-14 rounded-xl" />
+    </div>
+  );
 }

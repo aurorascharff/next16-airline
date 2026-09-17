@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { AnimatedSuspense } from '@/components/ui/animated-suspense';
-import { BookingStepPanel, BookingStepSkeleton } from '@/features/booking/components/booking-experience';
+import { BookingStepPanel } from '@/features/booking/components/booking-experience';
+import { BookingStepSkeleton } from '@/features/booking/components/booking-step-form';
 import { parseBookingDraft, parseDate, parseFare } from '@/features/booking/utils/search-params';
 import { isBookingStep } from '@/features/booking/utils/steps';
 import type { Metadata } from 'next';

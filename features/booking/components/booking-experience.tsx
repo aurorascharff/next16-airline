@@ -45,32 +45,6 @@ export async function BookingStepPanel({
   );
 }
 
-export function BookingStepSkeleton() {
-  return (
-    <div className="border-divider dark:border-divider-dark shadow-soft overflow-hidden rounded-2xl border bg-white dark:bg-black">
-      <div className="p-5 sm:p-6">
-        <Skeleton className="my-0.5 h-3.5 w-16" />
-        <Skeleton className="mt-1.5 mb-0.5 h-8 w-48" />
-        <div className="mt-6 space-y-3">
-          {Array.from({ length: 3 }).map((_, index) => (
-            <Skeleton className="skeleton-subtle h-16 rounded-xl" key={index} />
-          ))}
-        </div>
-      </div>
-      <div className="border-divider bg-card/60 dark:border-divider-dark dark:bg-card-dark/45 flex items-center justify-between border-t p-4 sm:px-6">
-        <div className="flex flex-col">
-          <Skeleton className="my-0.5 h-3 w-16" />
-          <Skeleton className="mt-[9px] mb-0.5 h-6 w-16" />
-        </div>
-        <div className="flex items-center gap-3">
-          <Skeleton className="skeleton-subtle h-11 w-24 rounded-full" />
-          <Skeleton className="skeleton-subtle h-11 w-32 rounded-full" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export async function FlightSummary({ flightId }: { flightId: string }) {
   const flight = await getFlight(flightId);
 
