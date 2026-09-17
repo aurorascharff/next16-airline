@@ -12,7 +12,16 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { Suspense, startTransition, use, useActionState, useEffect, useOptimistic, useRef } from 'react';
+import {
+  addTransitionType,
+  startTransition,
+  Suspense,
+  use,
+  useActionState,
+  useEffect,
+  useOptimistic,
+  useRef,
+} from 'react';
 import { toast } from 'sonner';
 import { Boundary } from '@/components/internal/boundary';
 import { Button } from '@/components/ui/button';
@@ -65,7 +74,10 @@ export function BookingStepForm({
       try {
         return await confirmBooking(state, formData);
       } finally {
-        overlay.hide();
+        startTransition(() => {
+          addTransitionType('booking-confirmed');
+          overlay.hide();
+        });
       }
     },
     null,
