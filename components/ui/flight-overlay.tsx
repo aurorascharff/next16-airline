@@ -8,7 +8,7 @@ export function FlightOverlay({ label, open }: { label: string; open: boolean })
   if (!open) return null;
 
   return createPortal(
-    <ViewTransition default="none" enter="nav-crossfade" exit="nav-crossfade">
+    <ViewTransition default="none" enter="overlay-fade" exit="overlay-fade">
       <div
         aria-live="polite"
         className="bg-surface/85 dark:bg-surface-dark/85 fixed inset-0 z-100 flex flex-col items-center justify-center gap-6 backdrop-blur-sm"
