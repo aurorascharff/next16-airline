@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { getFlight, getFlightOffer, getSeatHolds } from '@/features/flight/flight-queries';
+import { getExistingBooking } from '../booking-queries';
 import { createBookingHref } from '../utils/search-params';
 import { getAvailableSteps, nextBookingStep } from '../utils/steps';
 import { BookingStepForm } from './booking-step-form';
@@ -19,7 +20,12 @@ export async function BookingStepPanel({
   flightId: string;
   step: BookingStep;
 }) {
-  const [flight, offer] = await Promise.all([getFlight(flightId), getFlightOffer(flightId, date, fare)]);
+  const [flight, offer, booked] = await Promise.all([
+    getFlight(flightId),
+    getFlightOffer(flightId, date, fare),
+    getExistingBooking(flightId, date),
+  ]);
+  if (booked) redirect(`/trips/${booked.id}`);
   const steps = getAvailableSteps(offer);
 
   if (!steps.includes(step)) {

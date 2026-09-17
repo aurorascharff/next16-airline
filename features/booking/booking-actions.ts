@@ -1,7 +1,7 @@
 'use server';
 
 import { updateTag } from 'next/cache';
-import { redirect } from 'next/navigation';
+import { redirect, RedirectType } from 'next/navigation';
 import { z } from 'zod';
 import { flightTags } from '@/features/flight/flight-cache';
 import { verifySession } from '@/features/user/user-queries';
@@ -98,7 +98,7 @@ export async function confirmBooking(_state: ConfirmBookingState, formData: Form
   updateTag(bookingTags.user(sessionId));
   updateTag(flightTags.offer(flight.id));
   updateTag(flightTags.holds(flight.id));
-  redirect(`/trips/${booking.id}?confirmed=1`);
+  redirect(`/trips/${booking.id}?confirmed=1`, RedirectType.replace);
 }
 
 async function seatConflict(flightId: string, date: string, seatId: string, userId: string) {
