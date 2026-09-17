@@ -1,3 +1,4 @@
+import type { Fare } from './search-params';
 import type { BookingStep } from '../types/booking';
 
 export const BOOKING_STEPS: BookingStep[] = ['baggage', 'seats', 'extras', 'review'];
@@ -10,6 +11,10 @@ export function getAvailableSteps(offer: OfferShape): BookingStep[] {
     if (step === 'extras') return offer.extras.length > 0;
     return true;
   });
+}
+
+export function expectedSteps(fare: Fare): BookingStep[] {
+  return fare === 'Flex' ? BOOKING_STEPS : ['baggage', 'review'];
 }
 
 export function isBookingStep(value: string): value is BookingStep {

@@ -1,10 +1,11 @@
 'use client';
 
 import { Check } from 'lucide-react';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import { Boundary } from '@/components/internal/boundary';
-import { BOOKING_STEPS, isBookingStep } from '../utils/steps';
+import { parseFare } from '../utils/search-params';
+import { BOOKING_STEPS, expectedSteps, isBookingStep } from '../utils/steps';
 import type { BookingStep } from '../types/booking';
 
 const stepLabels: Record<BookingStep, string> = {
@@ -26,7 +27,8 @@ export function BookingProgress({ available }: { available?: BookingStep[] }) {
 
 function CurrentProgressBar({ available }: { available?: BookingStep[] }) {
   const { step } = useParams<{ step: string }>();
-  return <ProgressBar available={available} step={isBookingStep(step) ? step : undefined} />;
+  const fare = parseFare(useSearchParams().get('fare') ?? undefined);
+  return <ProgressBar available={available ?? expectedSteps(fare)} step={isBookingStep(step) ? step : undefined} />;
 }
 
 function ProgressBar({ available, step }: { available?: BookingStep[]; step?: BookingStep }) {

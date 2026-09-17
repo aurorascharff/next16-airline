@@ -24,16 +24,11 @@ The architecture follows the [Next.js App Architecture](https://github.com/auror
 - **[View Transitions](https://nextjs.org/docs/app/guides/view-transitions)** cross-fade streamed content into place while the header, tab bar, and demo toolbar stay pinned.
 - **Demo controls** outline Client Components, toggle prefetching and simulated latency, and simulate going offline so the behavior can be compared directly.
 
-## What this demo shows
+## The pattern
 
-A booking flow where the next step might not exist. Whether a flight offers a seat map or extras is only known once the provider returns its offer for that flight, date, and fare. The naive fix checks on the Next button, blocks on a spinner, and fetches the same offer again on the next page.
+Multi-step flows often have steps whose existence depends on data. In a booking, whether there is a seat map or an extras step is only known once the provider's offer for that flight, date, and fare comes back. The common solution checks on the Next button, shows a spinner, and fetches the same offer again on the next page.
 
-Waypoint shows the alternative:
-
-- **One cached offer, shared by every step.** Deciding which steps exist and rendering them use the same `'use cache'` read, so there is no second provider call.
-- **Prefetched steps.** Continue is a prefetched link, so the next step, offer included, is ready before the click.
-- **A stable step bar.** All steps render immediately; steps the fare doesn't have fade out once the offer arrives. Nothing blocks, nothing jumps.
-- **Fresh where it matters.** Picking a seat holds it for ten minutes and invalidates the offer for everyone. Confirming re-validates against the database, so cached reads stay fast and the write stays honest.
+This demo solves it with one cached offer: the same `'use cache'` read decides which steps exist and renders them, Continue is a prefetched link so the next step is ready before the click, and the step bar shows every step up front with missing ones faded once the offer arrives. Freshness is handled where it matters: picking a seat holds it and invalidates the offer, and confirming re-validates against the database.
 
 Try it: choose the **Basic** fare on any result to see Seats and Extras drop out, then compare **Delays** on with **Prefetch** off and on in the demo toolbar.
 

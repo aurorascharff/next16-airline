@@ -1,8 +1,8 @@
 'use client';
 
-import { RotateCcw } from 'lucide-react';
+import { UserRoundPlus } from 'lucide-react';
 import { useFormStatus } from 'react-dom';
-import { IconButton } from '@/components/ui/icon-button';
+import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { resetSession } from '../user-actions';
 
@@ -18,8 +18,16 @@ function ResetButton() {
   const { pending } = useFormStatus();
 
   return (
-    <IconButton disabled={pending} label="Start a new session" title="Start a new session" type="submit">
-      {pending ? <Spinner /> : <RotateCcw className="size-4" />}
-    </IconButton>
+    <Button
+      aria-label="Start a new session"
+      disabled={pending}
+      size="sm"
+      title="Forget this session and start as a new traveler"
+      type="submit"
+      variant="secondary"
+    >
+      {pending ? <Spinner /> : <UserRoundPlus className="size-4" />}
+      <span className="hidden sm:inline">New session</span>
+    </Button>
   );
 }

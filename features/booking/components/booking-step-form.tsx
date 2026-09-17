@@ -25,7 +25,6 @@ import { confirmBooking, holdSeat } from '../booking-actions';
 import { createBookingHref } from '../utils/search-params';
 import { nextBookingStep, previousBookingStep } from '../utils/steps';
 import type { BookingDraft, BookingStep } from '../types/booking';
-import type { Fare } from '../utils/search-params';
 
 const titles: Record<BookingStep, { eyebrow: string; title: string }> = {
   baggage: { eyebrow: 'Step 1', title: 'Baggage' },
@@ -54,6 +53,7 @@ export function BookingStepForm({
   steps: BookingStep[];
 }) {
   const router = useRouter();
+  const [confirmState, confirmAction] = useActionState(confirmBooking, null);
   const [optimisticDraft, updateOptimisticDraft] = useOptimistic(draft, (current, patch: Partial<BookingDraft>) => ({
     ...current,
     ...patch,
@@ -95,7 +95,10 @@ export function BookingStepForm({
 
   return (
     <Boundary label="BookingStepForm">
-      <section className="border-divider dark:border-divider-dark shadow-soft overflow-hidden rounded-2xl border bg-white dark:bg-black">
+      <form
+        action={confirmAction}
+        className="border-divider dark:border-divider-dark shadow-soft overflow-hidden rounded-2xl border bg-white dark:bg-black"
+      >
         <div className="p-5 sm:p-6">
           <p className="text-accent text-sm font-semibold">{titles[step].eyebrow}</p>
           <h1 className="mt-1.5 text-2xl sm:text-3xl">{titles[step].title}</h1>
@@ -105,7 +108,9 @@ export function BookingStepForm({
               <SeatOptions draft={optimisticDraft} offer={offer} onSelect={selectSeat} pendingSeat={pendingSeat} />
             )}
             {step === 'extras' && <ExtraOptions draft={optimisticDraft} offer={offer} updateDraft={updateDraft} />}
-            {step === 'review' && <Review draft={optimisticDraft} flight={flight} offer={offer} />}
+            {step === 'review' && (
+              <Review date={date} draft={optimisticDraft} error={confirmState?.error} flight={flight} offer={offer} />
+            )}
           </div>
         </div>
         <div className="border-divider bg-card/60 dark:border-divider-dark dark:bg-card-dark/45 flex flex-col gap-4 border-t p-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
@@ -135,7 +140,9 @@ export function BookingStepForm({
               </Button>
             )}
             {!nextStep ? (
-              <ConfirmTripForm date={date} draft={optimisticDraft} fare={offer.fare} flightId={flight.id} />
+              <Button data-testid="booking-confirm" size="lg" type="submit" variant="accent">
+                Confirm trip <ArrowRight className="size-4" />
+              </Button>
             ) : canContinue ? (
               <Button
                 data-testid="booking-next"
@@ -153,57 +160,8 @@ export function BookingStepForm({
             )}
           </div>
         </div>
-      </section>
+      </form>
     </Boundary>
-  );
-}
-
-function ConfirmTripForm({
-  date,
-  draft,
-  fare,
-  flightId,
-}: {
-  date: string;
-  draft: BookingDraft;
-  fare: Fare;
-  flightId: string;
-}) {
-  const [state, formAction] = useActionState(confirmBooking, null);
-
-  return (
-    <form action={formAction} className="flex flex-col items-end gap-3 sm:flex-row sm:items-start">
-      <div className="grid gap-1.5 text-xs font-semibold">
-        <label htmlFor="confirm-passenger">Passenger name</label>
-        <Input
-          aria-describedby={state?.error ? 'confirm-error' : undefined}
-          aria-invalid={state?.error ? true : undefined}
-          autoComplete="name"
-          className="w-56"
-          id="confirm-passenger"
-          name="passenger"
-          placeholder="Full name as on passport"
-          required
-        />
-      </div>
-      <input name="flightId" type="hidden" value={flightId} />
-      <input name="date" type="hidden" value={date} />
-      <input name="fare" type="hidden" value={fare} />
-      <input name="bags" type="hidden" value={draft.bags} />
-      <input name="carryOn" type="hidden" value={draft.carryOn ? '1' : '0'} />
-      <input name="seat" type="hidden" value={draft.seat} />
-      <input name="extras" type="hidden" value={draft.extras.join(',')} />
-      <div className="flex flex-col items-end gap-2 sm:pt-[22px]">
-        <Button data-testid="booking-confirm" size="lg" type="submit" variant="accent">
-          Confirm trip <ArrowRight className="size-4" />
-        </Button>
-        {state?.error && (
-          <p className="text-danger text-xs" id="confirm-error" role="alert">
-            {state.error}
-          </p>
-        )}
-      </div>
-    </form>
   );
 }
 
@@ -381,7 +339,19 @@ function ExtraIcon({ extra, index }: { extra: Extra; index: number }) {
   );
 }
 
-function Review({ draft, flight, offer }: { draft: BookingDraft; flight: Flight; offer: FlightOffer }) {
+function Review({
+  date,
+  draft,
+  error,
+  flight,
+  offer,
+}: {
+  date: string;
+  draft: BookingDraft;
+  error?: string;
+  flight: Flight;
+  offer: FlightOffer;
+}) {
   const selectedSeat = offer.seats.find(seat => seat.id === draft.seat);
   const selectedExtras = offer.extras.filter(extra => draft.extras.includes(extra.id));
   const rows = [
@@ -394,17 +364,47 @@ function Review({ draft, flight, offer }: { draft: BookingDraft; flight: Flight;
   ];
 
   return (
-    <div className="space-y-3">
-      {rows.map(row => (
-        <div
-          className="border-divider dark:border-divider-dark flex items-center justify-between border-b py-3 last:border-0"
-          key={row.label}
-        >
-          <span className="text-sm font-medium">{row.label}</span>
-          <span className="text-sm font-semibold tabular-nums">{formatPrice(row.value)}</span>
-        </div>
-      ))}
-      <div className="bg-success/10 mt-5 flex items-start gap-3 rounded-xl p-4">
+    <div className="space-y-6">
+      <fieldset className="grid gap-1.5">
+        <legend className="mb-3 text-sm font-semibold">Passenger</legend>
+        <label className="text-muted text-xs font-medium" htmlFor="confirm-passenger">
+          Full name as on passport
+        </label>
+        <Input
+          aria-describedby={error ? 'confirm-error' : undefined}
+          aria-invalid={error ? true : undefined}
+          autoComplete="name"
+          className="max-w-md"
+          id="confirm-passenger"
+          name="passenger"
+          required
+        />
+        {error && (
+          <p className="text-danger text-xs" id="confirm-error" role="alert">
+            {error}
+          </p>
+        )}
+      </fieldset>
+      <input name="flightId" type="hidden" value={flight.id} />
+      <input name="date" type="hidden" value={date} />
+      <input name="fare" type="hidden" value={offer.fare} />
+      <input name="bags" type="hidden" value={draft.bags} />
+      <input name="carryOn" type="hidden" value={draft.carryOn ? '1' : '0'} />
+      <input name="seat" type="hidden" value={draft.seat} />
+      <input name="extras" type="hidden" value={draft.extras.join(',')} />
+      <div>
+        <p className="mb-3 text-sm font-semibold">Price</p>
+        {rows.map(row => (
+          <div
+            className="border-divider dark:border-divider-dark flex items-center justify-between border-b py-3 last:border-0"
+            key={row.label}
+          >
+            <span className="text-sm font-medium">{row.label}</span>
+            <span className="text-sm font-semibold tabular-nums">{formatPrice(row.value)}</span>
+          </div>
+        ))}
+      </div>
+      <div className="bg-success/10 flex items-start gap-3 rounded-xl p-4">
         <ShieldCheck className="text-success mt-0.5 size-5 shrink-0" />
         <p className="text-sm leading-6">Your fare can be changed without a fee. Any fare difference still applies.</p>
       </div>
