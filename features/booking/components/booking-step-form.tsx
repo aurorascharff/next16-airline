@@ -237,7 +237,7 @@ function SeatOptions({ draft, offer, updateDraft }: StepProps) {
                   index % 4 === 2 && 'col-start-4',
                   occupied
                     ? 'bg-card text-muted dark:bg-card-dark cursor-not-allowed border-transparent'
-                    : 'border-divider dark:border-divider-dark bg-white hover:-translate-y-0.5 dark:bg-black',
+                    : 'border-divider dark:border-divider-dark bg-white dark:bg-black',
                   seat.type === 'extra-legroom' && !occupied && !selected && 'border-success dark:border-success',
                   selected && 'border-accent bg-accent dark:bg-accent text-white',
                 )}

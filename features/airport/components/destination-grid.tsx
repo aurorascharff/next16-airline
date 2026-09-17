@@ -12,7 +12,7 @@ export async function DestinationGrid() {
       {destinations.map(destination => (
         <li key={destination.code}>
           <HoverPrefetchLink
-            className="border-divider hover:border-accent/40 dark:border-divider-dark group shadow-soft flex h-full flex-col justify-between gap-8 rounded-2xl border bg-white p-5 transition-[border-color,box-shadow,transform] transition-colors hover:-translate-y-0.5 hover:shadow-md dark:bg-black"
+            className="border-divider hover:border-accent/40 dark:border-divider-dark group shadow-soft flex h-full flex-col justify-between gap-8 rounded-2xl border bg-white p-5 transition-[border-color,box-shadow] transition-colors hover:shadow-md dark:bg-black"
             data-testid="destination-card"
             href={`/explore/${destination.slug}`}
           >
@@ -45,12 +45,12 @@ export function DestinationGridSkeleton() {
           key={index}
         >
           <div>
-            <Skeleton className="h-4 w-24" />
-            <Skeleton className="mt-3 h-8 w-36" />
-            <Skeleton className="mt-1 h-5 w-full" />
+            <Skeleton className="my-0.5 h-3 w-24" />
+            <Skeleton className="my-1.5 mt-3 h-5 w-36" />
+            <Skeleton className="my-[3px] mt-1 h-3.5 w-full" />
           </div>
           <div className="flex items-center justify-between">
-            <Skeleton className="h-5 w-20" />
+            <Skeleton className="my-[3px] h-3.5 w-20" />
             <Skeleton className="size-4" />
           </div>
         </div>

@@ -25,7 +25,7 @@ export async function TripsList() {
       {bookings.map(booking => (
         <li key={booking.id}>
           <PrefetchLink
-            className="border-divider hover:border-accent/40 dark:border-divider-dark group shadow-soft relative grid overflow-hidden rounded-2xl border bg-white transition-[border-color,box-shadow,transform] transition-colors hover:-translate-y-0.5 hover:shadow-md sm:grid-cols-[1fr_15rem] dark:bg-black"
+            className="border-divider hover:border-accent/40 dark:border-divider-dark group shadow-soft relative grid overflow-hidden rounded-2xl border bg-white transition-[border-color,box-shadow] transition-colors hover:shadow-md sm:grid-cols-[1fr_15rem] dark:bg-black"
             data-testid="trip-card"
             href={`/trips/${booking.id}`}
           >
@@ -116,50 +116,50 @@ export function TripsListSkeleton() {
     <div className="grid gap-5">
       <div className="border-divider dark:border-divider-dark shadow-soft grid overflow-hidden rounded-2xl border bg-white sm:grid-cols-[1fr_15rem] dark:bg-black">
         <div className="p-5 sm:p-6">
-          <div className="flex items-center justify-between gap-4">
-            <Skeleton className="h-5 w-24" />
-            <Skeleton className="h-4 w-32" />
+          <div className="flex h-5 items-center justify-between">
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-3 w-10" />
           </div>
           <div className="mt-6 flex items-end gap-4">
-            <div>
-              <Skeleton className="h-4 w-12" />
-              <Skeleton className="h-10 w-20" />
-              <Skeleton className="mt-1 h-5 w-12" />
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-3 w-12" />
+              <Skeleton className="skeleton-subtle h-9 w-20" />
+              <Skeleton className="h-3 w-10" />
             </div>
-            <div className="flex flex-1 flex-col items-center gap-1 pb-2">
-              <Skeleton className="h-4 w-12" />
+            <div className="flex flex-1 flex-col items-center gap-3 pb-3">
+              <Skeleton className="h-3 w-12" />
               <Skeleton className="skeleton-subtle h-px w-full" />
             </div>
-            <div className="flex flex-col items-end">
-              <Skeleton className="h-4 w-16" />
-              <Skeleton className="h-10 w-20" />
-              <Skeleton className="mt-1 h-5 w-12" />
+            <div className="flex flex-col items-end gap-2">
+              <Skeleton className="h-3 w-16" />
+              <Skeleton className="skeleton-subtle h-9 w-20" />
+              <Skeleton className="h-3 w-10" />
             </div>
           </div>
           <div className="mt-6 grid grid-cols-3 gap-4">
             {Array.from({ length: 3 }).map((_, index) => (
-              <div key={index}>
-                <Skeleton className="h-4 w-16" />
-                <Skeleton className="mt-1 h-5 w-20" />
+              <div className="flex flex-col gap-2" key={index}>
+                <Skeleton className="h-3 w-12" />
+                <Skeleton className="h-3.5 w-20" />
               </div>
             ))}
           </div>
         </div>
         <div className="border-divider bg-card/60 dark:border-divider-dark dark:bg-card-dark/60 flex flex-col justify-between gap-6 border-t border-dashed p-5 sm:border-t-0 sm:border-l">
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Skeleton className="h-4 w-10" />
-              <Skeleton className="mt-1 h-8 w-14" />
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-3 w-10" />
+              <Skeleton className="skeleton-subtle h-7 w-14" />
             </div>
-            <div>
-              <Skeleton className="h-4 w-10" />
-              <Skeleton className="mt-1 h-8 w-16" />
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-3 w-10" />
+              <Skeleton className="skeleton-subtle h-7 w-16" />
             </div>
           </div>
-          <div className="flex items-center justify-between">
-            <div>
-              <Skeleton className="h-4 w-16" />
-              <Skeleton className="mt-1 h-5 w-20" />
+          <div className="flex items-end justify-between">
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-3 w-16" />
+              <Skeleton className="h-3.5 w-20" />
             </div>
             <Skeleton className="size-4" />
           </div>

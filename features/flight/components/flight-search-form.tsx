@@ -60,7 +60,7 @@ export function FlightSearchFormSkeleton() {
     <div className="border-divider dark:border-divider-dark shadow-soft shadow-soft grid gap-3 rounded-2xl border bg-white p-4 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-end dark:bg-black">
       {['From', 'To', 'Departure'].map(label => (
         <div className="grid gap-1.5" key={label}>
-          <Skeleton className="h-4 w-14" />
+          <Skeleton className="my-0.5 h-3 w-14" />
           <Skeleton className="skeleton-subtle h-10 rounded-md" />
         </div>
       ))}

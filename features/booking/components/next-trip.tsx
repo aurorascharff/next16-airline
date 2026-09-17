@@ -10,7 +10,7 @@ export async function NextTrip() {
   if (!booking) {
     return (
       <PrefetchLink
-        className="border-divider hover:border-accent/40 dark:border-divider-dark group shadow-soft flex items-center gap-4 rounded-2xl border bg-white p-4 transition-[border-color,box-shadow,transform] transition-colors hover:-translate-y-0.5 hover:shadow-md sm:p-5 dark:bg-black"
+        className="border-divider hover:border-accent/40 dark:border-divider-dark group shadow-soft flex items-center gap-4 rounded-2xl border bg-white p-4 transition-[border-color,box-shadow] transition-colors hover:shadow-md sm:p-5 dark:bg-black"
         data-testid="no-trip"
         href="/search"
       >
@@ -29,7 +29,7 @@ export async function NextTrip() {
 
   return (
     <PrefetchLink
-      className="border-divider hover:border-accent/40 dark:border-divider-dark group shadow-soft flex items-center gap-4 rounded-2xl border bg-white p-4 transition-[border-color,box-shadow,transform] transition-colors hover:-translate-y-0.5 hover:shadow-md sm:p-5 dark:bg-black"
+      className="border-divider hover:border-accent/40 dark:border-divider-dark group shadow-soft flex items-center gap-4 rounded-2xl border bg-white p-4 transition-[border-color,box-shadow] transition-colors hover:shadow-md sm:p-5 dark:bg-black"
       data-testid="next-trip"
       href={`/trips/${booking.id}`}
     >
@@ -55,9 +55,9 @@ export function NextTripSkeleton() {
     <div className="border-divider dark:border-divider-dark shadow-soft flex items-center gap-4 rounded-2xl border bg-white p-4 sm:p-5 dark:bg-black">
       <Skeleton className="skeleton-subtle size-11 shrink-0 rounded-lg" />
       <div className="min-w-0 flex-1">
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="mt-1 h-6 w-48" />
-        <Skeleton className="h-5 w-64" />
+        <Skeleton className="my-0.5 h-3 w-24" />
+        <Skeleton className="my-1 mt-1 h-4 w-48" />
+        <Skeleton className="my-[3px] h-3.5 w-64" />
       </div>
       <Skeleton className="size-4 shrink-0" />
     </div>
