@@ -8,17 +8,43 @@ datasource db {
 }
 
 model Booking {
-  id        String @id
-  passenger String
-  reference String @unique
-  cabin     String
-  baseFare  Int
-  bagPrice  Int
-  currency  String @default("EUR")
+  id              String @id
+  userId          String
+  destinationSlug String
+  reference       String @unique
+  cabin           String
+  baseFare        Int
+  bagPrice        Int
+  currency        String @default("EUR")
 
-  flight Flight?
-  seats  Seat[]
-  extras Extra[]
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  destination Destination @relation(fields: [destinationSlug], references: [slug])
+  flight      Flight?
+  seats       Seat[]
+  extras      Extra[]
+
+  @@index([userId])
+}
+
+model User {
+  id       String @id
+  name     String
+  initials String
+  accent   String
+
+  bookings Booking[]
+}
+
+model Destination {
+  slug        String @id
+  city        String
+  country     String
+  airport     String
+  tagline     String
+  description String
+  accent      String
+
+  bookings Booking[]
 }
 
 model Flight {

@@ -46,3 +46,5 @@ next-env.d.ts
 /generated/
 prisma/dev.db
 prisma/dev.db-journal
+prisma/waypoint.db
+prisma/waypoint.db-journal

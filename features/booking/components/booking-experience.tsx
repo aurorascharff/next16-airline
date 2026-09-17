@@ -31,7 +31,7 @@ export async function BookingExperience({
 
   return (
     <div data-testid="booking-experience">
-      <ol aria-label="Booking progress" className="mb-7 grid grid-cols-4 gap-2">
+      <ol aria-label="Booking progress" className="mb-5 grid grid-cols-4 gap-2">
         {BOOKING_STEPS.map((item, index) => {
           const complete = index < activeIndex;
           const active = item === step;
@@ -55,7 +55,7 @@ export async function BookingExperience({
         })}
       </ol>
 
-      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_21rem]">
+      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_19rem]">
         <BookingStepForm
           booking={booking}
           draft={draft}
@@ -63,15 +63,15 @@ export async function BookingExperience({
           prefetchEnabled={prefetchEnabled}
           step={step}
         />
-        <aside className="border-divider bg-surface dark:border-divider-dark dark:bg-surface-dark overflow-hidden rounded-[1.75rem] border lg:sticky lg:top-24">
-          <div className="bg-primary p-6 text-white">
+        <aside className="border-divider bg-surface dark:border-divider-dark dark:bg-surface-dark overflow-hidden rounded-3xl border lg:sticky lg:top-20">
+          <div className="bg-primary p-5 text-white">
             <div className="flex items-center justify-between text-xs font-semibold tracking-[0.16em] text-white/65 uppercase">
               <span>{booking.flight.flightNumber}</span>
               <span>{booking.cabin}</span>
             </div>
-            <div className="mt-6 flex items-center gap-4">
+            <div className="mt-5 flex items-center gap-3">
               <div>
-                <p className="text-3xl font-semibold">{booking.flight.departureAirport}</p>
+                <p className="text-2xl font-semibold">{booking.flight.departureAirport}</p>
                 <p className="mt-1 text-xs text-white/70">{booking.flight.departureTime}</p>
               </div>
               <div className="flex flex-1 items-center gap-2">
@@ -80,12 +80,12 @@ export async function BookingExperience({
                 <span className="h-px flex-1 bg-white/25" />
               </div>
               <div className="text-right">
-                <p className="text-3xl font-semibold">{booking.flight.arrivalAirport}</p>
+                <p className="text-2xl font-semibold">{booking.flight.arrivalAirport}</p>
                 <p className="mt-1 text-xs text-white/70">{booking.flight.arrivalTime}</p>
               </div>
             </div>
           </div>
-          <div className="space-y-5 p-6">
+          <div className="space-y-4 p-5">
             <div>
               <p className="text-muted dark:text-muted-dark text-xs font-semibold tracking-wide uppercase">Passenger</p>
               <p className="mt-1 text-sm font-semibold">{booking.passenger}</p>
@@ -98,9 +98,8 @@ export async function BookingExperience({
               </div>
             </div>
             <div className="border-divider dark:border-divider-dark border-t pt-5">
-              <p className="text-muted dark:text-muted-dark text-xs leading-5">
-                Your choices live in the URL, so this booking can be resumed or shared without losing progress.
-              </p>
+              <p className="text-muted dark:text-muted-dark text-xs font-semibold tracking-wide uppercase">Booking</p>
+              <p className="mt-1 text-sm font-semibold">{booking.reference}</p>
             </div>
           </div>
         </aside>
@@ -112,7 +111,7 @@ export async function BookingExperience({
 export function BookingExperienceSkeleton() {
   return (
     <div>
-      <div className="mb-7 grid grid-cols-4 gap-2">
+      <div className="mb-5 grid grid-cols-4 gap-2">
         {Array.from({ length: 4 }).map((_, index) => (
           <div key={index}>
             <Skeleton className="mb-2 h-6 w-20" />
@@ -120,9 +119,9 @@ export function BookingExperienceSkeleton() {
           </div>
         ))}
       </div>
-      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_21rem]">
-        <Skeleton className="h-[35rem] rounded-[1.75rem]" />
-        <Skeleton className="h-[25rem] rounded-[1.75rem]" />
+      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_19rem]">
+        <Skeleton className="h-[31rem] rounded-3xl" />
+        <Skeleton className="h-[22rem] rounded-3xl" />
       </div>
     </div>
   );

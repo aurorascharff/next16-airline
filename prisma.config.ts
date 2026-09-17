@@ -6,7 +6,7 @@ loadEnv({ path: '.env' });
 
 export default defineConfig({
   datasource: {
-    url: process.env.DATABASE_URL ?? 'file:./prisma/dev.db',
+    url: process.env.DATABASE_URL ?? 'file:./prisma/waypoint.db',
   },
   migrations: {
     seed: 'tsx prisma/seed.ts',

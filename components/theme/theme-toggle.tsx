@@ -1,23 +1,60 @@
 'use client';
 
-import { Moon, Sun } from 'lucide-react';
+import { Monitor, Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
+import { cn } from '@/lib/utils';
+
+const subscribe = () => () => {};
+
+function useIsMounted() {
+  return useSyncExternalStore(subscribe, () => true, () => false);
+}
 
 export function ThemeToggle() {
-  const { resolvedTheme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
+  const { setTheme, theme } = useTheme();
+  const active = useIsMounted() ? theme : undefined;
 
   return (
+    <div className="border-divider dark:border-divider-dark inline-flex items-center rounded-full border p-0.5">
+      <ThemeButton active={active === 'light'} label="Light mode" onClick={() => setTheme('light')}>
+        <Sun className="size-4" />
+      </ThemeButton>
+      <ThemeButton active={active === 'dark'} label="Dark mode" onClick={() => setTheme('dark')}>
+        <Moon className="size-4" />
+      </ThemeButton>
+      <ThemeButton active={active === 'system'} label="System theme" onClick={() => setTheme('system')}>
+        <Monitor className="size-4" />
+      </ThemeButton>
+    </div>
+  );
+}
+
+function ThemeButton({
+  active,
+  children,
+  label,
+  onClick,
+}: {
+  active: boolean;
+  children: React.ReactNode;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
     <button
-      aria-label="Toggle theme"
-      className="border-divider bg-surface/80 text-muted hover:text-ink dark:border-divider-dark dark:bg-surface-dark/80 dark:hover:text-white flex size-9 items-center justify-center rounded-full border backdrop-blur transition-colors"
-      onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+      aria-label={label}
+      aria-pressed={active}
+      className={cn(
+        'rounded-full p-1.5 transition-colors',
+        active
+          ? 'bg-card text-ink dark:bg-card-dark dark:text-white'
+          : 'text-muted hover:text-ink dark:text-muted-dark dark:hover:text-white',
+      )}
+      onClick={onClick}
       type="button"
     >
-      {mounted && resolvedTheme === 'dark' ? <Sun className="size-4" /> : <Moon className="size-4" />}
+      {children}
     </button>
   );
 }

@@ -56,11 +56,11 @@ export function BookingStepForm({
   const total = calculateTotal(offer, optimisticDraft);
 
   return (
-    <section className="border-divider bg-surface dark:border-divider-dark dark:bg-surface-dark overflow-hidden rounded-[1.75rem] border">
-      <div className="p-6 sm:p-8">
+    <section className="border-divider bg-surface dark:border-divider-dark dark:bg-surface-dark overflow-hidden rounded-3xl border">
+      <div className="p-5 sm:p-6">
         <p className="text-primary text-sm font-semibold">{titles[step].eyebrow}</p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">{titles[step].title}</h1>
-        <div className="mt-8">
+        <h1 className="mt-1.5 text-2xl font-semibold tracking-[-0.03em] sm:text-3xl">{titles[step].title}</h1>
+        <div className="mt-6">
           {step === 'baggage' && (
             <BaggageOptions draft={optimisticDraft} offer={offer} updateDraft={updateDraft} />
           )}
@@ -69,7 +69,7 @@ export function BookingStepForm({
           {step === 'review' && <Review booking={booking} draft={optimisticDraft} offer={offer} />}
         </div>
       </div>
-      <div className="border-divider bg-card/60 dark:border-divider-dark dark:bg-card-dark/45 flex flex-col gap-4 border-t p-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+      <div className="border-divider bg-card/60 dark:border-divider-dark dark:bg-card-dark/45 flex flex-col gap-4 border-t p-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div>
           <p className="text-muted dark:text-muted-dark text-xs font-medium">Trip total</p>
           <p className="text-xl font-semibold">€{total}</p>
@@ -129,7 +129,7 @@ function BaggageOptions({
             <button
               aria-pressed={draft.bags === count}
               className={cn(
-                'relative rounded-2xl border p-4 text-left transition-colors',
+                'relative rounded-2xl border p-3.5 text-left transition-colors',
                 draft.bags === count
                   ? 'border-primary bg-primary/5 dark:bg-primary/10'
                   : 'border-divider hover:bg-card/70 dark:border-divider-dark dark:hover:bg-card-dark/70',
@@ -138,7 +138,7 @@ function BaggageOptions({
               onClick={() => updateDraft({ bags: count })}
               type="button"
             >
-              <Luggage className={cn('mb-5 size-6', draft.bags === count ? 'text-primary' : 'text-muted')} />
+              <Luggage className={cn('mb-4 size-5', draft.bags === count ? 'text-primary' : 'text-muted')} />
               <p className="font-semibold">{count === 0 ? 'No bag' : `${count} bag${count > 1 ? 's' : ''}`}</p>
               <p className="text-muted dark:text-muted-dark mt-1 text-xs">
                 {count === 0 ? 'Travel light' : `23 kg · €${offer.bagPrice * count}`}

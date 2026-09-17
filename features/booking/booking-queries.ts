@@ -5,36 +5,47 @@ import { notFound } from 'next/navigation';
 import { isSlowEnabled } from '@/components/demo/demo-slow';
 import { prisma } from '@/lib/db';
 import { delay } from '@/lib/utils';
+import { verifyAuth } from '@/features/user/user-queries';
 import type { BookingDraft, BookingOffer } from './types/booking';
 
 export async function getBookings() {
+  return getBookingsForUser(await verifyAuth());
+}
+
+async function getBookingsForUser(userId: string) {
   'use cache';
   cacheLife('hours');
-  cacheTag('bookings');
+  cacheTag(`bookings:${userId}`);
   const bookings = await prisma.booking.findMany({
-    include: { flight: true },
+    include: { flight: true, user: true },
+    where: { userId },
   });
 
   return bookings.flatMap(booking =>
-    booking.flight ? [{ ...booking, flight: booking.flight }] : [],
+    booking.flight ? [{ ...booking, flight: booking.flight, passenger: booking.user.name }] : [],
   );
 }
 
 export async function getBooking(id: string) {
+  return getBookingForUser(id, await verifyAuth());
+}
+
+async function getBookingForUser(id: string, userId: string) {
   'use cache';
   cacheLife('hours');
-  cacheTag('bookings', `booking:${id}`);
+  cacheTag(`bookings:${userId}`, `booking:${id}:${userId}`);
   const booking = await prisma.booking.findUnique({
-    include: { flight: true },
+    include: { flight: true, user: true },
     where: { id },
   });
 
-  if (!booking?.flight) notFound();
-  return { ...booking, flight: booking.flight };
+  if (!booking?.flight || booking.userId !== userId) notFound();
+  return { ...booking, flight: booking.flight, passenger: booking.user.name };
 }
 
 export async function getBookingOffer(bookingId: string, draft: BookingDraft) {
   void draft;
+  await getBooking(bookingId);
   return getBookingOfferCached(bookingId, await isSlowEnabled());
 }
 
