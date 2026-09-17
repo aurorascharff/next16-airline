@@ -10,7 +10,7 @@ test.describe('Search page (/search)', () => {
     await page.getByRole('button', { name: 'Search flights' }).filter({ visible: true }).click();
 
     await page.waitForURL(url => url.pathname === '/search' && url.searchParams.get('to') === 'AMS');
-    await expect(page.getByRole('heading', { level: 2, name: 'Copenhagen to Amsterdam' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: 'CPH to AMS' })).toBeVisible();
     await expect(page.getByTestId('flight-result')).toHaveCount(2);
     await expect(page.getByText('Thu 12 Nov')).toBeVisible();
   });
@@ -22,7 +22,7 @@ test.describe('Search page (/search)', () => {
     await page.getByTestId('route-suggestion').filter({ hasText: 'Lisbon' }).click();
     await page.waitForURL(url => url.searchParams.get('to') === 'LIS');
     await expect(page.getByLabel('To').filter({ visible: true })).toHaveValue('LIS');
-    await expect(page.getByRole('heading', { level: 2, name: 'Copenhagen to Lisbon' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: 'CPH to LIS' })).toBeVisible();
   });
 
   test('selecting a flight navigates instantly into the booking flow', async ({ page }) => {

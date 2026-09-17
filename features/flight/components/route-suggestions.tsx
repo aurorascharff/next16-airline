@@ -10,10 +10,6 @@ export async function RouteSuggestions({ date, from }: { date: string; from: str
 
   return (
     <section>
-      <div className="mb-4">
-        <p className="text-muted text-sm font-medium">Pick a destination</p>
-        <h2 className="mt-1 text-2xl">Where Waypoint flies from {from}</h2>
-      </div>
       <ul className="grid gap-3 sm:grid-cols-3">
         {routes.map(route => (
           <li key={route.destination.code}>
@@ -45,10 +41,6 @@ export async function RouteSuggestions({ date, from }: { date: string; from: str
 export function RouteSuggestionsSkeleton() {
   return (
     <div>
-      <div className="mb-4">
-        <Skeleton className="my-[3px] h-3.5 w-28" />
-        <Skeleton className="mt-[10px] mb-1.5 h-5 w-64" />
-      </div>
       <div className="grid gap-3 sm:grid-cols-3">
         {Array.from({ length: 3 }).map((_, index) => (
           <div

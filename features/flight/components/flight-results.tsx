@@ -4,7 +4,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { createBookingHref, DEFAULT_BOOKING_DRAFT } from '@/features/booking/booking-search-params';
-import { formatDate, formatPrice } from '@/lib/utils';
+import { formatPrice } from '@/lib/utils';
 import { searchFlights } from '../flight-queries';
 
 export async function FlightResults({ date, from, to }: { date: string; from: string; to: string }) {
@@ -19,17 +19,6 @@ export async function FlightResults({ date, from, to }: { date: string; from: st
 
   return (
     <section>
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
-        <div>
-          <p className="text-muted text-sm font-medium">{formatDate(date)}</p>
-          <h2 className="mt-1 text-2xl">
-            {first.origin.city} to {first.destination.city}
-          </h2>
-        </div>
-        <span className="text-muted text-sm">
-          {flights.length} flight{flights.length === 1 ? '' : 's'}
-        </span>
-      </div>
       <ul className="grid gap-3">
         {flights.map(flight => (
           <li
@@ -88,13 +77,6 @@ export async function FlightResults({ date, from, to }: { date: string; from: st
 export function FlightResultsSkeleton() {
   return (
     <div>
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
-        <div>
-          <Skeleton className="my-[3px] h-3.5 w-24" />
-          <Skeleton className="mt-[10px] mb-1.5 h-5 w-56" />
-        </div>
-        <Skeleton className="my-[3px] h-3.5 w-16" />
-      </div>
       <div className="grid gap-3">
         {Array.from({ length: 2 }).map((_, index) => (
           <div
