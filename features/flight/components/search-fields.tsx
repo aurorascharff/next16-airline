@@ -2,26 +2,30 @@
 
 import { Input, Select } from '@/components/ui/input';
 import { parseAirportCode, parseDate } from '@/features/flight/utils/search-params';
-import type { Airport } from '@/generated/prisma/client';
 
 export type SearchValues = { date: string; from: string; to: string };
+
+export const DEFAULT_SEARCH_VALUES: SearchValues = { date: '', from: 'OSL', to: '' };
 
 export function searchValuesFrom(params: URLSearchParams): SearchValues {
   return {
     date: parseDate(params.get('date') ?? undefined),
-    from: parseAirportCode(params.get('from') ?? undefined) || 'OSL',
+    from: parseAirportCode(params.get('from') ?? undefined) || DEFAULT_SEARCH_VALUES.from,
     to: parseAirportCode(params.get('to') ?? undefined),
   };
 }
 
+export type SearchFieldsProps = {
+  destinationOptions: React.ReactNode;
+  hubOptions: React.ReactNode;
+};
+
 export function SearchFields({
-  destinations,
-  hubs,
+  destinationOptions,
+  hubOptions,
   onChange,
   values,
-}: {
-  destinations: Airport[];
-  hubs: Airport[];
+}: SearchFieldsProps & {
   onChange: (values: SearchValues) => void;
   values: SearchValues;
 }) {
@@ -35,11 +39,7 @@ export function SearchFields({
           onChange={event => onChange({ ...values, from: event.target.value })}
           value={values.from}
         >
-          {hubs.map(airport => (
-            <option key={airport.code} value={airport.code}>
-              {airport.city} ({airport.code})
-            </option>
-          ))}
+          {hubOptions}
         </Select>
       </div>
       <div className="grid gap-1.5 text-xs font-semibold">
@@ -52,11 +52,7 @@ export function SearchFields({
           value={values.to}
         >
           <option value="">Choose a destination</option>
-          {destinations.map(airport => (
-            <option key={airport.code} value={airport.code}>
-              {airport.city} ({airport.code})
-            </option>
-          ))}
+          {destinationOptions}
         </Select>
       </div>
       <div className="grid gap-1.5 text-xs font-semibold">

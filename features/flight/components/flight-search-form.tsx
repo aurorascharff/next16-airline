@@ -1,21 +1,15 @@
 import { Skeleton } from '@/components/ui/skeleton';
-import { getAirports } from '@/features/airport/airport-queries';
+import { DestinationOptions, HubOptions } from '@/features/airport/components/airport-options';
 import { HomeSearch } from './home-search';
 import { searchPanelClass } from './search-fields';
 import { SearchShell } from './search-shell';
 
-export async function FlightSearchForm({ children }: { children?: React.ReactNode }) {
-  const airports = await getAirports();
-  const hubs = airports.filter(airport => airport.hub);
-  const destinations = airports.filter(airport => !airport.hub);
+export function FlightSearchForm({ children }: { children?: React.ReactNode }) {
+  const options = { destinationOptions: <DestinationOptions />, hubOptions: <HubOptions /> };
 
-  if (children === undefined) return <HomeSearch destinations={destinations} hubs={hubs} />;
+  if (children === undefined) return <HomeSearch {...options} />;
 
-  return (
-    <SearchShell destinations={destinations} hubs={hubs}>
-      {children}
-    </SearchShell>
-  );
+  return <SearchShell {...options}>{children}</SearchShell>;
 }
 
 export function FlightSearchFormSkeleton() {
