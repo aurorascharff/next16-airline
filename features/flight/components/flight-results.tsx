@@ -162,7 +162,7 @@ export function FlightResultsSkeleton() {
             <div className={routeClass}>
               <div className="flex flex-col sm:row-span-2">
                 <Skeleton className="my-1.5 h-5 w-16" />
-                <Skeleton className="mt-[6px] mb-0.5 h-3 w-8" />
+                <Skeleton className="my-0.5 h-3 w-8" />
               </div>
               <div className="flex flex-col items-center gap-1">
                 <Skeleton className="my-0.5 h-3 w-12" />
@@ -172,7 +172,7 @@ export function FlightResultsSkeleton() {
               </div>
               <div className="flex flex-col items-end sm:row-span-2">
                 <Skeleton className="my-1.5 h-5 w-16" />
-                <Skeleton className="mt-[6px] mb-0.5 h-3 w-8" />
+                <Skeleton className="my-0.5 h-3 w-8" />
               </div>
               <div className={`${metaClass} h-4`}>
                 <Skeleton className="h-3 w-24" />
