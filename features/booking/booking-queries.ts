@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { cacheLife, cacheTag } from 'next/cache';
+import { cacheLife, cacheTag, unstable_navigation } from 'next/cache';
 import { notFound } from 'next/navigation';
 import { isSlowEnabled } from '@/features/demo/demo-queries';
 import { verifySession } from '@/features/user/user-queries';
@@ -30,6 +30,28 @@ async function getBookingsForUser(userId: string, slow: boolean): Promise<Bookin
     include: bookingInclude,
     orderBy: [{ date: 'asc' }, { createdAt: 'asc' }],
     where: { OR: [{ userId }, { userId: null }] },
+  });
+}
+
+export async function getTripsVia(airportCode: string) {
+  await unstable_navigation();
+  const [sessionId, slow] = await Promise.all([verifySession(), isSlowEnabled()]);
+  return getTripsViaForUser(airportCode, sessionId, slow);
+}
+
+async function getTripsViaForUser(airportCode: string, userId: string, slow: boolean): Promise<Booking[]> {
+  'use cache';
+  cacheLife('hours');
+  cacheTag(bookingTags.user(userId));
+
+  await delay(900, slow);
+  return prisma.booking.findMany({
+    include: bookingInclude,
+    orderBy: [{ date: 'asc' }, { createdAt: 'asc' }],
+    where: {
+      OR: [{ userId }, { userId: null }],
+      flight: { OR: [{ destinationCode: airportCode }, { originCode: airportCode }] },
+    },
   });
 }
 
