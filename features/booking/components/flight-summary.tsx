@@ -3,7 +3,6 @@ import { Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { RouteLine, RouteLineSkeleton } from '@/features/flight/components/route-line';
 import { getFlight, getOwnSeatHold } from '@/features/flight/flight-queries';
-import { SeatStatus } from './seat-status';
 
 export async function FlightSummary({ flightId }: { flightId: string }) {
   const flight = await getFlight(flightId);
@@ -45,7 +44,14 @@ export async function FlightSummary({ flightId }: { flightId: string }) {
 }
 
 async function HeldSeat({ flightId }: { flightId: string }) {
-  return <SeatStatus hold={await getOwnSeatHold(flightId)} />;
+  const hold = await getOwnSeatHold(flightId);
+
+  return (
+    <div>
+      <p className="text-sm font-semibold">{hold ? `Seat ${hold.seatLabel}` : 'No seat yet'}</p>
+      <p className="text-muted mt-0.5 text-xs">{hold ? 'Held for you' : 'Pick one in the seat step'}</p>
+    </div>
+  );
 }
 
 function DetailRowSkeleton() {

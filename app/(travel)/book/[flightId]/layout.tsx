@@ -2,10 +2,9 @@ import { ArrowLeft } from 'lucide-react';
 import { Suspense } from 'react';
 import ErrorBoundary from '@/components/ui/error-boundary';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
-import { BookingHold } from '@/features/booking/components/booking-hold';
+import { BookingHold, BookingHoldSkeleton } from '@/features/booking/components/booking-hold';
 import { CurrentProgressBar, ProgressBar } from '@/features/booking/components/booking-progress';
 import { FlightSummary, FlightSummarySkeleton } from '@/features/booking/components/flight-summary';
-import { HoldChipSkeleton } from '@/features/booking/components/seat-status';
 
 export default function BookingLayout({ children, params }: LayoutProps<'/book/[flightId]'>) {
   return (
@@ -21,7 +20,7 @@ export default function BookingLayout({ children, params }: LayoutProps<'/book/[
           <p className="text-muted text-sm font-medium">Booking</p>
           <h2 className="mt-1 text-xl">Book your flight</h2>
         </div>
-        <Suspense fallback={<HoldChipSkeleton />}>
+        <Suspense fallback={<BookingHoldSkeleton />}>
           {params.then(({ flightId }) => (
             <BookingHold flightId={flightId} />
           ))}
