@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { getFlight, getFlightOffer, getSeatHolds } from '@/features/flight/flight-queries';
+import { getFlight, getFlightOffer, getOwnSeatHold, getSeatHolds } from '@/features/flight/flight-queries';
 import { createBookingHref } from '../utils/search-params';
 import { getAvailableSteps, nextBookingStep } from '../utils/steps';
 import { BookingStepForm } from './booking-step-form';
@@ -19,7 +19,11 @@ export async function BookingStepPanel({
   flightId: string;
   step: BookingStep;
 }) {
-  const [flight, offer] = await Promise.all([getFlight(flightId), getFlightOffer(flightId, date, fare)]);
+  const [flight, offer, hold] = await Promise.all([
+    getFlight(flightId),
+    getFlightOffer(flightId, date, fare),
+    step === 'review' && draft.seat ? getOwnSeatHold(flightId) : null,
+  ]);
   const steps = getAvailableSteps(offer);
 
   if (!steps.includes(step)) {
@@ -32,6 +36,7 @@ export async function BookingStepPanel({
       date={date}
       draft={draft}
       flight={flight}
+      hold={hold}
       holds={step === 'seats' ? getSeatHolds(flightId, date) : undefined}
       offer={offer}
       step={step}

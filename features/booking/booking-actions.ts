@@ -53,17 +53,28 @@ export async function confirmBooking(_state: ConfirmBookingState, formData: Form
   const seat = flex && input.seat ? flight.seats.find(item => item.id === input.seat) : undefined;
   if (input.seat && !seat) return { error: 'Choose a seat on this flight.', ok: false };
   if (seat) {
-    const conflict = await seatConflict(flight.id, input.date, seat.id, sessionId);
-    if (conflict) {
+    const [conflict, ownHold] = await Promise.all([
+      seatConflict(flight.id, input.date, seat.id, sessionId),
+      prisma.seatHold.findFirst({
+        select: { id: true },
+        where: {
+          date: input.date,
+          expiresAt: { gt: new Date() },
+          flightId: flight.id,
+          seatId: seat.id,
+          userId: sessionId,
+        },
+      }),
+    ]);
+    if (conflict || !ownHold) {
       updateTag(flightTags.holds(flight.id));
-      const steps = parseSteps(input.steps);
       const draft: BookingDraft = {
         bags: input.bags,
         carryOn: input.carryOn === '1',
         extras: input.extras.split(',').filter(Boolean),
         seat: '',
       };
-      redirect(createBookingHref(flight.id, 'seats', draft, input.date, input.fare, steps));
+      redirect(createBookingHref(flight.id, 'seats', draft, input.date, input.fare, parseSteps(input.steps)));
     }
   }
   const bookedCount = await prisma.booking.count({ where: { date: input.date, flightId: flight.id } });

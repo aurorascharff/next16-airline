@@ -11,9 +11,10 @@ import { PlanePath, useFlightOverlay } from '@/components/ui/flight-overlay';
 import { Input } from '@/components/ui/input';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
-import type { Extra, Flight, FlightOffer, SeatHolds } from '@/features/flight/types/flight';
+import type { Extra, Flight, FlightOffer, SeatHold, SeatHolds } from '@/features/flight/types/flight';
 import { cn, formatPrice } from '@/lib/utils';
 import { confirmBooking, holdSeat } from '../booking-actions';
+import { useNow } from '../hooks/use-now';
 import { createBookingHref, parseBookingDraft } from '../utils/search-params';
 import { isBookingStep, nextBookingStep, previousBookingStep } from '../utils/steps';
 import { SeatMap, SeatMapSkeleton } from './seat-map';
@@ -35,6 +36,7 @@ export function BookingStepForm({
   date,
   draft,
   flight,
+  hold,
   holds,
   offer,
   step,
@@ -43,6 +45,7 @@ export function BookingStepForm({
   date: string;
   draft: BookingDraft;
   flight: Flight;
+  hold: SeatHold | null;
   holds?: Promise<SeatHolds>;
   offer: FlightOffer;
   step: BookingStep;
@@ -94,6 +97,11 @@ export function BookingStepForm({
   const nextStep = nextBookingStep(steps, step);
   const previousStep = previousBookingStep(steps, step);
   const total = calculateTotal(offer, optimisticDraft);
+  const now = useNow();
+  const holdLost =
+    step === 'review' &&
+    Boolean(optimisticDraft.seat) &&
+    (!hold || hold.seatId !== optimisticDraft.seat || (now > 0 && new Date(hold.expiresAt).getTime() <= now));
 
   return (
     <Boundary label="BookingStepForm">
@@ -120,7 +128,9 @@ export function BookingStepForm({
               <Review
                 date={date}
                 draft={optimisticDraft}
-                error={confirmState?.error}
+                error={
+                  holdLost ? 'Your seat hold has expired. Choose your seat again to continue.' : confirmState?.error
+                }
                 flight={flight}
                 offer={offer}
                 steps={steps}
@@ -151,7 +161,11 @@ export function BookingStepForm({
                   <ArrowLeft className="size-4" /> Exit
                 </Button>
               )}
-              {!nextStep ? (
+              {!nextStep && holdLost ? (
+                <Button render={<PrefetchLink href={hrefFor('seats', { seat: '' })} />} size="lg" variant="accent">
+                  Choose your seat again <ArrowRight className="size-4" />
+                </Button>
+              ) : !nextStep ? (
                 <Button data-testid="booking-confirm" size="lg" type="submit" variant="accent">
                   Confirm trip <ArrowRight className="size-4" />
                 </Button>
