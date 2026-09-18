@@ -16,7 +16,7 @@ The architecture follows the [Next.js App Architecture](https://github.com/auror
 
 ## Features
 
-- **[Cache Components](https://nextjs.org/docs/app/api-reference/config/next-config-js/cacheComponents)** cache the shared flight catalog, search results, and per-flight offers with [`'use cache: remote'`](https://nextjs.org/docs/app/api-reference/directives/use-cache-remote) so serverless instances share one cache, while the active traveler is resolved with [`'use cache: private'`](https://nextjs.org/docs/app/api-reference/directives/use-cache-private) so each user sees only their own trips.
+- **[Cache Components](https://nextjs.org/docs/app/api-reference/config/next-config-js/cacheComponents)** put the airport catalog in the static shell with `'use cache'`, cache search results and per-flight offers with [`'use cache: remote'`](https://nextjs.org/docs/app/api-reference/directives/use-cache-remote) so serverless instances share one cache, and resolve the active traveler with [`'use cache: private'`](https://nextjs.org/docs/app/api-reference/directives/use-cache-private) so each user sees only their own trips.
 - **[Partial Prefetching](https://nextjs.org/docs/app/guides/adopting-partial-prefetching)** keeps a shared route shell ready and prefetches the next URL-specific booking step, including its cached offer, before navigation.
 - **[Server Functions](https://nextjs.org/docs/app/getting-started/mutating-data)** confirm and cancel trips, then invalidate only the tags they change with [`updateTag`](https://nextjs.org/docs/app/api-reference/functions/updateTag), so a seat taken by one traveler shows as occupied for the next.
 - **[React Compiler](https://react.dev/learn/react-compiler)** memoizes components and hooks automatically, so the code needs no manual `useMemo` or `useCallback`.
@@ -25,10 +25,11 @@ The architecture follows the [Next.js App Architecture](https://github.com/auror
 
 ## Purpose of this demo
 
-A booking flow mixes shared data, session data and live data. Waypoint shows how Next.js 16 delivers each at the right moment: shared reads are cached and prefetched before the click, session reads wait for a per-link prefetch or a navigation, and live reads stream in on every request.
+A booking flow mixes static data, shared data, session data and live data. Waypoint shows how Next.js 16 delivers each at the right moment: static reads ship in the static shell, shared reads are cached and prefetched before the click, session reads wait for a per-link prefetch or a navigation, and live reads stream in on every request.
 
 | Read                        | How it is cached                                       | When it arrives          |
 | --------------------------- | ------------------------------------------------------ | ------------------------ |
+| Airports and destinations   | `'use cache'`                                          | In the static shell      |
 | Offer, seats, prices        | `'use cache: remote'`, tagged                          | With the prefetch        |
 | Your trips and your hold    | `'use cache'` per session, after `unstable_prefetch()` | With a per-link prefetch |
 | Flight list, who holds what | `'use cache'`, after `unstable_navigation()`           | On the navigation        |
