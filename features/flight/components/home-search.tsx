@@ -2,7 +2,7 @@
 
 import { ArrowRight } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { startTransition, useState } from 'react';
+import { startTransition, useRef, useState } from 'react';
 import { Boundary } from '@/components/internal/boundary';
 import { Button } from '@/components/ui/button';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
@@ -14,6 +14,7 @@ import type { Route } from 'next';
 export function HomeSearch({ destinations, hubs }: { destinations: Airport[]; hubs: Airport[] }) {
   const router = useRouter();
   const params = useSearchParams();
+  const formRef = useRef<HTMLFormElement>(null);
   const [values, setValues] = useState<SearchValues>({
     date: parseDate(params.get('date') ?? undefined),
     from: parseAirportCode(params.get('from') ?? undefined) || 'OSL',
@@ -30,15 +31,21 @@ export function HomeSearch({ destinations, hubs }: { destinations: Airport[]; hu
 
   return (
     <Boundary label="HomeSearch">
-      <div className={searchPanelClass}>
+      <form className={searchPanelClass} onSubmit={event => event.preventDefault()} ref={formRef}>
         <SearchFields destinations={destinations} hubs={hubs} onChange={update} values={values} />
-        <Button
-          className="h-10 sm:w-44"
-          render={<PrefetchLink href={createSearchHref(values.from, values.to, values.date)} />}
-        >
-          Search flights <ArrowRight className="size-4" />
-        </Button>
-      </div>
+        {values.to ? (
+          <Button
+            className="h-10 sm:w-44"
+            render={<PrefetchLink href={createSearchHref(values.from, values.to, values.date)} />}
+          >
+            Search flights <ArrowRight className="size-4" />
+          </Button>
+        ) : (
+          <Button className="h-10 sm:w-44" onClick={() => formRef.current?.reportValidity()}>
+            Search flights <ArrowRight className="size-4" />
+          </Button>
+        )}
+      </form>
     </Boundary>
   );
 }
