@@ -22,20 +22,20 @@ The architecture follows the [Next.js App Architecture](https://github.com/auror
 - **[React Compiler](https://react.dev/learn/react-compiler)** memoizes components and hooks automatically, so the code needs no manual `useMemo` or `useCallback`.
 - **[Async React](https://github.com/rickhanlonii/async-react)** keeps the booking flow responsive with `Suspense`, `useOptimistic`, and transitions while server-rendered content streams in.
 - **[View Transitions](https://nextjs.org/docs/app/guides/view-transitions)** cross-fade streamed content into place while the header, tab bar, and demo toolbar stay pinned.
-- **Demo controls** outline Client Components, toggle prefetching and simulated latency, and simulate going offline so the behavior can be compared directly.
 
 ## Purpose of this demo
 
-A booking has steps whose existence depends on data. Whether there is a seat map or an extras step is only known once the offer for that flight, date, and fare comes back. The usual fix checks on the Next button, shows a spinner, and fetches the offer again on the next page.
+Waypoint shows how the Next.js 16 cache directives combine in one booking flow. A read is cached for as long as its data allows, prefetched when the URL gives enough to render it, and left uncached when it has to be true for this request. The booking steps are the clearest case. Whether a flight has a seat map is only known once the offer comes back, so the offer is cached once, decides which steps exist, and is prefetched before the next click.
 
-This demo shows the alternative:
+| What you see                            | Read                                   | Arrives                             |
+| --------------------------------------- | -------------------------------------- | ----------------------------------- |
+| Flight list, offer, seat layout, prices | `'use cache: remote'`, tagged          | With the prefetch, before the click |
+| Your trips and your hold                | `'use cache'` keyed by session         | With the prefetch                   |
+| Who is holding a seat right now         | Cached, behind `unstable_navigation()` | Streams in on the navigation        |
+| Seats left per flight                   | Uncached                               | Streams in on every request         |
+| Session id                              | `'use cache: private'`                 | In the App Shell                    |
 
-- One cached offer decides which steps exist and renders them.
-- The step plan lives in the URL, so the step bar in the layout needs no data.
-- Every step is cached and keyed by the URL, so Continue and Back are prefetched and ready before the click.
-- Only the live parts, seats left per flight and who is holding a seat right now, stream in after the navigation.
-
-Try it: pick the **Basic** fare on any result to see Seats and Extras drop out, then compare **Delays** on with **Prefetch** off and on in the demo toolbar.
+Writes go through Server Functions that invalidate only the tags they touch, so holding a seat updates the seat map and the seats-left count without recomputing the flight list.
 
 ## Getting started
 
