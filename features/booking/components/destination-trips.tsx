@@ -1,8 +1,9 @@
 import { ArrowRight } from 'lucide-react';
-import { DotSeparator } from '@/components/ui/dot-separator';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Stat } from '@/components/ui/stat';
 import { getAirport } from '@/features/airport/airport-queries';
+import { RouteLine } from '@/features/flight/components/route-line';
 import { formatDate } from '@/lib/utils';
 import { getTripsVia } from '../booking-queries';
 
@@ -17,23 +18,26 @@ export async function DestinationTrips({ slug }: { slug: string }) {
       {trips.length === 0 ? (
         <p className="text-muted mt-3 text-sm">Nothing booked yet.</p>
       ) : (
-        <ul className="divide-divider/70 dark:divide-divider-dark/70 mt-3 divide-y">
+        <ul className="divide-divider/70 dark:divide-divider-dark/70 -mx-5 mt-3 -mb-5 divide-y">
           {trips.map(trip => (
-            <li key={trip.id}>
+            <li className="last:overflow-hidden last:rounded-b-lg" key={trip.id}>
               <PrefetchLink
-                className="group flex items-center justify-between gap-4 py-3 text-sm"
+                className="group hover:bg-card/40 dark:hover:bg-card-dark/40 grid gap-4 px-5 py-4 transition-colors sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
                 href={`/trips/${trip.id}`}
               >
-                <span className="flex min-w-0 items-center gap-1.5">
-                  <span className="font-semibold">{formatDate(trip.date)}</span>
-                  <DotSeparator />
-                  <span className="text-muted truncate">
-                    {trip.flight.origin.code} to {trip.flight.destination.code}
-                  </span>
-                  <DotSeparator />
-                  <span className="text-gray font-mono text-[12px] leading-4">{trip.reference}</span>
-                </span>
-                <ArrowRight className="text-muted group-hover:text-accent size-4 shrink-0 transition-colors" />
+                <div className="min-w-0 sm:max-w-sm">
+                  <RouteLine flight={trip.flight} size="sm" />
+                </div>
+                <div className="flex items-center gap-6">
+                  <dl className="grid flex-1 grid-cols-2 gap-6 sm:w-56">
+                    <Stat label="Date" value={formatDate(trip.date)} />
+                    <Stat
+                      label="Reference"
+                      value={<span className="font-mono tracking-widest">{trip.reference}</span>}
+                    />
+                  </dl>
+                  <ArrowRight className="text-muted group-hover:text-accent size-4 shrink-0 transition-colors" />
+                </div>
               </PrefetchLink>
             </li>
           ))}
