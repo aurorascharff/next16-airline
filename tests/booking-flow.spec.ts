@@ -45,6 +45,9 @@ test.describe('Booking flow (/book/[flightId]/[step])', () => {
   });
 
   test('confirming stores the trip in My trips, and cancelling removes it', async ({ page }) => {
+    await page.goto('/book/wp-41/seats?date=2026-12-03&fare=Flex&bags=2&carryOn=1&extras=wp-41-lounge');
+    await page.getByRole('button', { exact: true, name: 'Seat 12A' }).click();
+    await expect(page.getByTestId('seat-hold').filter({ visible: true })).toContainText('Booking held for');
     await page.goto('/book/wp-41/review?date=2026-12-03&fare=Flex&bags=2&carryOn=1&seat=wp-41-12A&extras=wp-41-lounge');
     await expect(page.getByRole('heading', { level: 1, name: 'Review and confirm' })).toBeVisible();
     await expect(page.getByTestId('trip-total')).toHaveText('€395');

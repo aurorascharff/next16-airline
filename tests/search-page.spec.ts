@@ -7,7 +7,7 @@ test.describe('Search page (/search)', () => {
     await page.getByLabel('From', { exact: true }).filter({ visible: true }).selectOption('CPH');
     await page.getByLabel('To', { exact: true }).filter({ visible: true }).selectOption('AMS');
     await page.getByLabel('Departure', { exact: true }).filter({ visible: true }).fill('2026-11-12');
-    await page.getByRole('button', { name: 'Search flights' }).filter({ visible: true }).click();
+    await page.getByRole('link', { name: 'Search flights' }).click();
 
     await page.waitForURL(url => url.pathname === '/search' && url.searchParams.get('to') === 'AMS');
     await expect(page.getByRole('heading', { level: 2, name: 'CPH to AMS' })).toBeVisible();

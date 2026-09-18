@@ -7,14 +7,14 @@ import { prisma } from '@/lib/db';
 import { delay } from '@/lib/utils';
 
 export async function getAirports() {
-  'use cache: remote';
+  'use cache';
   cacheLife('max');
 
   return prisma.airport.findMany({ orderBy: { city: 'asc' } });
 }
 
 export async function getDestinations() {
-  'use cache: remote';
+  'use cache';
   cacheLife('max');
 
   const airports = await prisma.airport.findMany({
@@ -41,7 +41,7 @@ async function getAirportCached(slug: string, slow: boolean) {
 }
 
 export async function getAirportSlugs() {
-  'use cache: remote';
+  'use cache';
   cacheLife('max');
 
   const airports = await prisma.airport.findMany({ select: { slug: true } });
