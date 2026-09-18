@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { cacheLife, cacheTag, unstable_navigation } from 'next/cache';
+import { cacheLife, cacheTag, unstable_navigation, unstable_prefetch } from 'next/cache';
 import { notFound } from 'next/navigation';
 import type { Fare } from '@/features/booking/utils/search-params';
 import { isSlowEnabled } from '@/features/demo/demo-queries';
@@ -34,11 +34,14 @@ async function searchFlightsCached(from: string, to: string, date: string, slow:
 }
 
 export async function getSeatsLeft(flightId: string, date: string) {
-  const [capacity, booked] = await Promise.all([
+  const [capacity, booked, [{ held }]] = await Promise.all([
     prisma.seat.count({ where: { flightId } }),
     prisma.booking.count({ where: { date, flightId } }),
+    prisma.$queryRaw<[{ held: number }]>`
+      SELECT count(*)::int AS held FROM "SeatHold"
+      WHERE "flightId" = ${flightId} AND "date" = ${date} AND "expiresAt" > now()
+    `,
   ]);
-  const held = await prisma.seatHold.count({ where: { date, expiresAt: { gt: new Date() }, flightId } });
   return Math.max(0, capacity - booked - held);
 }
 
@@ -145,6 +148,7 @@ async function getSeatHoldsForUser(flightId: string, date: string, userId: strin
 }
 
 export async function getOwnSeatHold(flightId: string): Promise<SeatHold | null> {
+  await unstable_prefetch();
   const sessionId = await getSessionId();
   return sessionId ? getOwnSeatHoldForUser(flightId, sessionId) : null;
 }

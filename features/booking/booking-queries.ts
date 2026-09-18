@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { cacheLife, cacheTag, unstable_navigation } from 'next/cache';
+import { cacheLife, cacheTag, unstable_navigation, unstable_prefetch } from 'next/cache';
 import { notFound } from 'next/navigation';
 import { isSlowEnabled } from '@/features/demo/demo-queries';
 import { verifySession } from '@/features/user/user-queries';
@@ -16,6 +16,7 @@ const bookingInclude = {
 } as const;
 
 export async function getBookings() {
+  await unstable_prefetch();
   const [sessionId, slow] = await Promise.all([verifySession(), isSlowEnabled()]);
   return getBookingsForUser(sessionId, slow);
 }
