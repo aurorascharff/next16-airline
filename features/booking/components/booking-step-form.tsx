@@ -114,7 +114,7 @@ export function BookingStepForm({
                 holds={holds}
                 nudge={seatNudge}
                 offer={offer}
-                onSelect={selectSeat}
+                onSelect={seatId => startTransition(() => selectSeat(seatId))}
                 pendingSeat={pendingSeat}
               />
             )}
