@@ -223,7 +223,6 @@
 }
 
 ::view-transition-group(site-header),
-::view-transition-group(mobile-nav),
 ::view-transition-group(demo-toolbar),
 ::view-transition-group(theme-toggle),
 ::view-transition-group(toaster),
@@ -239,8 +238,6 @@
 
 ::view-transition-old(site-header),
 ::view-transition-new(site-header),
-::view-transition-old(mobile-nav),
-::view-transition-new(mobile-nav),
 ::view-transition-old(demo-toolbar),
 ::view-transition-new(demo-toolbar),
 ::view-transition-old(theme-toggle),

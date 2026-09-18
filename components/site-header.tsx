@@ -6,15 +6,12 @@ import { NavLink } from '@/components/ui/nav-link';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 
 const navLinkClass =
-  'rounded-full px-4 py-2 text-sm font-medium transition-colors text-muted hover:bg-card hover:text-black dark:hover:bg-card-dark dark:hover:text-white aria-[current=page]:bg-card aria-[current=page]:text-black dark:aria-[current=page]:bg-card-dark dark:aria-[current=page]:text-white';
+  'rounded-full px-3 py-2 text-sm font-medium transition-colors text-muted hover:bg-card hover:text-black dark:hover:bg-card-dark dark:hover:text-white aria-[current=page]:bg-card aria-[current=page]:text-black dark:aria-[current=page]:bg-card-dark dark:aria-[current=page]:text-white md:px-4';
 
 export function SiteHeader() {
   return (
-    <header
-      style={{ viewTransitionName: 'site-header' }}
-      className="border-divider/70 dark:border-divider-dark/70 z-40 border-b bg-white pt-[env(safe-area-inset-top)] dark:bg-black"
-    >
-      <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
+    <header className="border-divider/70 dark:border-divider-dark/70 z-40 border-b bg-white pt-[env(safe-area-inset-top)] dark:bg-black">
+      <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
         <div className="flex items-center gap-1">
           <PrefetchLink
             aria-label="Waypoint home"
@@ -22,13 +19,18 @@ export function SiteHeader() {
             href="/"
           >
             <BrandMark className="text-accent size-7" />
-            <span>Waypoint</span>
+            <span className="max-[380px]:hidden">Waypoint</span>
           </PrefetchLink>
-          <IconButton external href="https://github.com/aurorascharff/next16-airline" label="View source on GitHub">
+          <IconButton
+            className="hidden md:inline-flex"
+            external
+            href="https://github.com/aurorascharff/next16-airline"
+            label="View source on GitHub"
+          >
             <GitHubIcon className="size-4" />
           </IconButton>
         </div>
-        <nav aria-label="Primary" className="hidden items-center gap-1 md:flex">
+        <nav aria-label="Primary" className="flex items-center gap-0.5 md:gap-1">
           <NavLink className={navLinkClass} href="/">
             Home
           </NavLink>
@@ -39,7 +41,9 @@ export function SiteHeader() {
             My trips
           </NavLink>
         </nav>
-        <ThemeToggle />
+        <div className="hidden md:block">
+          <ThemeToggle />
+        </div>
       </div>
     </header>
   );
