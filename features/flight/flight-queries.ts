@@ -9,13 +9,14 @@ import { prisma } from '@/lib/db';
 import { delay } from '@/lib/utils';
 import { flightTags } from './flight-cache';
 import { toSeat } from './types/flight';
+import { weekdayOf } from './utils/schedule';
 import type { Flight, FlightOffer, SeatHold, SeatHolds } from './types/flight';
 
-export async function searchFlights(from: string, to: string): Promise<Flight[]> {
-  return searchFlightsCached(from, to, await isSlowEnabled());
+export async function searchFlights(from: string, to: string, date: string): Promise<Flight[]> {
+  return searchFlightsCached(from, to, date, await isSlowEnabled());
 }
 
-async function searchFlightsCached(from: string, to: string, slow: boolean): Promise<Flight[]> {
+async function searchFlightsCached(from: string, to: string, date: string, slow: boolean): Promise<Flight[]> {
   'use cache: remote';
   cacheLife('max');
 
@@ -23,7 +24,11 @@ async function searchFlightsCached(from: string, to: string, slow: boolean): Pro
   return prisma.flight.findMany({
     include: { destination: true, origin: true },
     orderBy: { departureTime: 'asc' },
-    where: { destinationCode: to, originCode: from },
+    where: {
+      destinationCode: to,
+      originCode: from,
+      ...(date ? { operatingDays: { has: weekdayOf(date) } } : {}),
+    },
   });
 }
 

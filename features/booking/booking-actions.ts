@@ -4,6 +4,7 @@ import { updateTag } from 'next/cache';
 import { redirect, RedirectType } from 'next/navigation';
 import { z } from 'zod';
 import { flightTags } from '@/features/flight/flight-cache';
+import { operatesOn } from '@/features/flight/utils/schedule';
 import { verifySession } from '@/features/user/user-queries';
 import { prisma } from '@/lib/db';
 import { bookingTags } from './booking-cache';
@@ -48,6 +49,8 @@ export async function confirmBooking(_state: ConfirmBookingState, formData: Form
     where: { id: input.flightId },
   });
   if (!flight) return { error: 'That flight is no longer available.', ok: false };
+  if (!operatesOn(flight.operatingDays, input.date))
+    return { error: 'This flight does not fly on that date.', ok: false };
 
   const flex = input.fare === 'Flex';
   const seat = flex && input.seat ? flight.seats.find(item => item.id === input.seat) : undefined;

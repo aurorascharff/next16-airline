@@ -6,19 +6,24 @@ import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Fare } from '@/features/booking/utils/search-params';
 import { createBookingHref, DEFAULT_BOOKING_DRAFT } from '@/features/booking/utils/search-params';
-import { cn, formatPrice } from '@/lib/utils';
+import { cn, formatDate, formatPrice } from '@/lib/utils';
 import { getSeatsLeft, searchFlights } from '../flight-queries';
+import { formatOperatingDays } from '../utils/schedule';
 import type { Flight } from '../types/flight';
 import type { Route } from 'next';
 
 export async function FlightResults({ date, from, to }: { date: string; from: string; to: string }) {
-  const flights = await searchFlights(from, to);
+  const flights = await searchFlights(from, to, date);
   const [first] = flights;
 
   if (!first) {
     return (
       <EmptyState
-        body="No flights match this route and fare. Try another fare or destination."
+        body={
+          date
+            ? `Nothing flies ${from} to ${to} on ${formatDate(date)}. Try another day, or search with a flexible date.`
+            : 'No flights on this route yet. Try another destination.'
+        }
         title="No flights found"
       />
     );
@@ -47,6 +52,11 @@ export async function FlightResults({ date, from, to }: { date: string; from: st
                 </div>
                 <span className="text-gray flex items-center gap-1.5 font-mono text-[12px] leading-4">
                   {flight.flightNumber} <DotSeparator /> Direct
+                  {!date && (
+                    <>
+                      <DotSeparator /> {formatOperatingDays(flight.operatingDays)}
+                    </>
+                  )}
                 </span>
               </div>
               <div className="w-20 shrink-0 text-right">
