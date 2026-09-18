@@ -24,30 +24,29 @@ export default function SearchPage({ searchParams }: PageProps<'/search'>) {
       <ErrorBoundary title="Flights could not be loaded">
         <div className="mt-6">
           <AnimatedSuspense fallback={<FlightSearchFormSkeleton />}>
-            {query.then(({ date, from, to }) => (
-              <FlightSearchForm date={date} from={from} key={`${from}-${to}-${date}`} to={to} />
-            ))}
+            <FlightSearchForm>
+              <div className="mt-8">
+                <Suspense fallback={<SearchHeadingSkeleton />}>
+                  {query.then(({ date, from, to }) => (
+                    <SearchHeading date={date} from={from} to={to} />
+                  ))}
+                </Suspense>
+                <Suspense fallback={<FlightResultsSkeleton />}>
+                  {query.then(({ date, from, to }) =>
+                    to ? (
+                      <AnimatedSuspense fallback={<FlightResultsSkeleton />}>
+                        <FlightResults date={date} from={from} to={to} />
+                      </AnimatedSuspense>
+                    ) : (
+                      <AnimatedSuspense fallback={<RouteSuggestionsSkeleton />}>
+                        <RouteSuggestions date={date} from={from} />
+                      </AnimatedSuspense>
+                    ),
+                  )}
+                </Suspense>
+              </div>
+            </FlightSearchForm>
           </AnimatedSuspense>
-        </div>
-        <div className="mt-8">
-          <Suspense fallback={<SearchHeadingSkeleton />}>
-            {query.then(({ date, from, to }) => (
-              <SearchHeading date={date} from={from} to={to} />
-            ))}
-          </Suspense>
-          <Suspense fallback={<FlightResultsSkeleton />}>
-            {query.then(({ date, from, to }) =>
-              to ? (
-                <AnimatedSuspense fallback={<FlightResultsSkeleton />}>
-                  <FlightResults date={date} from={from} to={to} />
-                </AnimatedSuspense>
-              ) : (
-                <AnimatedSuspense fallback={<RouteSuggestionsSkeleton />}>
-                  <RouteSuggestions date={date} from={from} />
-                </AnimatedSuspense>
-              ),
-            )}
-          </Suspense>
         </div>
       </ErrorBoundary>
     </main>
