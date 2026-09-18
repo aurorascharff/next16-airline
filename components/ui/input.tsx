@@ -7,8 +7,12 @@ const base =
 export function Input({ className, type, ...props }: ComponentProps<'input'>) {
   return (
     <input
-      className={cn(base, type === 'date' &&
-          'block min-w-0 appearance-none text-base sm:text-sm [&::-webkit-date-and-time-value]:min-h-[1em] [&::-webkit-date-and-time-value]:text-left', className)}
+      className={cn(
+        base,
+        type === 'date' &&
+          'block min-w-0 appearance-none text-base sm:text-sm [&::-webkit-date-and-time-value]:min-h-[1em] [&::-webkit-date-and-time-value]:text-left',
+        className,
+      )}
       type={type}
       {...props}
     />

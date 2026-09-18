@@ -11,6 +11,10 @@ import { formatOperatingDays } from '../utils/schedule';
 import type { Flight } from '../types/flight';
 import type { Route } from 'next';
 
+const routeClass = 'grid grid-cols-[5rem_minmax(0,1fr)_5rem] items-center gap-x-4 gap-y-2 sm:gap-y-1';
+const metaClass =
+  'text-gray col-span-3 flex items-center justify-center gap-3 font-mono text-[12px] leading-4 whitespace-nowrap sm:col-span-1 sm:col-start-2';
+
 export async function FlightResults({ date, from, to }: { date: string; from: string; to: string }) {
   const flights = await searchFlights(from, to, date);
   const [first] = flights;
@@ -37,28 +41,28 @@ export async function FlightResults({ date, from, to }: { date: string; from: st
             data-testid="flight-result"
             key={flight.id}
           >
-            <div className="flex items-center gap-4">
-              <div className="w-20 shrink-0">
+            <div className={routeClass}>
+              <div className="sm:row-span-2">
                 <p className="text-2xl font-semibold tabular-nums">{flight.departureTime}</p>
                 <p className="text-muted text-xs">{flight.origin.code}</p>
               </div>
-              <div className="flex flex-1 flex-col items-center gap-1">
+              <div className="flex flex-col items-center gap-1">
                 <span className="text-muted text-xs">{flight.duration}</span>
                 <div className="flex w-full items-center gap-2">
                   <span className="bg-divider dark:bg-divider-dark h-px flex-1" />
                   <Plane className="text-accent size-4" />
                   <span className="bg-divider dark:bg-divider-dark h-px flex-1" />
                 </div>
-                <span className="text-gray flex items-center gap-3 font-mono text-[12px] leading-4">
-                  <span>{flight.flightNumber}</span>
-                  <span>Direct</span>
-                  {!date && <span>{formatOperatingDays(flight.operatingDays)}</span>}
-                </span>
               </div>
-              <div className="w-20 shrink-0 text-right">
+              <div className="text-right sm:row-span-2">
                 <p className="text-2xl font-semibold tabular-nums">{flight.arrivalTime}</p>
                 <p className="text-muted text-xs">{flight.destination.code}</p>
               </div>
+              <span className={metaClass}>
+                <span>{flight.flightNumber}</span>
+                <span>Direct</span>
+                {!date && <span>{formatOperatingDays(flight.operatingDays)}</span>}
+              </span>
             </div>
             <Suspense fallback={<FareColumnSkeleton />}>
               <FareColumn date={date} flight={flight} />
@@ -155,21 +159,23 @@ export function FlightResultsSkeleton() {
       <div className="border-divider/70 dark:border-divider-dark/70 divide-divider/70 dark:divide-divider-dark/70 divide-y rounded-lg border">
         {Array.from({ length: 2 }).map((_, index) => (
           <div className="grid gap-5 px-5 py-4 sm:grid-cols-[1fr_20rem] sm:items-center" key={index}>
-            <div className="flex items-center gap-4">
-              <div className="flex w-20 shrink-0 flex-col">
+            <div className={routeClass}>
+              <div className="flex flex-col sm:row-span-2">
                 <Skeleton className="my-1.5 h-5 w-16" />
                 <Skeleton className="mt-[6px] mb-0.5 h-3 w-8" />
               </div>
-              <div className="flex flex-1 flex-col items-center gap-1">
+              <div className="flex flex-col items-center gap-1">
                 <Skeleton className="my-0.5 h-3 w-12" />
                 <div className="flex h-4 w-full items-center">
                   <Skeleton className="skeleton-subtle h-px w-full" />
                 </div>
-                <Skeleton className="my-0.5 h-3 w-24" />
               </div>
-              <div className="flex w-20 shrink-0 flex-col items-end">
+              <div className="flex flex-col items-end sm:row-span-2">
                 <Skeleton className="my-1.5 h-5 w-16" />
                 <Skeleton className="mt-[6px] mb-0.5 h-3 w-8" />
+              </div>
+              <div className={`${metaClass} h-4`}>
+                <Skeleton className="h-3 w-24" />
               </div>
             </div>
             <FareColumnSkeleton />
