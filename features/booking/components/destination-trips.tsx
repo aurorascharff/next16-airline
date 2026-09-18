@@ -31,10 +31,12 @@ export async function DestinationTrips({ slug }: { slug: string }) {
             <div className="flex min-h-13 min-w-0 flex-col justify-center">
               <p className="text-sm font-semibold">Nothing booked yet</p>
               <p className="text-muted mt-1 text-sm">
-                Search flights {airport.hub ? 'from' : 'to'} {airport.city} and your trip will show up here.
+                Search flights {airport.hub ? 'from' : 'to'} {airport.city}
               </p>
             </div>
-            <ArrowRight className="text-muted group-hover:text-accent size-4 shrink-0 transition-colors" />
+            <div className="flex min-h-10 items-center justify-end">
+              <ArrowRight className="text-muted group-hover:text-accent size-4 shrink-0 transition-colors" />
+            </div>
           </PrefetchLink>
         </div>
       ) : (
