@@ -1,5 +1,4 @@
 import { Armchair, CalendarDays, CheckCircle2, Luggage, Plane, Sparkles } from 'lucide-react';
-import { DotSeparator } from '@/components/ui/dot-separator';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatDate, formatPrice } from '@/lib/utils';
@@ -31,9 +30,11 @@ export async function TripHeader({
       <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
         See you in {booking.flight.destination.city}.
       </h1>
-      <p className="text-muted mt-3 flex items-center gap-1.5 text-sm">
-        {booking.passenger} <DotSeparator /> Booking reference{' '}
-        <span className="font-semibold text-black dark:text-white">{booking.reference}</span>
+      <p className="text-muted mt-3 flex flex-wrap items-center gap-x-4 text-sm">
+        <span>{booking.passenger}</span>
+        <span>
+          Booking reference <span className="font-semibold text-black dark:text-white">{booking.reference}</span>
+        </span>
       </p>
     </>
   );

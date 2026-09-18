@@ -1,52 +1,21 @@
 'use client';
 
-import { cloneElement, type ButtonHTMLAttributes, type ReactElement, type ReactNode } from 'react';
 import { Boundary } from '@/components/internal/boundary';
 import { cn } from '@/lib/utils';
-
-type Size = 'sm' | 'default';
+import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
 type Props = {
   children: ReactNode;
   label: string;
-  size?: Size;
   href?: string;
   external?: boolean;
-  render?: ReactElement<{ className?: string; children?: ReactNode }>;
 } & ButtonHTMLAttributes<HTMLButtonElement>;
 
-const base =
-  'text-muted inline-flex shrink-0 items-center justify-center rounded-full transition-colors hover:bg-card hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-card-dark dark:hover:text-white';
+const iconButtonClass =
+  'text-muted inline-flex size-8 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-card hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-card-dark dark:hover:text-white';
 
-const sizes: Record<Size, string> = {
-  default: 'size-8',
-  sm: 'size-7',
-};
-
-export function IconButton({
-  children,
-  className,
-  external,
-  href,
-  label,
-  render,
-  size = 'default',
-  type = 'button',
-  ...props
-}: Props) {
-  const classes = cn(base, sizes[size], className);
-
-  if (render) {
-    return (
-      <Boundary label="IconButton" asChild>
-        {cloneElement(
-          render,
-          { 'aria-label': label, className: cn(classes, render.props?.className), ...props },
-          children,
-        )}
-      </Boundary>
-    );
-  }
+export function IconButton({ children, className, external, href, label, type = 'button', ...props }: Props) {
+  const classes = cn(iconButtonClass, className);
 
   if (href) {
     return (

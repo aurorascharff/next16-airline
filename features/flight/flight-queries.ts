@@ -122,7 +122,6 @@ async function getFlightOfferCached(flightId: string, date: string, fare: Fare, 
     extras: flex ? flight.extras : [],
     fare,
     seats: flex ? flight.seats.map(seat => toSeat(seat, taken.has(seat.id) ? 'occupied' : 'available')) : [],
-    seatsLeft: Math.max(0, flight.seats.length - bookings.length),
   };
 }
 

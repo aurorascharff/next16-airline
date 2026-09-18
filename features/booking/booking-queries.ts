@@ -56,11 +56,6 @@ async function getTripsViaForUser(airportCode: string, userId: string, slow: boo
   });
 }
 
-export async function getNextBooking() {
-  const bookings = await getBookings();
-  return bookings[0] ?? null;
-}
-
 export async function getBooking(id: string, reference = '') {
   const [sessionId, slow] = await Promise.all([verifySession(), isSlowEnabled()]);
   return getBookingForUser(id, sessionId, reference, slow);

@@ -20,7 +20,6 @@ export type FlightOffer = {
   extras: Extra[];
   fare: Fare;
   seats: Seat[];
-  seatsLeft: number;
 };
 
 export type SeatHold = { expiresAt: string; seatId: string; seatLabel: string };

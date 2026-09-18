@@ -4,7 +4,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Stat, StatSkeleton } from '@/components/ui/stat';
 import { RouteLine, RouteLineSkeleton } from '@/features/flight/components/route-line';
 import { formatDate } from '@/lib/utils';
-import { getNextBooking } from '../booking-queries';
+import { getBookings } from '../booking-queries';
 
 const cardClass =
   'border-divider/70 dark:border-divider-dark/70 grid gap-5 rounded-lg border bg-white p-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:p-6 dark:bg-black';
@@ -13,7 +13,7 @@ const stubClass =
   'border-divider dark:border-divider-dark flex items-center gap-6 border-t border-dashed pt-5 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-6';
 
 export async function NextTrip() {
-  const booking = await getNextBooking();
+  const [booking] = await getBookings();
 
   if (!booking) {
     return (

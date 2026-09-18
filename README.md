@@ -4,7 +4,7 @@
 
 # Next 16 Airline "Waypoint"
 
-An airline booking demo, from flight search to a stored trip, that demonstrates [Instant Navigations](https://nextjs.org/docs/app/guides/instant-navigation) in [Next.js 16.3](https://nextjs.org/blog/next-16-3-instant-navigations).
+An airline booking demo, from flight search to a stored trip, that demonstrates [Instant Navigations](https://nextjs.org/docs/app/guides/instant-navigation) in [Next.js 16](https://nextjs.org/blog/next-16-3-instant-navigations).
 
 [**Live demo →**](https://next16-airline.vercel.app/)
 
@@ -39,7 +39,7 @@ Writes go through Server Functions that invalidate only the tags they touch, so 
 
 ## Getting started
 
-Waypoint runs on Postgres. Set `DATABASE_URL` in `.env.local`, then:
+Waypoint runs on Postgres and on a Next.js 16.4 canary, which `unstable_prefetch()` and `unstable_navigation()` need. Set `DATABASE_URL` in `.env.local`, then:
 
 ```bash
 pnpm install
@@ -78,7 +78,7 @@ pnpm typecheck
 
 ## Stack
 
-- **[Next.js 16.3](https://nextjs.org/)**: App Router, Cache Components, Partial Prefetching, Server Functions
+- **[Next.js 16](https://nextjs.org/)** canary: App Router, Cache Components, Partial Prefetching, Server Functions
 - **[React 19](https://react.dev/)** with React Compiler: Suspense, View Transitions, `useOptimistic`
 - **[TypeScript](https://www.typescriptlang.org/)** and **[Tailwind CSS v4](https://tailwindcss.com/)**
 - **[Prisma 7](https://www.prisma.io/)** on PostgreSQL

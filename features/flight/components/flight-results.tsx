@@ -1,6 +1,5 @@
 import { Armchair, Plane } from 'lucide-react';
 import { Suspense } from 'react';
-import { DotSeparator } from '@/components/ui/dot-separator';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -50,13 +49,10 @@ export async function FlightResults({ date, from, to }: { date: string; from: st
                   <Plane className="text-accent size-4" />
                   <span className="bg-divider dark:bg-divider-dark h-px flex-1" />
                 </div>
-                <span className="text-gray flex items-center gap-1.5 font-mono text-[12px] leading-4">
-                  {flight.flightNumber} <DotSeparator /> Direct
-                  {!date && (
-                    <>
-                      <DotSeparator /> {formatOperatingDays(flight.operatingDays)}
-                    </>
-                  )}
+                <span className="text-gray flex items-center gap-3 font-mono text-[12px] leading-4">
+                  <span>{flight.flightNumber}</span>
+                  <span>Direct</span>
+                  {!date && <span>{formatOperatingDays(flight.operatingDays)}</span>}
                 </span>
               </div>
               <div className="w-20 shrink-0 text-right">

@@ -21,7 +21,7 @@ export const viewport: Viewport = {
 };
 
 const description =
-  'A Next.js 16.3 airline booking demo demonstrating Instant Navigations with Cache Components and Partial Prefetching.';
+  'A Next.js 16 airline booking demo demonstrating Instant Navigations with Cache Components and Partial Prefetching.';
 
 export const metadata: Metadata = {
   applicationName: 'Waypoint',
