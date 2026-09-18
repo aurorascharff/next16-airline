@@ -2,7 +2,6 @@ import 'server-only';
 
 import { cacheLife, cacheTag, unstable_navigation } from 'next/cache';
 import { notFound } from 'next/navigation';
-
 import type { Fare } from '@/features/booking/utils/search-params';
 import { isSlowEnabled } from '@/features/demo/demo-queries';
 import { getSessionId } from '@/features/user/user-queries';
@@ -29,11 +28,11 @@ async function searchFlightsCached(from: string, to: string, slow: boolean): Pro
 }
 
 export async function getSeatsLeft(flightId: string, date: string) {
-  const [capacity, booked, held] = await Promise.all([
+  const [capacity, booked] = await Promise.all([
     prisma.seat.count({ where: { flightId } }),
     prisma.booking.count({ where: { date, flightId } }),
-    prisma.seatHold.count({ where: { date, expiresAt: { gt: new Date() }, flightId } }),
   ]);
+  const held = await prisma.seatHold.count({ where: { date, expiresAt: { gt: new Date() }, flightId } });
   return Math.max(0, capacity - booked - held);
 }
 
