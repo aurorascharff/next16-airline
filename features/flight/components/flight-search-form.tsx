@@ -1,12 +1,18 @@
 import { Skeleton } from '@/components/ui/skeleton';
 import { getAirports } from '@/features/airport/airport-queries';
+import { HomeSearch } from './home-search';
+import { searchPanelClass } from './search-fields';
 import { SearchShell } from './search-shell';
 
 export async function FlightSearchForm({ children }: { children?: React.ReactNode }) {
   const airports = await getAirports();
+  const hubs = airports.filter(airport => airport.hub);
+  const destinations = airports.filter(airport => !airport.hub);
+
+  if (children === undefined) return <HomeSearch destinations={destinations} hubs={hubs} />;
 
   return (
-    <SearchShell destinations={airports.filter(airport => !airport.hub)} hubs={airports.filter(airport => airport.hub)}>
+    <SearchShell destinations={destinations} hubs={hubs}>
       {children}
     </SearchShell>
   );
@@ -14,7 +20,7 @@ export async function FlightSearchForm({ children }: { children?: React.ReactNod
 
 export function FlightSearchFormSkeleton() {
   return (
-    <div className="border-divider/70 dark:border-divider-dark/70 grid gap-3 rounded-lg border bg-white p-4 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-end dark:bg-black">
+    <div className={searchPanelClass}>
       {['From', 'To', 'Departure'].map(label => (
         <div className="grid gap-1.5" key={label}>
           <Skeleton className="my-0.5 h-3 w-14" />

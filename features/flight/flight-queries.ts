@@ -13,6 +13,7 @@ import { weekdayOf } from './utils/schedule';
 import type { Flight, FlightOffer, SeatHold, SeatHolds } from './types/flight';
 
 export async function searchFlights(from: string, to: string, date: string): Promise<Flight[]> {
+  await unstable_navigation();
   return searchFlightsCached(from, to, date, await isSlowEnabled());
 }
 

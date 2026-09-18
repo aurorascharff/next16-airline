@@ -2,50 +2,42 @@
 
 import { ArrowRight } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState, useTransition } from 'react';
+import { startTransition, useState } from 'react';
 import { Boundary } from '@/components/internal/boundary';
 import { Button } from '@/components/ui/button';
+import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { createSearchHref, parseAirportCode, parseDate } from '@/features/booking/utils/search-params';
 import type { Airport } from '@/generated/prisma/client';
 import { SearchFields, searchPanelClass, type SearchValues } from './search-fields';
+import type { Route } from 'next';
 
-export function SearchShell({
-  children,
-  destinations,
-  hubs,
-}: {
-  children: React.ReactNode;
-  destinations: Airport[];
-  hubs: Airport[];
-}) {
+export function HomeSearch({ destinations, hubs }: { destinations: Airport[]; hubs: Airport[] }) {
   const router = useRouter();
   const params = useSearchParams();
-  const [isPending, startTransition] = useTransition();
   const [values, setValues] = useState<SearchValues>({
     date: parseDate(params.get('date') ?? undefined),
     from: parseAirportCode(params.get('from') ?? undefined) || 'OSL',
     to: parseAirportCode(params.get('to') ?? undefined),
   });
 
+  function update(next: SearchValues) {
+    setValues(next);
+    const query = new URLSearchParams({ from: next.from });
+    if (next.to) query.set('to', next.to);
+    if (next.date) query.set('date', next.date);
+    startTransition(() => router.replace(`/?${query}` as Route, { scroll: false }));
+  }
+
   return (
-    <Boundary label="SearchShell">
-      <form
-        className={searchPanelClass}
-        onSubmit={event => {
-          event.preventDefault();
-          startTransition(() => router.push(createSearchHref(values.from, values.to, values.date)));
-        }}
-      >
-        <SearchFields destinations={destinations} hubs={hubs} onChange={setValues} values={values} />
-        <Button className="h-10 sm:w-44" type="submit">
+    <Boundary label="HomeSearch">
+      <div className={searchPanelClass}>
+        <SearchFields destinations={destinations} hubs={hubs} onChange={update} values={values} />
+        <Button
+          className="h-10 sm:w-44"
+          render={<PrefetchLink href={createSearchHref(values.from, values.to, values.date)} />}
+        >
           Search flights <ArrowRight className="size-4" />
         </Button>
-      </form>
-      <div
-        className="transition-opacity duration-200 ease-out data-pending:opacity-60"
-        data-pending={isPending ? '' : undefined}
-      >
-        {children}
       </div>
     </Boundary>
   );
