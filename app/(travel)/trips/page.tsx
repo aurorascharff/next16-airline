@@ -1,5 +1,4 @@
 import { AnimatedSuspense } from '@/components/ui/animated-suspense';
-import ErrorBoundary from '@/components/ui/error-boundary';
 import { FindBookingForm } from '@/features/booking/components/find-booking-form';
 import { TripsList, TripsListSkeleton } from '@/features/booking/components/trips-list';
 import type { Metadata } from 'next';
@@ -15,11 +14,9 @@ export default function TripsPage() {
         <FindBookingForm />
       </div>
       <div className="mt-8">
-        <ErrorBoundary title="Your trips could not be loaded">
-          <AnimatedSuspense fallback={<TripsListSkeleton />}>
-            <TripsList />
-          </AnimatedSuspense>
-        </ErrorBoundary>
+        <AnimatedSuspense fallback={<TripsListSkeleton />}>
+          <TripsList />
+        </AnimatedSuspense>
       </div>
     </main>
   );

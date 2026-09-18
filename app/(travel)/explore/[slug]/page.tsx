@@ -23,20 +23,20 @@ export default function ExplorePage({ params }: PageProps<'/explore/[slug]'>) {
       >
         <ArrowLeft className="size-4" /> Home
       </PrefetchLink>
-      <ErrorBoundary title="This destination could not be loaded">
-        <AnimatedSuspense fallback={<AirportDetailsSkeleton />}>
-          {params.then(({ slug }) => (
-            <AirportDetails slug={slug} />
-          ))}
-        </AnimatedSuspense>
-        <div className="mt-5">
+      <AnimatedSuspense fallback={<AirportDetailsSkeleton />}>
+        {params.then(({ slug }) => (
+          <AirportDetails slug={slug} />
+        ))}
+      </AnimatedSuspense>
+      <div className="mt-5">
+        <ErrorBoundary title="Your trips could not be loaded">
           <AnimatedSuspense fallback={<DestinationTripsSkeleton />}>
             {params.then(({ slug }) => (
               <DestinationTrips slug={slug} />
             ))}
           </AnimatedSuspense>
-        </div>
-      </ErrorBoundary>
+        </ErrorBoundary>
+      </div>
     </main>
   );
 }

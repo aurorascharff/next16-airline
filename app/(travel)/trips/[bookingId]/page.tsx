@@ -1,7 +1,6 @@
 import { ArrowLeft, Plane } from 'lucide-react';
 import { ViewTransition } from 'react';
 import { AnimatedSuspense } from '@/components/ui/animated-suspense';
-import ErrorBoundary from '@/components/ui/error-boundary';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import {
   TripHeader,
@@ -32,41 +31,39 @@ export default function TripPage({ params, searchParams }: PageProps<'/trips/[bo
       >
         <ArrowLeft className="size-4" /> My trips
       </PrefetchLink>
-      <ErrorBoundary title="This trip could not be loaded">
-        <div className="border-divider/70 dark:border-divider-dark/70 overflow-hidden rounded-lg border bg-white dark:bg-black">
-          <div className="bg-card dark:bg-card-dark relative flex flex-col p-7 pr-28 sm:p-10 sm:pr-40">
-            <ViewTransition default="none" name="confirm-plane" share="morph-plane">
-              <Plane className="text-accent absolute top-7 right-7 size-16 sm:top-10 sm:right-10 sm:size-24" />
-            </ViewTransition>
-            <AnimatedSuspense fallback={<TripHeaderSkeleton />}>
-              {query.then(({ bookingId, confirmed, reference }) => (
-                <TripHeader bookingId={bookingId} confirmed={confirmed} reference={reference} />
+      <div className="border-divider/70 dark:border-divider-dark/70 overflow-hidden rounded-lg border bg-white dark:bg-black">
+        <div className="bg-card dark:bg-card-dark relative flex flex-col p-7 pr-28 sm:p-10 sm:pr-40">
+          <ViewTransition default="none" name="confirm-plane" share="morph-plane">
+            <Plane className="text-accent absolute top-7 right-7 size-16 sm:top-10 sm:right-10 sm:size-24" />
+          </ViewTransition>
+          <AnimatedSuspense fallback={<TripHeaderSkeleton />}>
+            {query.then(({ bookingId, confirmed, reference }) => (
+              <TripHeader bookingId={bookingId} confirmed={confirmed} reference={reference} />
+            ))}
+          </AnimatedSuspense>
+        </div>
+        <div className="p-7 sm:p-10">
+          <AnimatedSuspense fallback={<TripRouteSkeleton />}>
+            {query.then(({ bookingId, reference }) => (
+              <TripRoute bookingId={bookingId} reference={reference} />
+            ))}
+          </AnimatedSuspense>
+          <div className="border-divider dark:border-divider-dark mt-8 border-t pt-8">
+            <AnimatedSuspense fallback={<TripSummarySkeleton />}>
+              {query.then(({ bookingId, reference }) => (
+                <TripSummary bookingId={bookingId} reference={reference} />
               ))}
             </AnimatedSuspense>
           </div>
-          <div className="p-7 sm:p-10">
-            <AnimatedSuspense fallback={<TripRouteSkeleton />}>
+          <div className="border-divider dark:border-divider-dark mt-8 border-t pt-6">
+            <AnimatedSuspense fallback={<TripReceiptSkeleton />}>
               {query.then(({ bookingId, reference }) => (
-                <TripRoute bookingId={bookingId} reference={reference} />
+                <TripReceipt bookingId={bookingId} reference={reference} />
               ))}
             </AnimatedSuspense>
-            <div className="border-divider dark:border-divider-dark mt-8 border-t pt-8">
-              <AnimatedSuspense fallback={<TripSummarySkeleton />}>
-                {query.then(({ bookingId, reference }) => (
-                  <TripSummary bookingId={bookingId} reference={reference} />
-                ))}
-              </AnimatedSuspense>
-            </div>
-            <div className="border-divider dark:border-divider-dark mt-8 border-t pt-6">
-              <AnimatedSuspense fallback={<TripReceiptSkeleton />}>
-                {query.then(({ bookingId, reference }) => (
-                  <TripReceipt bookingId={bookingId} reference={reference} />
-                ))}
-              </AnimatedSuspense>
-            </div>
           </div>
         </div>
-      </ErrorBoundary>
+      </div>
     </main>
   );
 }
