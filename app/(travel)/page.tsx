@@ -7,13 +7,8 @@ import { FlightSearchForm, FlightSearchFormSkeleton } from '@/features/flight/co
 export default function HomePage() {
   return (
     <main className="mx-auto w-full max-w-4xl px-4 py-6 sm:px-6 sm:py-8">
-      <section>
-        <p className="text-muted text-sm font-medium">Fly Waypoint</p>
-        <h1 className="mt-1 text-3xl">Where to next?</h1>
-        <p className="text-muted mt-2 max-w-xl text-sm leading-6">
-          Direct flights from Oslo and Copenhagen. Pick a route, then shape the trip your way: bags, seat, and extras.
-        </p>
-      </section>
+      <p className="text-muted text-sm font-medium">Fly Waypoint</p>
+      <h1 className="mt-1">Where to next?</h1>
       <ErrorBoundary title="Search is unavailable">
         <div className="mt-6">
           <AnimatedSuspense fallback={<FlightSearchFormSkeleton />}>
