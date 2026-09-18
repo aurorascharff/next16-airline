@@ -2,7 +2,7 @@
 
 import { ArrowLeft, ArrowRight, BriefcaseBusiness, Check, Leaf, Luggage, ShieldCheck, Sparkles } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { startTransition, Suspense, use, useActionState,  useOptimistic, useRef } from 'react';
+import { startTransition, Suspense, use, useActionState, useOptimistic, useRef } from 'react';
 import { toast } from 'sonner';
 import { Boundary } from '@/components/internal/boundary';
 import { Button } from '@/components/ui/button';

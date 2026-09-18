@@ -2,11 +2,10 @@
 
 import { Armchair } from 'lucide-react';
 import { Suspense, use } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 import type { FlightOffer, SeatHolds } from '@/features/flight/types/flight';
 import { cn } from '@/lib/utils';
 import type { BookingDraft } from '../types/booking';
-
-const NO_HOLDS: SeatHolds = { heldByOthers: [], own: null };
 
 export function SeatMap({
   draft,
@@ -39,11 +38,7 @@ export function SeatMap({
       </div>
       <div className="border-divider/70 bg-card/40 dark:border-divider-dark/70 dark:bg-card-dark/40 rounded-lg border px-7 pt-10 pb-7">
         <div className="border-divider dark:border-divider-dark mx-auto mb-8 h-7 w-3/4 rounded-t-[50%] border-t" />
-        <Suspense
-          fallback={
-            <SeatGrid draft={draft} holds={NO_HOLDS} offer={offer} onSelect={onSelect} pendingSeat={pendingSeat} />
-          }
-        >
+        <Suspense fallback={<SeatGridSkeleton count={offer.seats.length} />}>
           <LiveSeatGrid draft={draft} holds={holds} offer={offer} onSelect={onSelect} pendingSeat={pendingSeat} />
         </Suspense>
       </div>
@@ -113,4 +108,17 @@ function SeatGrid({ draft, holds, offer, onSelect, pendingSeat }: SeatGridProps)
 
 function labelOf(offer: FlightOffer, seatId: string) {
   return offer.seats.find(seat => seat.id === seatId)?.label ?? '';
+}
+
+function SeatGridSkeleton({ count }: { count: number }) {
+  return (
+    <div className="grid grid-cols-[1fr_1fr_2rem_1fr_1fr] gap-2">
+      {Array.from({ length: count }).map((_, index) => (
+        <Skeleton
+          className={cn('skeleton-subtle aspect-square rounded-md', index % 4 === 2 && 'col-start-4')}
+          key={index}
+        />
+      ))}
+    </div>
+  );
 }
