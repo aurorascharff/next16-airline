@@ -40,6 +40,7 @@ model Flight {
   flexFare        Int
   bagPrice        Int
   currency        String @default("EUR")
+  operatingDays   Int[]  @default([0, 1, 2, 3, 4, 5, 6])
 
   origin      Airport   @relation("departures", fields: [originCode], references: [code])
   destination Airport   @relation("arrivals", fields: [destinationCode], references: [code])

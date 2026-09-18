@@ -113,6 +113,12 @@ function durationLabel(minutes: number) {
   return rest ? `${hours}h ${String(rest).padStart(2, '0')}m` : `${hours}h`;
 }
 
+const schedules: Record<string, [number[], number[]]> = {
+  AMS: [[1, 2, 3, 4, 5], [2, 4, 6]],
+  BCN: [[0, 1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5]],
+  LIS: [[0, 1, 3, 4, 5], [2, 5, 6]],
+};
+
 function flightData(route: Route, index: 0 | 1) {
   const departs = index === 0 ? 7 * 60 + 15 + route.number : 15 * 60 + 40 + route.number;
   const id = `wp-${route.number + index + 1}`;
@@ -134,6 +140,7 @@ function flightData(route: Route, index: 0 | 1) {
     flexFare: route.fares[index] + 45,
     flightNumber: `WP ${route.number + index + 1}`,
     id,
+    operatingDays: schedules[route.destination][index],
     originCode: route.origin,
     seats: {
       create: seatPlan.map(([label, price, type]) => ({
