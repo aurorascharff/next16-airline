@@ -8,7 +8,7 @@ import { OfflineIndicator } from '@/components/offline-indicator';
 import { NavLinkScript } from '@/components/scripts/nav-link-script';
 import { ThemeProvider } from '@/components/theme/theme-provider';
 import { Toaster } from '@/components/toaster';
-import { DemoToolbar, DemoToolbarSkeleton } from '@/features/demo/components/demo-toolbar';
+import { DemoToolbar } from '@/features/demo/components/demo-toolbar';
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
@@ -55,7 +55,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
           <BoundaryProvider>
             {children}
             <div className="demo-toggles fixed right-4 bottom-4 z-50 hidden items-end sm:flex">
-              <Suspense fallback={<DemoToolbarSkeleton />}>
+              <Suspense>
                 <DemoToolbar />
               </Suspense>
             </div>
