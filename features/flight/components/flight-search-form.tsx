@@ -1,4 +1,5 @@
 import { ArrowRight } from 'lucide-react';
+import Form from 'next/form';
 import { Button } from '@/components/ui/button';
 import { Input, Select } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -18,10 +19,9 @@ export async function FlightSearchForm({
   const destinations = airports.filter(airport => !airport.hub);
 
   return (
-    <form
+    <Form
       action="/search"
       className="border-divider/70 dark:border-divider-dark/70 grid gap-3 rounded-lg border bg-white p-4 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-end dark:bg-black"
-      method="get"
     >
       <div className="grid gap-1.5 text-xs font-semibold">
         <label htmlFor="search-from">From</label>
@@ -51,7 +51,7 @@ export async function FlightSearchForm({
       <Button className="h-10" type="submit">
         Search flights <ArrowRight className="size-4" />
       </Button>
-    </form>
+    </Form>
   );
 }
 

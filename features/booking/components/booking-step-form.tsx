@@ -12,7 +12,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { startTransition,   useActionState, useOptimistic, useState } from 'react';
+import { startTransition, useActionState, useOptimistic, useState } from 'react';
 import { Boundary } from '@/components/internal/boundary';
 import { Button } from '@/components/ui/button';
 import { DotSeparator } from '@/components/ui/dot-separator';
