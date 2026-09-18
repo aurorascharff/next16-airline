@@ -1,6 +1,6 @@
 import { AnimatedSuspense } from '@/components/ui/animated-suspense';
 import ErrorBoundary from '@/components/ui/error-boundary';
-import { DestinationGrid, DestinationGridSkeleton } from '@/features/airport/components/destination-grid';
+import { DestinationGrid } from '@/features/airport/components/destination-grid';
 import { NextTrip, NextTripSkeleton } from '@/features/booking/components/next-trip';
 import { FlightSearchForm, FlightSearchFormSkeleton } from '@/features/flight/components/flight-search-form';
 
@@ -26,9 +26,7 @@ export default function HomePage() {
           <p className="text-muted text-sm font-medium">Popular right now</p>
           <h2 className="mt-1 text-xl">Destinations</h2>
         </div>
-        <AnimatedSuspense fallback={<DestinationGridSkeleton />}>
-          <DestinationGrid />
-        </AnimatedSuspense>
+        <DestinationGrid />
       </section>
     </main>
   );
