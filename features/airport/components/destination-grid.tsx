@@ -21,7 +21,7 @@ export async function DestinationGrid() {
                 <MapPin className="size-3.5" /> {destination.country}
               </p>
               <h3 className="mt-3 text-2xl font-semibold tracking-tight">{destination.city}</h3>
-              <p className="text-muted mt-1 text-sm leading-6">{destination.tagline}</p>
+              <p className="text-muted mt-1 min-h-12 text-sm leading-6">{destination.tagline}</p>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm font-semibold tabular-nums">
@@ -48,6 +48,7 @@ export function DestinationGridSkeleton() {
             <Skeleton className="my-0.5 h-3 w-24" />
             <Skeleton className="mt-[18px] mb-1.5 h-5 w-36" />
             <Skeleton className="mt-[9px] mb-[5px] h-3.5 w-full" />
+            <Skeleton className="my-[5px] h-3.5 w-2/3" />
           </div>
           <div className="flex items-center justify-between">
             <Skeleton className="my-[3px] h-3.5 w-20" />
