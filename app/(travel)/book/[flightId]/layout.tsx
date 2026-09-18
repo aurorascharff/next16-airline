@@ -2,10 +2,10 @@ import { ArrowLeft } from 'lucide-react';
 import { Suspense } from 'react';
 import ErrorBoundary from '@/components/ui/error-boundary';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
+import { BookingHold } from '@/features/booking/components/booking-hold';
 import { CurrentProgressBar, ProgressBar } from '@/features/booking/components/booking-progress';
 import { FlightSummary, FlightSummarySkeleton } from '@/features/booking/components/flight-summary';
-import { HoldChip, HoldChipSkeleton } from '@/features/booking/components/seat-status';
-import { getOwnSeatHold } from '@/features/flight/flight-queries';
+import { HoldChipSkeleton } from '@/features/booking/components/seat-status';
 
 export default function BookingLayout({ children, params }: LayoutProps<'/book/[flightId]'>) {
   return (
@@ -44,8 +44,4 @@ export default function BookingLayout({ children, params }: LayoutProps<'/book/[
       </div>
     </main>
   );
-}
-
-async function BookingHold({ flightId }: { flightId: string }) {
-  return <HoldChip hold={await getOwnSeatHold(flightId)} />;
 }

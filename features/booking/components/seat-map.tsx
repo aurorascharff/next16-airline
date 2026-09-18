@@ -110,6 +110,27 @@ function labelOf(offer: FlightOffer, seatId: string) {
   return offer.seats.find(seat => seat.id === seatId)?.label ?? '';
 }
 
+export function SeatMapSkeleton({ count = 16 }: { count?: number }) {
+  return (
+    <div className="mx-auto max-w-lg">
+      <div className="text-muted mb-5 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-xs">
+        {['w-20', 'w-24', 'w-24', 'w-12'].map(width => (
+          <span className="flex h-4 items-center" key={width}>
+            <Skeleton className={cn('h-3', width)} />
+          </span>
+        ))}
+      </div>
+      <div className="border-divider/70 bg-card/40 dark:border-divider-dark/70 dark:bg-card-dark/40 rounded-lg border px-7 pt-10 pb-7">
+        <div className="border-divider dark:border-divider-dark mx-auto mb-8 h-7 w-3/4 rounded-t-[50%] border-t" />
+        <SeatGridSkeleton count={count} />
+      </div>
+      <div className="mt-4 flex h-4 items-center justify-center">
+        <Skeleton className="h-3 w-24" />
+      </div>
+    </div>
+  );
+}
+
 function SeatGridSkeleton({ count }: { count: number }) {
   return (
     <div className="grid grid-cols-[1fr_1fr_2rem_1fr_1fr] gap-2">

@@ -16,7 +16,7 @@ import { cn, formatPrice } from '@/lib/utils';
 import { confirmBooking, holdSeat } from '../booking-actions';
 import { createBookingHref, parseBookingDraft } from '../utils/search-params';
 import { isBookingStep, nextBookingStep, previousBookingStep } from '../utils/steps';
-import { SeatMap } from './seat-map';
+import { SeatMap, SeatMapSkeleton } from './seat-map';
 import type { ConfirmBookingState } from '../booking-actions';
 import type { BookingDraft, BookingStep } from '../types/booking';
 
@@ -62,11 +62,14 @@ export function BookingStepForm({
     ...patch,
   }));
 
+  function hrefFor(target: BookingStep, patch: Partial<BookingDraft> = {}) {
+    return createBookingHref(flight.id, target, { ...optimisticDraft, ...patch }, date, offer.fare, steps);
+  }
+
   function updateDraft(patch: Partial<BookingDraft>) {
-    const nextDraft = { ...optimisticDraft, ...patch };
     startTransition(() => {
       updateOptimisticDraft(patch);
-      router.replace(createBookingHref(flight.id, step, nextDraft, date, offer.fare, steps), { scroll: false });
+      router.replace(hrefFor(step, patch), { scroll: false });
     });
   }
 
@@ -78,19 +81,12 @@ export function BookingStepForm({
     startTransition(async () => {
       updateOptimisticDraft({ seat: seatId });
       setPendingSeat(seatId);
-      router.replace(
-        createBookingHref(flight.id, step, { ...optimisticDraft, seat: seatId }, date, offer.fare, steps),
-        {
-          scroll: false,
-        },
-      );
+      router.replace(hrefFor(step, { seat: seatId }), { scroll: false });
       const result = await holdSeat(flight.id, date, seatId);
       if (!result.ok && latestSeat.current === seatId) {
         toast.error(result.error);
         updateOptimisticDraft({ seat: '' });
-        router.replace(createBookingHref(flight.id, step, { ...optimisticDraft, seat: '' }, date, offer.fare, steps), {
-          scroll: false,
-        });
+        router.replace(hrefFor(step, { seat: '' }), { scroll: false });
       }
     });
   }
@@ -147,15 +143,7 @@ export function BookingStepForm({
           ) : (
             <div className="flex items-center gap-3">
               {previousStep ? (
-                <Button
-                  render={
-                    <PrefetchLink
-                      href={createBookingHref(flight.id, previousStep, optimisticDraft, date, offer.fare, steps)}
-                    />
-                  }
-                  size="lg"
-                  variant="secondary"
-                >
+                <Button render={<PrefetchLink href={hrefFor(previousStep)} />} size="lg" variant="secondary">
                   <ArrowLeft className="size-4" /> Back
                 </Button>
               ) : (
@@ -178,15 +166,7 @@ export function BookingStepForm({
                   Continue <ArrowRight className="size-4" />
                 </Button>
               ) : (
-                <Button
-                  data-testid="booking-next"
-                  render={
-                    <PrefetchLink
-                      href={createBookingHref(flight.id, nextStep, optimisticDraft, date, offer.fare, steps)}
-                    />
-                  }
-                  size="lg"
-                >
+                <Button data-testid="booking-next" render={<PrefetchLink href={hrefFor(nextStep)} />} size="lg">
                   Continue <ArrowRight className="size-4" />
                 </Button>
               )}
@@ -435,7 +415,7 @@ function StepSkeleton({ draft, step }: { draft?: BookingDraft; step?: BookingSte
         <Skeleton className="mt-1.5 mb-1 h-8 w-56" />
         <div className="mt-6">
           {step === 'seats' ? (
-            <SeatsSkeleton />
+            <SeatMapSkeleton />
           ) : step === 'extras' ? (
             <ExtrasSkeleton />
           ) : step === 'review' ? (
@@ -469,20 +449,6 @@ function BaggageSkeleton() {
         ))}
       </div>
       <Skeleton className="skeleton-subtle mt-6 h-[4.875rem] rounded-md" />
-    </div>
-  );
-}
-
-function SeatsSkeleton() {
-  return (
-    <div className="mx-auto flex max-w-lg flex-col">
-      <div className="flex h-4 items-center justify-between">
-        <Skeleton className="h-3 w-20" />
-        <Skeleton className="h-3 w-24" />
-        <Skeleton className="h-3 w-14" />
-      </div>
-      <Skeleton className="skeleton-subtle mt-5 h-[34rem] rounded-lg" />
-      <Skeleton className="mx-auto mt-[18px] mb-0.5 h-3 w-72" />
     </div>
   );
 }

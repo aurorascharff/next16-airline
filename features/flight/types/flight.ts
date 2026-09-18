@@ -10,7 +10,7 @@ export type Flight = FlightRecord & { destination: Airport; origin: Airport };
 export type FlightResult = Flight & { seatsLeft: number };
 
 export type SeatStatus = 'available' | 'occupied' | 'held';
-export type SeatType = 'standard' | 'extra-legroom';
+type SeatType = 'standard' | 'extra-legroom';
 export type Seat = Omit<SeatRecord, 'type'> & { status: SeatStatus; type: SeatType };
 export type Extra = ExtraRecord;
 

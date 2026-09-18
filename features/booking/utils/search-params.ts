@@ -26,7 +26,7 @@ export function parseAirportCode(value: string | string[] | undefined) {
   return code && /^[A-Z]{3}$/.test(code) ? code : '';
 }
 
-export const FARES = ['Flex', 'Basic'] as const;
+const FARES = ['Flex', 'Basic'] as const;
 export type Fare = (typeof FARES)[number];
 
 export function parseFare(value: string | string[] | undefined): Fare {
@@ -57,7 +57,7 @@ export function parseBookingDraft(params: SearchParams): BookingDraft {
   };
 }
 
-export function toBookingSearchParams(draft: BookingDraft, date: string, fare: Fare, steps?: BookingStep[]) {
+function toBookingSearchParams(draft: BookingDraft, date: string, fare: Fare, steps?: BookingStep[]) {
   const params = new URLSearchParams();
   if (date) params.set('date', date);
   params.set('fare', fare);

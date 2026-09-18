@@ -96,6 +96,37 @@ export async function getFlightOffer(flightId: string, date: string, fare: Fare)
   return getFlightOfferCached(flightId, date, fare, await isSlowEnabled());
 }
 
+async function getFlightOfferCached(flightId: string, date: string, fare: Fare, slow: boolean): Promise<FlightOffer> {
+  'use cache: remote';
+  cacheLife('hours');
+  cacheTag(flightTags.offer(flightId));
+
+  await delay(2200, slow);
+  const [flight, bookings] = await Promise.all([
+    prisma.flight.findUnique({
+      include: {
+        extras: { orderBy: { price: 'asc' } },
+        seats: { orderBy: { label: 'asc' } },
+      },
+      where: { id: flightId },
+    }),
+    prisma.booking.findMany({ select: { seatId: true }, where: { date, flightId } }),
+  ]);
+  if (!flight) notFound();
+
+  const taken = new Set(bookings.map(booking => booking.seatId));
+  const flex = fare === 'Flex';
+  return {
+    bagPrice: flight.bagPrice,
+    baseFare: flex ? flight.flexFare : flight.basicFare,
+    currency: flight.currency,
+    extras: flex ? flight.extras : [],
+    fare,
+    seats: flex ? flight.seats.map(seat => toSeat(seat, taken.has(seat.id) ? 'occupied' : 'available')) : [],
+    seatsLeft: Math.max(0, flight.seats.length - bookings.length),
+  };
+}
+
 export async function getSeatHolds(flightId: string, date: string): Promise<SeatHolds> {
   await unstable_navigation();
   return getSeatHoldsForUser(flightId, date, await getSessionId());
@@ -137,37 +168,6 @@ async function getOwnSeatHoldForUser(flightId: string, userId: string): Promise<
 
 function toSeatHold(hold: { expiresAt: Date; seat: { label: string }; seatId: string }): SeatHold {
   return { expiresAt: hold.expiresAt.toISOString(), seatId: hold.seatId, seatLabel: hold.seat.label };
-}
-
-async function getFlightOfferCached(flightId: string, date: string, fare: Fare, slow: boolean): Promise<FlightOffer> {
-  'use cache: remote';
-  cacheLife('hours');
-  cacheTag(flightTags.offer(flightId));
-
-  await delay(2200, slow);
-  const [flight, bookings] = await Promise.all([
-    prisma.flight.findUnique({
-      include: {
-        extras: { orderBy: { price: 'asc' } },
-        seats: { orderBy: { label: 'asc' } },
-      },
-      where: { id: flightId },
-    }),
-    prisma.booking.findMany({ select: { seatId: true }, where: { date, flightId } }),
-  ]);
-  if (!flight) notFound();
-
-  const taken = new Set(bookings.map(booking => booking.seatId));
-  const flex = fare === 'Flex';
-  return {
-    bagPrice: flight.bagPrice,
-    baseFare: flex ? flight.flexFare : flight.basicFare,
-    currency: flight.currency,
-    extras: flex ? flight.extras : [],
-    fare,
-    seats: flex ? flight.seats.map(seat => toSeat(seat, taken.has(seat.id) ? 'occupied' : 'available')) : [],
-    seatsLeft: Math.max(0, flight.seats.length - bookings.length),
-  };
 }
 
 export async function getRoutesTo(destinationCode: string) {

@@ -138,7 +138,7 @@ export async function holdSeat(flightId: string, date: string, seatId: string) {
   return { expiresAt: expiresAt.toISOString(), ok: true as const };
 }
 
-export type FindBookingState = { ok: false; error: string } | null;
+type FindBookingState = { ok: false; error: string } | null;
 
 const findSchema = z.object({
   lastName: z.string().trim().min(2, 'Enter the passenger last name.'),
