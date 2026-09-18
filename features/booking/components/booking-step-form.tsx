@@ -1,6 +1,16 @@
 'use client';
 
-import { ArrowLeft, ArrowRight, BriefcaseBusiness, Check, Leaf, Luggage, ShieldCheck, Sparkles } from 'lucide-react';
+import {
+  ArrowLeft,
+  ArrowRight,
+  BriefcaseBusiness,
+  Check,
+  Info,
+  Leaf,
+  Luggage,
+  ShieldCheck,
+  Sparkles,
+} from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { startTransition, Suspense, use, useActionState, useOptimistic, useState } from 'react';
 import { Boundary } from '@/components/internal/boundary';
@@ -367,10 +377,21 @@ function Review({
           </div>
         ))}
       </div>
-      <div className="bg-success/10 flex items-start gap-3 rounded-md p-4">
-        <ShieldCheck className="text-success mt-0.5 size-5 shrink-0" />
-        <p className="text-sm leading-6">Your fare can be changed without a fee. Any fare difference still applies.</p>
-      </div>
+      {offer.fare === 'Flex' ? (
+        <div className="bg-success/10 flex items-start gap-3 rounded-md p-4">
+          <ShieldCheck className="text-success mt-0.5 size-5 shrink-0" />
+          <p className="text-sm leading-6">
+            Your fare can be changed without a fee. Any fare difference still applies.
+          </p>
+        </div>
+      ) : (
+        <div className="bg-card dark:bg-card-dark flex items-start gap-3 rounded-md p-4">
+          <Info className="text-muted mt-0.5 size-5 shrink-0" />
+          <p className="text-sm leading-6">
+            Basic fares can&apos;t be changed after booking. Your seat is assigned at the gate.
+          </p>
+        </div>
+      )}
     </div>
   );
 }
