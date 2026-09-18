@@ -48,7 +48,7 @@ export async function FlightSearchForm({
         <label htmlFor="search-date">Departure</label>
         <Input defaultValue={date} id="search-date" name="date" type="date" />
       </div>
-      <Button className="h-10" type="submit">
+      <Button className="h-10 sm:w-44" type="submit">
         Search flights <ArrowRight className="size-4" />
       </Button>
     </Form>
@@ -64,7 +64,7 @@ export function FlightSearchFormSkeleton() {
           <Skeleton className="skeleton-subtle h-10 rounded-md" />
         </div>
       ))}
-      <Skeleton className="skeleton-subtle h-10 w-full rounded-full sm:w-40" />
+      <Skeleton className="skeleton-subtle h-10 w-full rounded-full sm:w-44" />
     </div>
   );
 }
