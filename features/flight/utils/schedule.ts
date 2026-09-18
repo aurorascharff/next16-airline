@@ -1,7 +1,9 @@
+import { parseDateOnly } from '@/lib/utils';
+
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 export function weekdayOf(date: string) {
-  return new Date(`${date}T00:00:00Z`).getUTCDay();
+  return parseDateOnly(date).getUTCDay();
 }
 
 export function operatesOn(operatingDays: number[], date: string) {

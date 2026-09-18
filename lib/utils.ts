@@ -16,8 +16,12 @@ const dateFormatter = new Intl.DateTimeFormat('en-GB', {
   weekday: 'short',
 });
 
+export function parseDateOnly(date: string) {
+  return new Date(`${date}T00:00:00Z`);
+}
+
 export function formatDate(date: string) {
-  return date ? dateFormatter.format(new Date(`${date}T00:00:00Z`)) : 'Flexible date';
+  return date ? dateFormatter.format(parseDateOnly(date)) : 'Flexible date';
 }
 
 export function formatPrice(amount: number) {
