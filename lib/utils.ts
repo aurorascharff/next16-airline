@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function delay(ms: number, enabled: boolean) {
+export function delay(ms: number, enabled = true) {
   return enabled ? new Promise<void>(resolve => setTimeout(resolve, ms)) : Promise.resolve();
 }
 

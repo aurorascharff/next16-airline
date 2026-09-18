@@ -2,7 +2,6 @@ import 'server-only';
 
 import { cacheLife } from 'next/cache';
 import { notFound } from 'next/navigation';
-import { isSlowEnabled } from '@/features/demo/demo-queries';
 import { prisma } from '@/lib/db';
 import { delay } from '@/lib/utils';
 
@@ -10,6 +9,7 @@ export async function getAirports() {
   'use cache';
   cacheLife('max');
 
+  await delay(400);
   return prisma.airport.findMany({ orderBy: { city: 'asc' } });
 }
 
@@ -17,6 +17,7 @@ export async function getDestinations() {
   'use cache';
   cacheLife('max');
 
+  await delay(1200);
   const airports = await prisma.airport.findMany({
     include: { arrivals: { orderBy: { basicFare: 'asc' }, select: { basicFare: true }, take: 1 } },
     orderBy: { city: 'asc' },
@@ -27,14 +28,10 @@ export async function getDestinations() {
 }
 
 export async function getAirport(slug: string) {
-  return getAirportCached(slug, await isSlowEnabled());
-}
-
-async function getAirportCached(slug: string, slow: boolean) {
-  'use cache: remote';
+  'use cache';
   cacheLife('max');
 
-  await delay(600, slow);
+  await delay(600);
   const airport = await prisma.airport.findUnique({ where: { slug } });
   if (!airport) notFound();
   return airport;

@@ -170,14 +170,10 @@ function toSeatHold(hold: { expiresAt: Date; seat: { label: string }; seatId: st
 }
 
 export async function getRoutesTo(destinationCode: string) {
-  return getRoutesToCached(destinationCode, await isSlowEnabled());
-}
-
-async function getRoutesToCached(destinationCode: string, slow: boolean) {
-  'use cache: remote';
+  'use cache';
   cacheLife('max');
 
-  await delay(800, slow);
+  await delay(800);
   const flights = await prisma.flight.findMany({
     include: { origin: true },
     orderBy: [{ originCode: 'asc' }, { basicFare: 'asc' }],
