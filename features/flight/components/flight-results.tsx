@@ -1,4 +1,4 @@
-import { Plane } from 'lucide-react';
+import { Armchair, Plane } from 'lucide-react';
 import { Suspense } from 'react';
 import { DotSeparator } from '@/components/ui/dot-separator';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -6,7 +6,7 @@ import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Fare } from '@/features/booking/utils/search-params';
 import { createBookingHref, DEFAULT_BOOKING_DRAFT } from '@/features/booking/utils/search-params';
-import { formatPrice } from '@/lib/utils';
+import { cn, formatPrice } from '@/lib/utils';
 import { getSeatsLeft, searchFlights } from '../flight-queries';
 import type { Flight } from '../types/flight';
 import type { Route } from 'next';
@@ -71,14 +71,16 @@ async function FareColumn({ date, flight }: { date: string; flight: Flight }) {
   return (
     <div className="border-divider dark:border-divider-dark grid grid-cols-2 gap-3 border-t pt-4 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-6">
       <p
-        className={
+        className={cn(
+          'col-span-2 inline-flex h-7 w-fit items-center gap-1.5 rounded-full px-3 text-xs font-semibold',
           soldOut
-            ? 'text-danger col-span-2 text-xs font-semibold'
+            ? 'bg-danger/10 text-danger'
             : seatsLeft <= 4
-              ? 'text-warning col-span-2 text-xs font-semibold'
-              : 'text-muted col-span-2 text-xs font-medium'
-        }
+              ? 'bg-warning/15 text-warning'
+              : 'bg-accent/10 text-accent',
+        )}
       >
+        <Armchair className="size-3.5 shrink-0" />
         {soldOut ? 'Sold out on this date' : `${seatsLeft} seat${seatsLeft === 1 ? '' : 's'} left`}
       </p>
       <FareOption
@@ -175,7 +177,7 @@ export function FlightResultsSkeleton() {
 function FareColumnSkeleton() {
   return (
     <div className="border-divider dark:border-divider-dark grid grid-cols-2 gap-3 border-t pt-4 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-6">
-      <Skeleton className="col-span-2 my-0.5 h-3 w-20" />
+      <Skeleton className="skeleton-subtle col-span-2 h-7 w-28 rounded-full" />
       <Skeleton className="skeleton-subtle h-[5.125rem] rounded-md" />
       <Skeleton className="skeleton-subtle h-[5.125rem] rounded-md" />
     </div>
