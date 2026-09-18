@@ -6,7 +6,6 @@ import { useTransition } from 'react';
 import { Boundary } from '@/components/internal/boundary';
 import { Button } from '@/components/ui/button';
 import { Input, Select } from '@/components/ui/input';
-import { Spinner } from '@/components/ui/spinner';
 import { createSearchHref, parseAirportCode, parseDate } from '@/features/booking/utils/search-params';
 import type { Airport } from '@/generated/prisma/client';
 
@@ -69,7 +68,6 @@ export function SearchShell({
           <Input defaultValue={date} id="search-date" name="date" type="date" />
         </div>
         <Button className="h-10 sm:w-44" type="submit">
-          {isPending && <Spinner />}
           Search flights <ArrowRight className="size-4" />
         </Button>
       </form>
