@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import { BrandMark } from '@/components/ui/brand-mark';
 import { getFlight, getFlightOffer, getOwnSeatHold, getSeatHolds } from '@/features/flight/flight-queries';
 import { createBookingHref } from '../utils/search-params';
 import { getAvailableSteps, nextBookingStep } from '../utils/steps';
@@ -42,5 +43,17 @@ export async function BookingStepPanel({
       step={step}
       steps={steps}
     />
+  );
+}
+
+export function BookingStepFallback() {
+  return (
+    <div
+      aria-label="Loading booking step"
+      className="border-divider/70 dark:border-divider-dark/70 grid min-h-[28.75rem] place-items-center rounded-lg border bg-white dark:bg-black"
+      role="status"
+    >
+      <BrandMark animated className="text-accent size-16 opacity-70" />
+    </div>
   );
 }

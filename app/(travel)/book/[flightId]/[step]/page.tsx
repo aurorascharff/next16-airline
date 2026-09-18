@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 import { AnimatedSuspense } from '@/components/ui/animated-suspense';
 import { BookingStepSkeleton } from '@/features/booking/components/booking-step-form';
-import { BookingStepPanel } from '@/features/booking/components/booking-step-panel';
+import { BookingStepFallback, BookingStepPanel } from '@/features/booking/components/booking-step-panel';
 import { parseBookingDraft, parseDate, parseFare } from '@/features/booking/utils/search-params';
 import { isBookingStep } from '@/features/booking/utils/steps';
 import type { Metadata } from 'next';
@@ -25,9 +26,11 @@ export default function BookingStepPage({ params, searchParams }: PageProps<'/bo
 
   return (
     <div>
-      <AnimatedSuspense fallback={<BookingStepSkeleton query={query.then(({ draft, step }) => ({ draft, step }))} />}>
+      <AnimatedSuspense fallback={<BookingStepFallback />}>
         {query.then(({ date, draft, fare, flightId, step }) => (
-          <BookingStepPanel date={date} draft={draft} fare={fare} flightId={flightId} step={step} />
+          <Suspense fallback={<BookingStepSkeleton draft={draft} step={step} />}>
+            <BookingStepPanel date={date} draft={draft} fare={fare} flightId={flightId} step={step} />
+          </Suspense>
         ))}
       </AnimatedSuspense>
     </div>

@@ -11,8 +11,8 @@ import {
   ShieldCheck,
   Sparkles,
 } from 'lucide-react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { startTransition, Suspense, use, useActionState, useOptimistic, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { startTransition,   useActionState, useOptimistic, useState } from 'react';
 import { Boundary } from '@/components/internal/boundary';
 import { Button } from '@/components/ui/button';
 import { DotSeparator } from '@/components/ui/dot-separator';
@@ -24,8 +24,8 @@ import type { Extra, Flight, FlightOffer, SeatHold, SeatHolds } from '@/features
 import { cn, formatPrice } from '@/lib/utils';
 import { confirmBooking, holdSeat } from '../booking-actions';
 import { useNow } from '../hooks/use-now';
-import { createBookingHref, parseBookingDraft } from '../utils/search-params';
-import { isBookingStep, nextBookingStep, previousBookingStep } from '../utils/steps';
+import { createBookingHref } from '../utils/search-params';
+import { nextBookingStep, previousBookingStep } from '../utils/steps';
 import { SeatMap, SeatMapSkeleton } from './seat-map';
 import type { ConfirmBookingState } from '../booking-actions';
 import type { BookingDraft, BookingStep } from '../types/booking';
@@ -404,34 +404,7 @@ function calculateTotal(offer: FlightOffer, draft: BookingDraft) {
   return offer.baseFare + draft.bags * offer.bagPrice + seat + extras;
 }
 
-type SkeletonQuery = { draft: BookingDraft; step: string };
-
-export function BookingStepSkeleton({ query }: { query: Promise<SkeletonQuery> }) {
-  return (
-    <Suspense
-      fallback={
-        <Suspense fallback={<StepSkeleton />}>
-          <UrlStepSkeleton />
-        </Suspense>
-      }
-    >
-      <ResolvedStepSkeleton query={query} />
-    </Suspense>
-  );
-}
-
-function ResolvedStepSkeleton({ query }: { query: Promise<SkeletonQuery> }) {
-  const { draft, step } = use(query);
-  return <StepSkeleton draft={draft} step={isBookingStep(step) ? step : undefined} />;
-}
-
-function UrlStepSkeleton() {
-  const step = usePathname().split('/').at(-1) ?? '';
-  const draft = parseBookingDraft(Object.fromEntries(useSearchParams()));
-  return <StepSkeleton draft={draft} step={isBookingStep(step) ? step : undefined} />;
-}
-
-function StepSkeleton({ draft, step }: { draft?: BookingDraft; step?: BookingStep }) {
+export function BookingStepSkeleton({ draft, step }: { draft: BookingDraft; step: BookingStep }) {
   return (
     <div className="border-divider/70 dark:border-divider-dark/70 overflow-hidden rounded-lg border bg-white dark:bg-black">
       <div className="flex flex-col p-5 sm:p-6">
@@ -443,7 +416,7 @@ function StepSkeleton({ draft, step }: { draft?: BookingDraft; step?: BookingSte
           ) : step === 'extras' ? (
             <ExtrasSkeleton />
           ) : step === 'review' ? (
-            <ReviewSkeleton rows={draft ? priceRowCount(draft) : 2} />
+            <ReviewSkeleton rows={priceRowCount(draft)} />
           ) : (
             <BaggageSkeleton />
           )}
