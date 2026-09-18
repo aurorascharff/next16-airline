@@ -5,8 +5,9 @@ import { useParams, useSearchParams } from 'next/navigation';
 import { Boundary } from '@/components/internal/boundary';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import type { SeatHold } from '@/features/flight/types/flight';
+import { parseDate, parseFare } from '@/features/flight/utils/search-params';
 import { secondsUntil, useNow } from '../hooks/use-now';
-import { createBookingHref, parseBookingDraft, parseDate, parseFare, parseSteps } from '../utils/search-params';
+import { createBookingHref, parseBookingDraft, parseSteps } from '../utils/search-params';
 
 export function HoldChip({ hold }: { hold: SeatHold | null }) {
   const now = useNow();

@@ -1,3 +1,4 @@
+import type { Fare } from '@/features/flight/utils/search-params';
 import { BOOKING_STEPS, isBookingStep } from './steps';
 import type { BookingDraft, BookingStep } from '../types/booking';
 import type { Route } from 'next';
@@ -14,24 +15,6 @@ type SearchParams = Record<string, string | string[] | undefined>;
 function read(params: SearchParams, key: string) {
   const value = params[key];
   return Array.isArray(value) ? value[0] : value;
-}
-
-export function parseDate(value: string | string[] | undefined) {
-  const date = Array.isArray(value) ? value[0] : value;
-  return date && /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : '';
-}
-
-export function parseAirportCode(value: string | string[] | undefined) {
-  const code = Array.isArray(value) ? value[0] : value;
-  return code && /^[A-Z]{3}$/.test(code) ? code : '';
-}
-
-const FARES = ['Flex', 'Basic'] as const;
-export type Fare = (typeof FARES)[number];
-
-export function parseFare(value: string | string[] | undefined): Fare {
-  const fare = Array.isArray(value) ? value[0] : value;
-  return FARES.includes(fare as Fare) ? (fare as Fare) : 'Flex';
 }
 
 export function parseSteps(value: string | string[] | undefined): BookingStep[] | undefined {
@@ -78,10 +61,4 @@ export function createBookingHref(
   steps?: BookingStep[],
 ) {
   return `/book/${flightId}/${step}?${toBookingSearchParams(draft, date, fare, steps)}` as Route;
-}
-
-export function createSearchHref(from: string, to: string, date = '') {
-  const params = new URLSearchParams({ from, to });
-  if (date) params.set('date', date);
-  return `/search?${params}` as Route;
 }

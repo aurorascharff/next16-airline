@@ -6,7 +6,7 @@ import { startTransition, useOptimistic, useRef } from 'react';
 import { Boundary } from '@/components/internal/boundary';
 import { Button } from '@/components/ui/button';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
-import { createSearchHref } from '@/features/booking/utils/search-params';
+import { createSearchHref } from '@/features/flight/utils/search-params';
 import type { Airport } from '@/generated/prisma/client';
 import { SearchFields, searchPanelClass, searchValuesFrom, type SearchValues } from './search-fields';
 import type { Route } from 'next';

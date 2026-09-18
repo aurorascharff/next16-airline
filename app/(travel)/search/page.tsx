@@ -1,11 +1,11 @@
 import { Suspense } from 'react';
 import { AnimatedSuspense } from '@/components/ui/animated-suspense';
 import ErrorBoundary from '@/components/ui/error-boundary';
-import { parseAirportCode, parseDate } from '@/features/booking/utils/search-params';
 import { FlightResults, FlightResultsSkeleton } from '@/features/flight/components/flight-results';
 import { FlightSearchForm, FlightSearchFormSkeleton } from '@/features/flight/components/flight-search-form';
 import { RouteSuggestions, RouteSuggestionsSkeleton } from '@/features/flight/components/route-suggestions';
 import { SearchHeading, SearchHeadingSkeleton } from '@/features/flight/components/search-heading';
+import { parseAirportCode, parseDate } from '@/features/flight/utils/search-params';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = { title: 'Flights' };

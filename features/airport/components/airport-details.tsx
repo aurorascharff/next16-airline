@@ -2,8 +2,8 @@ import { ArrowRight, MapPin, Plane } from 'lucide-react';
 import { buttonClasses } from '@/components/ui/button-classes';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
-import { createSearchHref } from '@/features/booking/utils/search-params';
 import { getRoutesTo } from '@/features/flight/flight-queries';
+import { createSearchHref } from '@/features/flight/utils/search-params';
 import { formatPrice } from '@/lib/utils';
 import { getAirport } from '../airport-queries';
 

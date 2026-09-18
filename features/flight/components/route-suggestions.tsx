@@ -2,7 +2,7 @@ import { ArrowRight, Plane } from 'lucide-react';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
-import { createSearchHref } from '@/features/booking/utils/search-params';
+import { createSearchHref } from '@/features/flight/utils/search-params';
 import { formatPrice } from '@/lib/utils';
 import { getRoutesFrom } from '../flight-queries';
 

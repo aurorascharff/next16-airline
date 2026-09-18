@@ -1,11 +1,11 @@
 import { redirect } from 'next/navigation';
 import { BrandMark } from '@/components/ui/brand-mark';
 import { getFlight, getFlightOffer, getOwnSeatHold, getSeatHolds } from '@/features/flight/flight-queries';
+import type { Fare } from '@/features/flight/utils/search-params';
 import { createBookingHref } from '../utils/search-params';
 import { getAvailableSteps, nextBookingStep } from '../utils/steps';
 import { BookingStepForm } from './booking-step-form';
 import type { BookingDraft, BookingStep } from '../types/booking';
-import type { Fare } from '../utils/search-params';
 
 export async function BookingStepPanel({
   date,

@@ -4,9 +4,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Stat, StatSkeleton } from '@/components/ui/stat';
 import { getAirport } from '@/features/airport/airport-queries';
 import { RouteLine, RouteLineSkeleton } from '@/features/flight/components/route-line';
+import { createSearchHref } from '@/features/flight/utils/search-params';
 import { formatDate } from '@/lib/utils';
 import { getTripsVia } from '../booking-queries';
-import { createSearchHref } from '../utils/search-params';
 
 const cardClass = 'border-divider/70 dark:border-divider-dark/70 rounded-lg border bg-white p-5 dark:bg-black';
 const listClass = '-mx-5 mt-3 -mb-5';

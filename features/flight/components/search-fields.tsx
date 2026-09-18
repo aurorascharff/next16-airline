@@ -1,7 +1,7 @@
 'use client';
 
 import { Input, Select } from '@/components/ui/input';
-import { parseAirportCode, parseDate } from '@/features/booking/utils/search-params';
+import { parseAirportCode, parseDate } from '@/features/flight/utils/search-params';
 import type { Airport } from '@/generated/prisma/client';
 
 export type SearchValues = { date: string; from: string; to: string };

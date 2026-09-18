@@ -3,8 +3,9 @@ import { Suspense } from 'react';
 import { AnimatedSuspense } from '@/components/ui/animated-suspense';
 import { BookingStepSkeleton } from '@/features/booking/components/booking-step-form';
 import { BookingStepFallback, BookingStepPanel } from '@/features/booking/components/booking-step-panel';
-import { parseBookingDraft, parseDate, parseFare } from '@/features/booking/utils/search-params';
+import { parseBookingDraft } from '@/features/booking/utils/search-params';
 import { isBookingStep } from '@/features/booking/utils/steps';
+import { parseDate, parseFare } from '@/features/flight/utils/search-params';
 import type { Metadata } from 'next';
 
 export async function generateMetadata({ params }: PageProps<'/book/[flightId]/[step]'>): Promise<Metadata> {

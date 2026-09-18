@@ -2,8 +2,8 @@ import 'server-only';
 
 import { cacheLife, cacheTag, unstable_navigation, unstable_prefetch } from 'next/cache';
 import { notFound } from 'next/navigation';
-import type { Fare } from '@/features/booking/utils/search-params';
 import { isSlowEnabled } from '@/features/demo/demo-queries';
+import type { Fare } from '@/features/flight/utils/search-params';
 import { getSessionId } from '@/features/user/user-queries';
 import { prisma } from '@/lib/db';
 import { delay } from '@/lib/utils';

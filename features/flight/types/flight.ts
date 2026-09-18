@@ -1,4 +1,4 @@
-import type { Fare } from '@/features/booking/utils/search-params';
+import type { Fare } from '@/features/flight/utils/search-params';
 import type {
   Airport,
   Extra as ExtraRecord,
