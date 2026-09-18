@@ -2,7 +2,7 @@ import { AnimatedSuspense } from '@/components/ui/animated-suspense';
 import ErrorBoundary from '@/components/ui/error-boundary';
 import { DestinationGrid } from '@/features/airport/components/destination-grid';
 import { NextTrip, NextTripSkeleton } from '@/features/booking/components/next-trip';
-import { FlightSearchForm, FlightSearchFormSkeleton } from '@/features/flight/components/flight-search-form';
+import { FlightSearchForm } from '@/features/flight/components/flight-search-form';
 
 export default function HomePage() {
   return (
@@ -10,9 +10,7 @@ export default function HomePage() {
       <p className="text-muted text-sm font-medium">Fly Waypoint</p>
       <h1 className="mt-1">Where to next?</h1>
       <div className="mt-6">
-        <AnimatedSuspense fallback={<FlightSearchFormSkeleton />}>
-          <FlightSearchForm />
-        </AnimatedSuspense>
+        <FlightSearchForm />
       </div>
       <section className="mt-8">
         <ErrorBoundary title="Your next trip could not be loaded">
