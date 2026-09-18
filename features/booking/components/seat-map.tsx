@@ -9,13 +9,17 @@ import type { BookingDraft } from '../types/booking';
 
 export function SeatMap({
   draft,
+  error,
   holds,
+  nudge,
   offer,
   onSelect,
   pendingSeat,
 }: {
   draft: BookingDraft;
+  error: string | null;
   holds: Promise<SeatHolds>;
+  nudge: boolean;
   offer: FlightOffer;
   onSelect: (seatId: string) => void;
   pendingSeat: string;
@@ -42,12 +46,26 @@ export function SeatMap({
           <LiveSeatGrid draft={draft} holds={holds} offer={offer} onSelect={onSelect} pendingSeat={pendingSeat} />
         </Suspense>
       </div>
-      <p aria-live="polite" className="text-muted mt-4 text-center text-xs">
+      <p
+        aria-live="polite"
+        className={cn(
+          'mt-4 text-center text-xs',
+          error && !draft.seat
+            ? 'text-danger font-semibold'
+            : nudge && !draft.seat
+              ? 'text-warning font-semibold'
+              : 'text-muted',
+        )}
+      >
         {pendingSeat
           ? `Holding seat ${labelOf(offer, pendingSeat)} for you…`
           : draft.seat
             ? `You have chosen seat ${labelOf(offer, draft.seat)}`
-            : 'Pick a seat'}
+            : error
+              ? `${error} Pick another one.`
+              : nudge
+                ? 'Pick a seat to continue'
+                : 'Pick a seat'}
       </p>
     </div>
   );

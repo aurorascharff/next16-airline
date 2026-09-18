@@ -2,8 +2,7 @@
 
 import { ArrowLeft, ArrowRight, BriefcaseBusiness, Check, Leaf, Luggage, ShieldCheck, Sparkles } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { startTransition, Suspense, use, useActionState, useOptimistic, useRef } from 'react';
-import { toast } from 'sonner';
+import { startTransition, Suspense, use, useActionState, useOptimistic, useState } from 'react';
 import { Boundary } from '@/components/internal/boundary';
 import { Button } from '@/components/ui/button';
 import { DotSeparator } from '@/components/ui/dot-separator';
@@ -76,23 +75,17 @@ export function BookingStepForm({
     });
   }
 
-  const [pendingSeat, setPendingSeat] = useOptimistic('');
-  const latestSeat = useRef('');
-
-  function selectSeat(seatId: string) {
-    latestSeat.current = seatId;
-    startTransition(async () => {
-      updateOptimisticDraft({ seat: seatId });
-      setPendingSeat(seatId);
-      router.replace(hrefFor(step, { seat: seatId }), { scroll: false });
-      const result = await holdSeat(flight.id, date, seatId);
-      if (!result.ok && latestSeat.current === seatId) {
-        toast.error(result.error);
-        updateOptimisticDraft({ seat: '' });
-        router.replace(hrefFor(step, { seat: '' }), { scroll: false });
-      }
-    });
-  }
+  const [seatNudge, setSeatNudge] = useState(false);
+  const [seatError, selectSeat, holdingSeat] = useActionState(async (_previous: string | null, seatId: string) => {
+    setSeatNudge(false);
+    updateOptimisticDraft({ seat: seatId });
+    router.replace(hrefFor(step, { seat: seatId }), { scroll: false });
+    const result = await holdSeat(flight.id, date, seatId);
+    if (result.ok) return null;
+    router.replace(hrefFor(step, { seat: '' }), { scroll: false });
+    return result.error;
+  }, null);
+  const pendingSeat = holdingSeat ? optimisticDraft.seat : '';
 
   const nextStep = nextBookingStep(steps, step);
   const previousStep = previousBookingStep(steps, step);
@@ -117,7 +110,9 @@ export function BookingStepForm({
             {step === 'seats' && holds && (
               <SeatMap
                 draft={optimisticDraft}
+                error={seatError}
                 holds={holds}
+                nudge={seatNudge}
                 offer={offer}
                 onSelect={selectSeat}
                 pendingSeat={pendingSeat}
@@ -170,13 +165,7 @@ export function BookingStepForm({
                   Confirm trip <ArrowRight className="size-4" />
                 </Button>
               ) : step === 'seats' && (!optimisticDraft.seat || pendingSeat) ? (
-                <Button
-                  data-testid="booking-next"
-                  onClick={() =>
-                    pendingSeat ? toast('Please wait for your seat to confirm.') : toast.error('Pick a seat first.')
-                  }
-                  size="lg"
-                >
+                <Button data-testid="booking-next" onClick={() => setSeatNudge(!optimisticDraft.seat)} size="lg">
                   Continue <ArrowRight className="size-4" />
                 </Button>
               ) : (

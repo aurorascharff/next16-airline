@@ -10,7 +10,7 @@ test.describe('Booking flow (/book/[flightId]/[step])', () => {
     await page.waitForURL(url => url.pathname === '/book/wp-21/seats');
     await expect(page.getByRole('heading', { level: 1, name: 'Choose your seat' })).toBeVisible();
     await page.getByTestId('booking-next').filter({ visible: true }).click();
-    await expect(page.getByText('Pick a seat first.')).toBeVisible();
+    await expect(page.getByText('Pick a seat to continue')).toBeVisible();
     await expect(page).toHaveURL(url => url.pathname === '/book/wp-21/seats');
 
     await page.getByRole('button', { exact: true, name: 'Seat 10C' }).click();
