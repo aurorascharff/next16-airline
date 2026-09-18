@@ -3,15 +3,15 @@
 import { Plane } from 'lucide-react';
 import { createContext, use, useOptimistic, ViewTransition } from 'react';
 
-type ShowFlightOverlay = (label: string) => void;
+type ShowConfirmOverlay = (label: string) => void;
 
-const FlightOverlayContext = createContext<ShowFlightOverlay>(() => {});
+const ConfirmOverlayContext = createContext<ShowConfirmOverlay>(() => {});
 
-export function FlightOverlayProvider({ children }: { children: React.ReactNode }) {
+export function ConfirmOverlayProvider({ children }: { children: React.ReactNode }) {
   const [label, showOverlay] = useOptimistic<string | null>(null);
 
   return (
-    <FlightOverlayContext value={showOverlay}>
+    <ConfirmOverlayContext value={showOverlay}>
       {children}
       {label !== null && (
         <ViewTransition default="none" enter="overlay-fade" exit="overlay-fade">
@@ -27,12 +27,12 @@ export function FlightOverlayProvider({ children }: { children: React.ReactNode 
           </div>
         </ViewTransition>
       )}
-    </FlightOverlayContext>
+    </ConfirmOverlayContext>
   );
 }
 
-export function useFlightOverlay() {
-  return use(FlightOverlayContext);
+export function useConfirmOverlay() {
+  return use(ConfirmOverlayContext);
 }
 
 export function PlanePath({
