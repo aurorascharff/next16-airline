@@ -8,13 +8,13 @@ test.describe('Home page (/)', () => {
       async () => {
         await page.goto('/');
         await expect(page.getByRole('heading', { level: 1, name: 'Where to next?' })).toBeVisible();
-        await expect(page.getByRole('button', { name: 'Search flights' })).toHaveCount(0);
+        await expect(page.getByRole('link', { name: 'Search flights' })).toHaveCount(0);
         await expect(page.getByTestId('next-trip')).toHaveCount(0);
       },
       { baseURL },
     );
 
-    await expect(page.getByRole('button', { name: 'Search flights' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Search flights' })).toBeVisible();
     await expect(page.getByTestId('next-trip')).toContainText('OSL');
     await expect(page.getByTestId('next-trip')).toContainText('Barcelona');
     await expect(page.getByTestId('destination-card')).toHaveCount(3);
