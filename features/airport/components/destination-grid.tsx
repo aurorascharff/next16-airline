@@ -12,7 +12,7 @@ export async function DestinationGrid() {
       {destinations.map(destination => (
         <li key={destination.code}>
           <PrefetchLink
-            className="border-divider/70 dark:border-divider-dark/70 group hover:bg-card/40 dark:hover:bg-card-dark/40 flex h-full flex-col justify-between gap-8 rounded-lg border bg-white p-5 transition-colors dark:bg-black"
+            className="border-divider/70 dark:border-divider-dark/70 group hover:bg-card/40 dark:hover:bg-card-dark/40 flex h-full flex-col justify-between gap-6 rounded-lg border bg-white p-5 transition-colors sm:gap-8 dark:bg-black"
             data-testid="destination-card"
             href={`/explore/${destination.slug}`}
           >
@@ -21,7 +21,7 @@ export async function DestinationGrid() {
                 <MapPin className="size-3.5" /> {destination.country}
               </p>
               <h3 className="mt-3 text-2xl font-semibold tracking-tight">{destination.city}</h3>
-              <p className="text-muted mt-1 min-h-12 text-sm leading-6">{destination.tagline}</p>
+              <p className="text-muted mt-1 text-sm leading-6 sm:min-h-12">{destination.tagline}</p>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm font-semibold tabular-nums">
@@ -41,14 +41,14 @@ export function DestinationGridSkeleton() {
     <div className="grid gap-4 sm:grid-cols-3">
       {Array.from({ length: 3 }).map((_, index) => (
         <div
-          className="border-divider/70 dark:border-divider-dark/70 flex flex-col justify-between gap-8 rounded-lg border bg-white p-5 dark:bg-black"
+          className="border-divider/70 dark:border-divider-dark/70 flex flex-col justify-between gap-6 rounded-lg border bg-white p-5 sm:gap-8 dark:bg-black"
           key={index}
         >
           <div className="flex flex-col">
             <Skeleton className="my-0.5 h-3 w-24" />
             <Skeleton className="mt-[18px] mb-1.5 h-5 w-36" />
             <Skeleton className="mt-[9px] mb-[5px] h-3.5 w-full" />
-            <Skeleton className="my-[5px] h-3.5 w-2/3" />
+            <Skeleton className="my-[5px] hidden h-3.5 w-2/3 sm:block" />
           </div>
           <div className="flex items-center justify-between">
             <Skeleton className="my-[3px] h-3.5 w-20" />

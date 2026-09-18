@@ -12,7 +12,7 @@ export function SiteHeader() {
   return (
     <header
       style={{ viewTransitionName: 'site-header' }}
-      className="border-divider/70 dark:border-divider-dark/70 sticky top-0 z-40 border-b bg-white/80 pt-[env(safe-area-inset-top)] backdrop-blur-md backdrop-saturate-150 dark:bg-black/80"
+      className="border-divider/70 dark:border-divider-dark/70 z-40 border-b bg-white pt-[env(safe-area-inset-top)] dark:bg-black"
     >
       <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
         <div className="flex items-center gap-1">

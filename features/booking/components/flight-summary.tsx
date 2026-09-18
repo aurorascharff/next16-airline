@@ -8,7 +8,7 @@ export async function FlightSummary({ flightId }: { flightId: string }) {
   const flight = await getFlight(flightId);
 
   return (
-    <aside className="border-divider/70 dark:border-divider-dark/70 overflow-hidden rounded-lg border bg-white lg:sticky lg:top-20 dark:bg-black">
+    <aside className="border-divider/70 dark:border-divider-dark/70 overflow-hidden rounded-lg border bg-white lg:sticky lg:top-6 dark:bg-black">
       <div className="bg-card dark:bg-card-dark p-5">
         <p className="text-gray font-mono text-[12px] leading-4">{flight.flightNumber}</p>
         <div className="mt-5">
