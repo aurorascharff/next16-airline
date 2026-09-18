@@ -22,7 +22,7 @@ export function SearchShell({
   const router = useRouter();
   const params = useSearchParams();
   const [isPending, startTransition] = useTransition();
-  const from = parseAirportCode(params.get('from') ?? undefined) || hubs[0]?.code || '';
+  const from = parseAirportCode(params.get('from') ?? undefined) || 'OSL';
   const to = parseAirportCode(params.get('to') ?? undefined);
   const date = parseDate(params.get('date') ?? undefined);
 
