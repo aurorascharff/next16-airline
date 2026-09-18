@@ -13,6 +13,10 @@ export default function HomePage() {
         <FlightSearchForm />
       </div>
       <section className="mt-8">
+        <div className="mb-4">
+          <p className="text-muted text-sm font-medium">Upcoming</p>
+          <h2 className="mt-1 text-xl">Your next trip</h2>
+        </div>
         <ErrorBoundary title="Your next trip could not be loaded">
           <AnimatedSuspense fallback={<NextTripSkeleton />}>
             <NextTrip />

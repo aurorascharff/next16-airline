@@ -19,9 +19,8 @@ export async function NextTrip() {
     return (
       <PrefetchLink className={linkClass} data-testid="no-trip" href="/search">
         <div className="flex min-h-27 min-w-0 flex-col justify-center">
-          <p className="text-muted text-xs font-semibold tracking-wide uppercase">Your next trip</p>
-          <p className="mt-3 text-base font-semibold">Nothing booked yet</p>
-          <p className="text-muted mt-1 text-sm">Search a route below and your trip will show up here.</p>
+          <p className="text-base font-semibold">Nothing booked yet</p>
+          <p className="text-muted mt-1 text-sm">Search a route above and your trip will show up here.</p>
         </div>
         <ArrowRight className="text-muted group-hover:text-accent size-4 shrink-0 transition-colors" />
       </PrefetchLink>
@@ -31,10 +30,7 @@ export async function NextTrip() {
   return (
     <PrefetchLink className={linkClass} data-testid="next-trip" href={`/trips/${booking.id}`}>
       <div className="min-w-0">
-        <p className="text-muted text-xs font-semibold tracking-wide uppercase">Your next trip</p>
-        <div className="mt-4">
-          <RouteLine flight={booking.flight} />
-        </div>
+        <RouteLine flight={booking.flight} />
       </div>
       <div className={stubClass}>
         <dl className="grid flex-1 grid-cols-2 gap-6 sm:w-56">
@@ -50,13 +46,8 @@ export async function NextTrip() {
 export function NextTripSkeleton() {
   return (
     <div className={cardClass}>
-      <div className="flex min-w-0 flex-col">
-        <div className="flex h-4 items-center">
-          <Skeleton className="h-3 w-24" />
-        </div>
-        <div className="mt-4">
-          <RouteLineSkeleton />
-        </div>
+      <div className="min-w-0">
+        <RouteLineSkeleton />
       </div>
       <div className={stubClass}>
         <div className="grid flex-1 grid-cols-2 gap-6 sm:w-56">
