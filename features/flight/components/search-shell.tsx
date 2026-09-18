@@ -5,27 +5,21 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { Boundary } from '@/components/internal/boundary';
 import { Button } from '@/components/ui/button';
-import { createSearchHref, parseAirportCode, parseDate } from '@/features/booking/utils/search-params';
+import { createSearchHref } from '@/features/booking/utils/search-params';
 import type { Airport } from '@/generated/prisma/client';
-import { SearchFields, searchPanelClass, type SearchValues } from './search-fields';
+import { SearchFields, searchPanelClass, searchValuesFrom, type SearchValues } from './search-fields';
 
-export function SearchShell({
-  children,
-  destinations,
-  hubs,
-}: {
-  children: React.ReactNode;
-  destinations: Airport[];
-  hubs: Airport[];
-}) {
-  const router = useRouter();
+type Props = { children: React.ReactNode; destinations: Airport[]; hubs: Airport[] };
+
+export function SearchShell(props: Props) {
   const params = useSearchParams();
+  return <SearchForm key={params.toString()} {...props} initial={searchValuesFrom(params)} />;
+}
+
+function SearchForm({ children, destinations, hubs, initial }: Props & { initial: SearchValues }) {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [values, setValues] = useState<SearchValues>({
-    date: parseDate(params.get('date') ?? undefined),
-    from: parseAirportCode(params.get('from') ?? undefined) || 'OSL',
-    to: parseAirportCode(params.get('to') ?? undefined),
-  });
+  const [values, setValues] = useState(initial);
 
   return (
     <Boundary label="SearchShell">
