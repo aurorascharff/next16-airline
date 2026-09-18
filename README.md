@@ -25,17 +25,16 @@ The architecture follows the [Next.js App Architecture](https://github.com/auror
 
 ## Purpose of this demo
 
-Waypoint shows how the Next.js 16 cache directives combine in one booking flow. A read is cached for as long as its data allows, prefetched when the URL gives enough to render it, and left uncached when it has to be true for this request. The booking steps are the clearest case. Whether a flight has a seat map is only known once the offer comes back, so the offer is cached once, decides which steps exist, and is prefetched before the next click.
+A booking flow mixes shared data, session data and live data. Waypoint shows how Next.js 16 delivers each at the right moment: shared reads are cached and prefetched before the click, session reads wait for a per-link prefetch or a navigation, and live reads stream in on every request.
 
-| What you see                                                         | Read                                                         | Arrives                                          |
-| -------------------------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------ |
-| Offer, seat layout, prices                                           | `'use cache: remote'`, tagged                                | With the prefetch, before the click              |
-| Your trips and your hold                                             | `'use cache'` keyed by session, behind `unstable_prefetch()` | With a per-link prefetch, never in the App Shell |
-| Flight list, your trips on a destination page, who is holding a seat | Cached, behind `unstable_navigation()`                       | Streams in on the navigation                     |
-| Seats left per flight                                                | Uncached                                                     | Streams in on every request                      |
-| Session id                                                           | `'use cache: private'`                                       | In the App Shell                                 |
+| Read                        | How it is cached                                       | When it arrives          |
+| --------------------------- | ------------------------------------------------------ | ------------------------ |
+| Offer, seats, prices        | `'use cache: remote'`, tagged                          | With the prefetch        |
+| Your trips and your hold    | `'use cache'` per session, after `unstable_prefetch()` | With a per-link prefetch |
+| Flight list, who holds what | `'use cache'`, after `unstable_navigation()`           | On the navigation        |
+| Seats left                  | Uncached                                               | On every request         |
 
-Writes go through Server Functions that invalidate only the tags they touch, so holding a seat updates the seat map and the seats-left count without recomputing the flight list.
+Writes are Server Functions that update only the tags they touch, so holding a seat refreshes the seat map without recomputing the flight list.
 
 ## Getting started
 
