@@ -7,7 +7,6 @@ import type {
 } from '@/generated/prisma/client';
 
 export type Flight = FlightRecord & { destination: Airport; origin: Airport };
-export type FlightResult = Flight & { seatsLeft: number };
 
 export type SeatStatus = 'available' | 'occupied' | 'held';
 type SeatType = 'standard' | 'extra-legroom';

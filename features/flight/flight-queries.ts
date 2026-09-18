@@ -2,6 +2,7 @@ import 'server-only';
 
 import { cacheLife, cacheTag, unstable_navigation } from 'next/cache';
 import { notFound } from 'next/navigation';
+
 import type { Fare } from '@/features/booking/utils/search-params';
 import { isSlowEnabled } from '@/features/demo/demo-queries';
 import { getSessionId } from '@/features/user/user-queries';
@@ -9,41 +10,31 @@ import { prisma } from '@/lib/db';
 import { delay } from '@/lib/utils';
 import { flightTags } from './flight-cache';
 import { toSeat } from './types/flight';
-import type { FlightOffer, FlightResult, SeatHold, SeatHolds } from './types/flight';
+import type { Flight, FlightOffer, SeatHold, SeatHolds } from './types/flight';
 
-const flightInclude = {
-  _count: { select: { seats: true } },
-  destination: true,
-  origin: true,
-} as const;
-
-export async function searchFlights(from: string, to: string, date: string): Promise<FlightResult[]> {
-  return searchFlightsCached(from, to, date, await isSlowEnabled());
+export async function searchFlights(from: string, to: string): Promise<Flight[]> {
+  return searchFlightsCached(from, to, await isSlowEnabled());
 }
 
-async function searchFlightsCached(from: string, to: string, date: string, slow: boolean): Promise<FlightResult[]> {
+async function searchFlightsCached(from: string, to: string, slow: boolean): Promise<Flight[]> {
   'use cache: remote';
   cacheLife('max');
 
   await delay(1000, slow);
-  const flights = await prisma.flight.findMany({
-    include: flightInclude,
+  return prisma.flight.findMany({
+    include: { destination: true, origin: true },
     orderBy: { departureTime: 'asc' },
     where: { destinationCode: to, originCode: from },
   });
-  if (flights.length === 0) return [];
-  cacheTag(...flights.map(flight => flightTags.offer(flight.id)));
+}
 
-  const booked = await prisma.booking.groupBy({
-    _count: { _all: true },
-    by: ['flightId'],
-    where: { date, flightId: { in: flights.map(flight => flight.id) } },
-  });
-  const bookedByFlight = new Map(booked.map(row => [row.flightId, row._count._all]));
-  return flights.map(({ _count, ...flight }) => ({
-    ...flight,
-    seatsLeft: Math.max(0, _count.seats - (bookedByFlight.get(flight.id) ?? 0)),
-  }));
+export async function getSeatsLeft(flightId: string, date: string) {
+  const [capacity, booked, held] = await Promise.all([
+    prisma.seat.count({ where: { flightId } }),
+    prisma.booking.count({ where: { date, flightId } }),
+    prisma.seatHold.count({ where: { date, expiresAt: { gt: new Date() }, flightId } }),
+  ]);
+  return Math.max(0, capacity - booked - held);
 }
 
 export async function getRoutesFrom(originCode: string) {

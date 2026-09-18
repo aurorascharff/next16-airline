@@ -33,7 +33,7 @@ This demo shows the alternative:
 - One cached offer decides which steps exist and renders them.
 - The step plan lives in the URL, so the step bar in the layout needs no data.
 - Every step is cached and keyed by the URL, so Continue and Back are prefetched and ready before the click.
-- Only the live part, who is holding a seat right now, streams in after the navigation.
+- Only the live parts, seats left per flight and who is holding a seat right now, stream in after the navigation.
 
 Try it: pick the **Basic** fare on any result to see Seats and Extras drop out, then compare **Delays** on with **Prefetch** off and on in the demo toolbar.
 

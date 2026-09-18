@@ -1,4 +1,5 @@
 import { Plane } from 'lucide-react';
+import { Suspense } from 'react';
 import { DotSeparator } from '@/components/ui/dot-separator';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
@@ -6,11 +7,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import type { Fare } from '@/features/booking/utils/search-params';
 import { createBookingHref, DEFAULT_BOOKING_DRAFT } from '@/features/booking/utils/search-params';
 import { formatPrice } from '@/lib/utils';
-import { searchFlights } from '../flight-queries';
+import { getSeatsLeft, searchFlights } from '../flight-queries';
+import type { Flight } from '../types/flight';
 import type { Route } from 'next';
 
 export async function FlightResults({ date, from, to }: { date: string; from: string; to: string }) {
-  const flights = await searchFlights(from, to, date);
+  const flights = await searchFlights(from, to);
   const [first] = flights;
 
   if (!first) {
@@ -52,39 +54,48 @@ export async function FlightResults({ date, from, to }: { date: string; from: st
                 <p className="text-muted text-xs">{flight.destination.code}</p>
               </div>
             </div>
-            <div className="border-divider dark:border-divider-dark grid grid-cols-2 gap-3 border-t pt-4 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-6">
-              <p
-                className={
-                  flight.seatsLeft === 0
-                    ? 'text-danger col-span-2 text-xs font-semibold'
-                    : flight.seatsLeft <= 4
-                      ? 'text-warning col-span-2 text-xs font-semibold'
-                      : 'text-muted col-span-2 text-xs font-medium'
-                }
-              >
-                {flight.seatsLeft === 0
-                  ? 'Sold out on this date'
-                  : `${flight.seatsLeft} seat${flight.seatsLeft === 1 ? '' : 's'} left`}
-              </p>
-              <FareOption
-                description="Seat at the gate"
-                disabled={flight.seatsLeft === 0}
-                fare="Basic"
-                href={createBookingHref(flight.id, 'baggage', DEFAULT_BOOKING_DRAFT, date, 'Basic')}
-                price={flight.basicFare}
-              />
-              <FareOption
-                description="Choose your seat, add extras"
-                disabled={flight.seatsLeft === 0}
-                fare="Flex"
-                href={createBookingHref(flight.id, 'baggage', DEFAULT_BOOKING_DRAFT, date, 'Flex')}
-                price={flight.flexFare}
-              />
-            </div>
+            <Suspense fallback={<FareColumnSkeleton />}>
+              <FareColumn date={date} flight={flight} />
+            </Suspense>
           </li>
         ))}
       </ul>
     </section>
+  );
+}
+
+async function FareColumn({ date, flight }: { date: string; flight: Flight }) {
+  const seatsLeft = await getSeatsLeft(flight.id, date);
+  const soldOut = seatsLeft === 0;
+
+  return (
+    <div className="border-divider dark:border-divider-dark grid grid-cols-2 gap-3 border-t pt-4 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-6">
+      <p
+        className={
+          soldOut
+            ? 'text-danger col-span-2 text-xs font-semibold'
+            : seatsLeft <= 4
+              ? 'text-warning col-span-2 text-xs font-semibold'
+              : 'text-muted col-span-2 text-xs font-medium'
+        }
+      >
+        {soldOut ? 'Sold out on this date' : `${seatsLeft} seat${seatsLeft === 1 ? '' : 's'} left`}
+      </p>
+      <FareOption
+        description="Seat at the gate"
+        disabled={soldOut}
+        fare="Basic"
+        href={createBookingHref(flight.id, 'baggage', DEFAULT_BOOKING_DRAFT, date, 'Basic')}
+        price={flight.basicFare}
+      />
+      <FareOption
+        description="Choose your seat, add extras"
+        disabled={soldOut}
+        fare="Flex"
+        href={createBookingHref(flight.id, 'baggage', DEFAULT_BOOKING_DRAFT, date, 'Flex')}
+        price={flight.flexFare}
+      />
+    </div>
   );
 }
 
@@ -153,14 +164,20 @@ export function FlightResultsSkeleton() {
                 <Skeleton className="mt-[6px] mb-0.5 h-3 w-8" />
               </div>
             </div>
-            <div className="border-divider dark:border-divider-dark grid grid-cols-2 gap-3 border-t pt-4 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-6">
-              <Skeleton className="col-span-2 my-0.5 h-3 w-20" />
-              <Skeleton className="skeleton-subtle h-[5.125rem] rounded-md" />
-              <Skeleton className="skeleton-subtle h-[5.125rem] rounded-md" />
-            </div>
+            <FareColumnSkeleton />
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+function FareColumnSkeleton() {
+  return (
+    <div className="border-divider dark:border-divider-dark grid grid-cols-2 gap-3 border-t pt-4 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-6">
+      <Skeleton className="col-span-2 my-0.5 h-3 w-20" />
+      <Skeleton className="skeleton-subtle h-[5.125rem] rounded-md" />
+      <Skeleton className="skeleton-subtle h-[5.125rem] rounded-md" />
     </div>
   );
 }
