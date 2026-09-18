@@ -7,26 +7,16 @@ import { prisma } from '@/lib/db';
 import { delay } from '@/lib/utils';
 
 export async function getAirports() {
-  return getAirportsCached(await isSlowEnabled());
-}
-
-async function getAirportsCached(slow: boolean) {
   'use cache: remote';
   cacheLife('max');
 
-  await delay(400, slow);
   return prisma.airport.findMany({ orderBy: { city: 'asc' } });
 }
 
 export async function getDestinations() {
-  return getDestinationsCached(await isSlowEnabled());
-}
-
-async function getDestinationsCached(slow: boolean) {
   'use cache: remote';
   cacheLife('max');
 
-  await delay(1200, slow);
   const airports = await prisma.airport.findMany({
     include: { arrivals: { orderBy: { basicFare: 'asc' }, select: { basicFare: true }, take: 1 } },
     orderBy: { city: 'asc' },
