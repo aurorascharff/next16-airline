@@ -1,11 +1,17 @@
 import { ArrowRight } from 'lucide-react';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Stat } from '@/components/ui/stat';
+import { Stat, StatSkeleton } from '@/components/ui/stat';
 import { getAirport } from '@/features/airport/airport-queries';
-import { RouteLine } from '@/features/flight/components/route-line';
+import { RouteLine, RouteLineSkeleton } from '@/features/flight/components/route-line';
 import { formatDate } from '@/lib/utils';
 import { getTripsVia } from '../booking-queries';
+import { createSearchHref } from '../utils/search-params';
+
+const cardClass = 'border-divider/70 dark:border-divider-dark/70 rounded-lg border bg-white p-5 dark:bg-black';
+const listClass = '-mx-5 mt-3 -mb-5';
+const rowClass = 'grid gap-4 px-5 py-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center';
+const linkClass = `${rowClass} group hover:bg-card/40 dark:hover:bg-card-dark/40 rounded-b-lg transition-colors`;
 
 export async function DestinationTrips({ slug }: { slug: string }) {
   const airport = await getAirport(slug);
@@ -13,18 +19,29 @@ export async function DestinationTrips({ slug }: { slug: string }) {
   const title = `Your trips ${airport.hub ? 'from' : 'to'} ${airport.city}`;
 
   return (
-    <section className="border-divider/70 dark:border-divider-dark/70 rounded-lg border bg-white p-5 dark:bg-black">
+    <section className={cardClass}>
       <h2 className="text-base">{title}</h2>
       {trips.length === 0 ? (
-        <p className="text-muted mt-3 text-sm">Nothing booked yet.</p>
+        <div className={listClass}>
+          <PrefetchLink
+            className={linkClass}
+            data-testid="no-destination-trips"
+            href={airport.hub ? createSearchHref(airport.code, '') : createSearchHref('OSL', airport.code)}
+          >
+            <div className="flex min-h-13 min-w-0 flex-col justify-center">
+              <p className="text-sm font-semibold">Nothing booked yet</p>
+              <p className="text-muted mt-1 text-sm">
+                Search flights {airport.hub ? 'from' : 'to'} {airport.city} and your trip will show up here.
+              </p>
+            </div>
+            <ArrowRight className="text-muted group-hover:text-accent size-4 shrink-0 transition-colors" />
+          </PrefetchLink>
+        </div>
       ) : (
-        <ul className="divide-divider/70 dark:divide-divider-dark/70 -mx-5 mt-3 -mb-5 divide-y">
+        <ul className={`${listClass} divide-divider/70 dark:divide-divider-dark/70 divide-y`}>
           {trips.map(trip => (
-            <li className="last:overflow-hidden last:rounded-b-lg" key={trip.id}>
-              <PrefetchLink
-                className="group hover:bg-card/40 dark:hover:bg-card-dark/40 grid gap-4 px-5 py-4 transition-colors sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
-                href={`/trips/${trip.id}`}
-              >
+            <li key={trip.id}>
+              <PrefetchLink className={linkClass} href={`/trips/${trip.id}`}>
                 <div className="min-w-0 sm:max-w-sm">
                   <RouteLine flight={trip.flight} size="sm" />
                 </div>
@@ -49,9 +66,24 @@ export async function DestinationTrips({ slug }: { slug: string }) {
 
 export function DestinationTripsSkeleton() {
   return (
-    <div className="border-divider/70 dark:border-divider-dark/70 flex flex-col rounded-lg border bg-white p-5 dark:bg-black">
-      <Skeleton className="my-0.5 h-5 w-48" />
-      <Skeleton className="mt-[15px] mb-[3px] h-3.5 w-32" />
+    <div className={cardClass}>
+      <div className="flex h-6 items-center">
+        <Skeleton className="h-4 w-48" />
+      </div>
+      <div className={listClass}>
+        <div className={rowClass}>
+          <div className="min-w-0 sm:max-w-sm">
+            <RouteLineSkeleton size="sm" />
+          </div>
+          <div className="flex items-center gap-6">
+            <div className="grid flex-1 grid-cols-2 gap-6 sm:w-56">
+              <StatSkeleton width="w-20" />
+              <StatSkeleton width="w-14" />
+            </div>
+            <Skeleton className="size-4 shrink-0" />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
