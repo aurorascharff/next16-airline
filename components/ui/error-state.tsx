@@ -1,19 +1,19 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { BrandMark } from '@/components/ui/brand-mark';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 export function ErrorState({
   body,
+  children,
   className,
-  onRetry,
   title,
   variant = 'section',
 }: {
   body: string;
+  children: ReactNode;
   className?: string;
-  onRetry: () => void;
   title: string;
   variant?: 'page' | 'section';
 }) {
@@ -24,9 +24,7 @@ export function ErrorState({
           <BrandMark animated className="text-accent mb-1 size-10" />
           <h1 className="text-xl font-semibold tracking-tight">{title}</h1>
           <p className="text-muted text-sm leading-6">{body}</p>
-          <Button className="mt-1" onClick={onRetry} variant="secondary">
-            Try again
-          </Button>
+          <div className="mt-1">{children}</div>
         </div>
       </main>
     );
@@ -42,9 +40,7 @@ export function ErrorState({
       <BrandMark className="text-divider dark:text-divider-dark size-8" />
       <p className="text-sm font-medium text-black dark:text-white">{title}</p>
       <p className="text-muted max-w-xs text-sm">{body}</p>
-      <Button onClick={onRetry} size="sm" variant="secondary">
-        Try again
-      </Button>
+      {children}
     </div>
   );
 }
