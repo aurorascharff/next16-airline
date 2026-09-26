@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   experimental: {
     agentFeedback: true,
+    agenticAutoUpgrade: 'latest',
     // Lets `@next/playwright`'s `instant()` run against `next start` when set (never in real deploys).
     exposeTestingApiInProductionBuild: process.env.NEXT_TESTING_API === '1',
     inlineCss: true,
