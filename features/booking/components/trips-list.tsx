@@ -1,4 +1,5 @@
 import { ArrowRight } from 'lucide-react';
+import { unstable_prefetch } from 'next/cache';
 import { BrandMark } from '@/components/ui/brand-mark';
 import { buttonClasses } from '@/components/ui/button-classes';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -15,6 +16,7 @@ const stubClass =
   'border-divider bg-card/60 dark:border-divider-dark dark:bg-card-dark/60 relative flex flex-col justify-between gap-6 border-t border-dashed p-5 sm:border-t-0 sm:border-l';
 
 export async function TripsList() {
+  await unstable_prefetch();
   const bookings = await getBookings();
 
   if (bookings.length === 0) {

@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { cacheLife, cacheTag, unstable_navigation, unstable_prefetch } from 'next/cache';
+import { cacheLife, cacheTag } from 'next/cache';
 import { notFound } from 'next/navigation';
 import { isSlowEnabled } from '@/features/demo/demo-queries';
 import type { Fare } from '@/features/flight/utils/search-params';
@@ -13,7 +13,6 @@ import { weekdayOf } from './utils/schedule';
 import type { Flight, FlightOffer, SeatHold, SeatHolds } from './types/flight';
 
 export async function searchFlights(from: string, to: string, date: string): Promise<Flight[]> {
-  await unstable_navigation();
   return searchFlightsCached(from, to, date, await isSlowEnabled());
 }
 
@@ -126,7 +125,6 @@ async function getFlightOfferCached(flightId: string, date: string, fare: Fare, 
 }
 
 export async function getSeatHolds(flightId: string, date: string): Promise<SeatHolds> {
-  await unstable_navigation();
   return getSeatHoldsForUser(flightId, date, await getSessionId());
 }
 
@@ -147,7 +145,6 @@ async function getSeatHoldsForUser(flightId: string, date: string, userId: strin
 }
 
 export async function getOwnSeatHold(flightId: string): Promise<SeatHold | null> {
-  await unstable_prefetch();
   const sessionId = await getSessionId();
   return sessionId ? getOwnSeatHoldForUser(flightId, sessionId) : null;
 }

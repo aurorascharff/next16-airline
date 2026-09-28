@@ -1,4 +1,5 @@
 import { Armchair, Plane } from 'lucide-react';
+import { unstable_navigation } from 'next/cache';
 import { Suspense } from 'react';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
@@ -16,6 +17,7 @@ const metaClass =
   'text-gray col-span-3 flex items-center justify-center gap-3 font-mono text-[12px] leading-4 whitespace-nowrap sm:col-span-1 sm:col-start-2';
 
 export async function FlightResults({ date, from, to }: { date: string; from: string; to: string }) {
+  await unstable_navigation();
   const flights = await searchFlights(from, to, date);
   const [first] = flights;
 

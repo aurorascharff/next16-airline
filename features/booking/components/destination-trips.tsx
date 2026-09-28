@@ -1,4 +1,5 @@
 import { ArrowRight } from 'lucide-react';
+import { unstable_navigation } from 'next/cache';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Stat, StatSkeleton } from '@/components/ui/stat';
@@ -15,6 +16,7 @@ const linkClass = `${rowClass} group hover:bg-card/40 dark:hover:bg-card-dark/40
 
 export async function DestinationTrips({ slug }: { slug: string }) {
   const airport = await getAirport(slug);
+  await unstable_navigation();
   const trips = await getTripsVia(airport.code);
   const title = `Your trips ${airport.hub ? 'from' : 'to'} ${airport.city}`;
 

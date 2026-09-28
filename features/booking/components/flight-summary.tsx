@@ -1,4 +1,5 @@
 import { Armchair, Clock3, MapPin } from 'lucide-react';
+import { unstable_prefetch } from 'next/cache';
 import { Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { RouteLine, RouteLineSkeleton } from '@/features/flight/components/route-line';
@@ -44,6 +45,7 @@ export async function FlightSummary({ flightId }: { flightId: string }) {
 }
 
 async function HeldSeat({ flightId }: { flightId: string }) {
+  await unstable_prefetch();
   const hold = await getOwnSeatHold(flightId);
 
   return (

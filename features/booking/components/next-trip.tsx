@@ -1,4 +1,5 @@
 import { ArrowRight } from 'lucide-react';
+import { unstable_prefetch } from 'next/cache';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Stat, StatSkeleton } from '@/components/ui/stat';
@@ -13,6 +14,7 @@ const stubClass =
   'border-divider dark:border-divider-dark flex items-center gap-6 border-t border-dashed pt-5 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-6';
 
 export async function NextTrip() {
+  await unstable_prefetch();
   const [booking] = await getBookings();
 
   if (!booking) {
