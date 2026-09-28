@@ -4,7 +4,7 @@
 
 # Next 16 Airline "Waypoint"
 
-An airline booking demo, from flight search to a stored trip, that demonstrates [Instant Navigations](https://nextjs.org/docs/app/guides/instant-navigation) in [Next.js 16](https://nextjs.org/blog/next-16-3-instant-navigations).
+An airline booking demo, from flight search to a stored trip, that demonstrates [Instant Navigations](https://nextjs.org/docs/app/guides/instant-navigation) in [Next.js 16.4](https://nextjs.org/blog/next-16-4).
 
 [**Live demo →**](https://next16-airline.vercel.app/)
 
@@ -16,17 +16,17 @@ The architecture follows the [Next.js App Architecture](https://github.com/auror
 
 ## Features
 
-- **[Cache Components](https://nextjs.org/docs/app/api-reference/config/next-config-js/cacheComponents)** with `'use cache'`, [`'use cache: remote'`](https://nextjs.org/docs/app/api-reference/directives/use-cache-remote) for reads that serverless instances share, and [`'use cache: private'`](https://nextjs.org/docs/app/api-reference/directives/use-cache-private) for the active traveler.
-- **[Partial Prefetching](https://nextjs.org/docs/app/guides/adopting-partial-prefetching)** with one shared shell per route and `prefetch={true}` on the next booking step.
-- **[`prefetch()`](https://nextjs.org/docs/app/api-reference/functions/prefetch) and [`navigation()`](https://nextjs.org/docs/app/api-reference/functions/navigation)** awaited in the components that render session and live reads, so those are produced at the right stage.
-- **[Server Functions](https://nextjs.org/docs/app/getting-started/mutating-data)** that hold seats, confirm, and cancel trips, invalidating only their own tags with [`updateTag`](https://nextjs.org/docs/app/api-reference/functions/updateTag).
-- **[React Compiler](https://react.dev/learn/react-compiler)**, so there is no manual `useMemo` or `useCallback`.
-- **[Async React](https://github.com/rickhanlonii/async-react)**: `Suspense`, `useOptimistic`, and transitions while server-rendered content streams in.
-- **[View Transitions](https://nextjs.org/docs/app/guides/view-transitions)** on streamed content, with the header, tab bar, and demo toolbar pinned.
+- **[Cache Components](https://nextjs.org/docs/app/api-reference/config/next-config-js/cacheComponents)** cache each query with `'use cache'`, name the data with `cacheTag`, and set its lifetime with `cacheLife`. Search results and flight offers use [`'use cache: remote'`](https://nextjs.org/docs/app/api-reference/directives/use-cache-remote) so serverless instances share one cache, and the active traveler is read with [`'use cache: private'`](https://nextjs.org/docs/app/api-reference/directives/use-cache-private).
+- **[Partial Prefetching](https://nextjs.org/docs/app/guides/adopting-partial-prefetching)** prefetches one shared App Shell per route. The link to the next booking step uses `prefetch={true}`, which also resolves its cached offer.
+- **[`prefetch()`](https://nextjs.org/docs/app/api-reference/functions/prefetch) and [`navigation()`](https://nextjs.org/docs/app/api-reference/functions/navigation)** are awaited in the components that render trips, holds, and flight lists, which moves those reads to a per-link prefetch or to the navigation while keeping them cached.
+- **[Server Functions](https://nextjs.org/docs/app/getting-started/mutating-data)** hold seats, confirm, and cancel trips on the server, and invalidate only the tags they change with [`updateTag`](https://nextjs.org/docs/app/api-reference/functions/updateTag).
+- **[React Compiler](https://react.dev/learn/react-compiler)** memoizes components and hooks automatically, so the code needs no manual `useMemo` or `useCallback`.
+- **[View Transitions](https://nextjs.org/docs/app/guides/view-transitions)** animate content as it streams in, while the header, tab bar, and demo toolbar stay in place.
+- **[Async React](https://github.com/rickhanlonii/async-react)** keeps the UI interactive during server work with `Suspense`, `useOptimistic`, and `useTransition`.
 
-## Purpose of this demo
+## How the data loads
 
-A booking flow mixes static data, shared data, session data and live data. Waypoint shows how Next.js 16 delivers each at the right moment: static reads ship in the static shell, shared reads are cached and prefetched before the click, session reads wait for a per-link prefetch or a navigation, and live reads stream in on every request.
+Each read is cached differently and arrives at a different stage of a navigation.
 
 | Read                        | How it is cached                                       | When it arrives          |
 | --------------------------- | ------------------------------------------------------ | ------------------------ |
@@ -36,7 +36,7 @@ A booking flow mixes static data, shared data, session data and live data. Waypo
 | Flight list, who holds what | `'use cache'`, after `unstable_navigation()`           | On the navigation        |
 | Seats left                  | Uncached                                               | On every request         |
 
-Writes are Server Functions that update only the tags they touch, so holding a seat refreshes the seat map without recomputing the flight list.
+Holding a seat updates only the seat map's tag, so the flight list is not recomputed.
 
 ## Getting started
 
@@ -79,7 +79,7 @@ pnpm typecheck
 
 ## Stack
 
-- **[Next.js 16](https://nextjs.org/)** canary: App Router, Cache Components, Partial Prefetching, Server Functions
+- **[Next.js 16.4](https://nextjs.org/)** canary: App Router, Cache Components, Partial Prefetching, `prefetch()` and `navigation()`, Server Functions
 - **[React 19](https://react.dev/)** with React Compiler: Suspense, View Transitions, `useOptimistic`
 - **[TypeScript](https://www.typescriptlang.org/)** and **[Tailwind CSS v4](https://tailwindcss.com/)**
 - **[Prisma 7](https://www.prisma.io/)** on PostgreSQL
