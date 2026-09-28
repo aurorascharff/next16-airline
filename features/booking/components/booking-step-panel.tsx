@@ -1,3 +1,4 @@
+import { unstable_navigation, unstable_prefetch } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { BrandMark } from '@/components/ui/brand-mark';
 import { getFlight, getFlightOffer, getOwnSeatHold, getSeatHolds } from '@/features/flight/flight-queries';
@@ -20,6 +21,7 @@ export async function BookingStepPanel({
   flightId: string;
   step: BookingStep;
 }) {
+  await unstable_prefetch();
   const [flight, offer, hold] = await Promise.all([
     getFlight(flightId),
     getFlightOffer(flightId, date, fare),
@@ -38,7 +40,7 @@ export async function BookingStepPanel({
       draft={draft}
       flight={flight}
       hold={hold}
-      holds={step === 'seats' ? getSeatHolds(flightId, date) : undefined}
+      holds={step === 'seats' ? unstable_navigation().then(() => getSeatHolds(flightId, date)) : undefined}
       offer={offer}
       step={step}
       steps={steps}

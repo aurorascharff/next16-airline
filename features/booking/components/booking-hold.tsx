@@ -1,8 +1,10 @@
+import { unstable_prefetch } from 'next/cache';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getOwnSeatHold } from '@/features/flight/flight-queries';
 import { HoldChip } from './hold-chip';
 
 export async function BookingHold({ flightId }: { flightId: string }) {
+  await unstable_prefetch();
   return <HoldChip hold={await getOwnSeatHold(flightId)} />;
 }
 
