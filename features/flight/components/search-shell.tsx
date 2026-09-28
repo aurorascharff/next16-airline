@@ -6,7 +6,13 @@ import { useState, useTransition } from 'react';
 import { Boundary } from '@/components/internal/boundary';
 import { Button } from '@/components/ui/button';
 import { createSearchHref } from '@/features/flight/utils/search-params';
-import { SearchFields, type SearchFieldsProps, searchPanelClass, searchValuesFrom, type SearchValues } from './search-fields';
+import {
+  SearchFields,
+  type SearchFieldsProps,
+  searchPanelClass,
+  searchValuesFrom,
+  type SearchValues,
+} from './search-fields';
 
 type Props = SearchFieldsProps & { children: React.ReactNode };
 

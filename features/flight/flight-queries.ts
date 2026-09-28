@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { cacheLife, cacheTag } from 'next/cache';
+import { cacheLife, cacheTag, unstable_navigation } from 'next/cache';
 import { notFound } from 'next/navigation';
 import { isSlowEnabled } from '@/features/demo/demo-queries';
 import type { Fare } from '@/features/flight/utils/search-params';
@@ -125,6 +125,7 @@ async function getFlightOfferCached(flightId: string, date: string, fare: Fare, 
 }
 
 export async function getSeatHolds(flightId: string, date: string): Promise<SeatHolds> {
+  await unstable_navigation();
   return getSeatHoldsForUser(flightId, date, await getSessionId());
 }
 
