@@ -1,7 +1,7 @@
 'use server';
 
 import { updateTag } from 'next/cache';
-import { redirect, RedirectType } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { flightTags } from '@/features/flight/flight-cache';
 import { operatesOn } from '@/features/flight/utils/schedule';
@@ -13,7 +13,7 @@ import type { BookingDraft } from './types/booking';
 
 const SEAT_HOLD_MINUTES = 5;
 
-export type ConfirmBookingState = { ok: false; error: string } | null;
+export type ConfirmBookingState = { ok: false; error: string } | { ok: true; bookingId: string } | null;
 
 const confirmSchema = z.object({
   bags: z.coerce.number().int().min(0).max(2),
@@ -112,7 +112,7 @@ export async function confirmBooking(_state: ConfirmBookingState, formData: Form
   updateTag(bookingTags.user(sessionId));
   updateTag(flightTags.offer(flight.id));
   updateTag(flightTags.holds(flight.id));
-  redirect(`/trips/${booking.id}?confirmed=1`, RedirectType.replace);
+  return { bookingId: booking.id, ok: true };
 }
 
 async function seatConflict(flightId: string, date: string, seatId: string, userId: string) {
