@@ -16,12 +16,13 @@ The architecture follows the [Next.js App Architecture](https://github.com/auror
 
 ## Features
 
-- **[Cache Components](https://nextjs.org/docs/app/api-reference/config/next-config-js/cacheComponents)** put the airport catalog in the static shell with `'use cache'`, cache search results and per-flight offers with [`'use cache: remote'`](https://nextjs.org/docs/app/api-reference/directives/use-cache-remote) so serverless instances share one cache, and resolve the active traveler with [`'use cache: private'`](https://nextjs.org/docs/app/api-reference/directives/use-cache-private) so each user sees only their own trips.
-- **[Partial Prefetching](https://nextjs.org/docs/app/guides/adopting-partial-prefetching)** keeps a shared route shell ready and prefetches the next URL-specific booking step, including its cached offer, before navigation.
-- **[Server Functions](https://nextjs.org/docs/app/getting-started/mutating-data)** confirm and cancel trips, then invalidate only the tags they change with [`updateTag`](https://nextjs.org/docs/app/api-reference/functions/updateTag), so a seat taken by one traveler shows as occupied for the next.
-- **[React Compiler](https://react.dev/learn/react-compiler)** memoizes components and hooks automatically, so the code needs no manual `useMemo` or `useCallback`.
-- **[Async React](https://github.com/rickhanlonii/async-react)** keeps the booking flow responsive with `Suspense`, `useOptimistic`, and transitions while server-rendered content streams in.
-- **[View Transitions](https://nextjs.org/docs/app/guides/view-transitions)** cross-fade streamed content into place while the header, tab bar, and demo toolbar stay pinned.
+- **[Cache Components](https://nextjs.org/docs/app/api-reference/config/next-config-js/cacheComponents)** with `'use cache'`, [`'use cache: remote'`](https://nextjs.org/docs/app/api-reference/directives/use-cache-remote) for reads that serverless instances share, and [`'use cache: private'`](https://nextjs.org/docs/app/api-reference/directives/use-cache-private) for the active traveler.
+- **[Partial Prefetching](https://nextjs.org/docs/app/guides/adopting-partial-prefetching)** with one shared shell per route and `prefetch={true}` on the next booking step.
+- **[`prefetch()`](https://nextjs.org/docs/app/api-reference/functions/prefetch) and [`navigation()`](https://nextjs.org/docs/app/api-reference/functions/navigation)** awaited in the components that render session and live reads, so those are produced at the right stage.
+- **[Server Functions](https://nextjs.org/docs/app/getting-started/mutating-data)** that hold seats, confirm, and cancel trips, invalidating only their own tags with [`updateTag`](https://nextjs.org/docs/app/api-reference/functions/updateTag).
+- **[React Compiler](https://react.dev/learn/react-compiler)**, so there is no manual `useMemo` or `useCallback`.
+- **[Async React](https://github.com/rickhanlonii/async-react)**: `Suspense`, `useOptimistic`, and transitions while server-rendered content streams in.
+- **[View Transitions](https://nextjs.org/docs/app/guides/view-transitions)** on streamed content, with the header, tab bar, and demo toolbar pinned.
 
 ## Purpose of this demo
 
