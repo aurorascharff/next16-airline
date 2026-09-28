@@ -56,8 +56,20 @@ export function BookingStepForm({
   const showOverlay = useConfirmOverlay();
   const [confirmState, confirmAction, confirming] = useActionState(
     async (state: ConfirmBookingState, formData: FormData) => {
-      showOverlay('Confirming your booking');
-      return confirmBooking(state, formData);
+      showOverlay({ phase: 'pending' });
+      const result = await confirmBooking(state, formData);
+      if (!result?.ok) return result;
+
+      const href = `/trips/${result.bookingId}?confirmed=1` as const;
+      router.prefetch(href);
+      await new Promise<void>(resolve => {
+        startTransition(async () => {
+          await new Promise<void>(onComplete => showOverlay({ onComplete, phase: 'success' }));
+          startTransition(() => router.replace(href));
+          resolve();
+        });
+      });
+      return null;
     },
     null,
   );
@@ -122,7 +134,11 @@ export function BookingStepForm({
                 date={date}
                 draft={optimisticDraft}
                 error={
-                  holdLost ? 'Your seat hold has expired. Choose your seat again to continue.' : confirmState?.error
+                  holdLost
+                    ? 'Your seat hold has expired. Choose your seat again to continue.'
+                    : confirmState && !confirmState.ok
+                      ? confirmState.error
+                      : undefined
                 }
                 flight={flight}
                 offer={offer}

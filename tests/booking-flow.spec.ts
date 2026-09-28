@@ -55,7 +55,12 @@ test.describe('Booking flow (/book/[flightId]/[step])', () => {
     await page.getByLabel('First name').fill('Test');
     await page.getByLabel('Last name').fill('Traveler');
     await page.getByTestId('booking-confirm').filter({ visible: true }).click();
+    await expect(page.getByTestId('booking-success')).toBeVisible();
+    await expect(page.getByRole('status').filter({ hasText: 'Booking confirmed' })).toBeVisible();
+    await expect(page).toHaveURL(url => url.pathname === '/book/wp-41/review');
+    await expect(page.locator('[inert]').filter({ has: page.getByTestId('trip-total') })).toHaveCount(1);
     await page.waitForURL(url => url.pathname.startsWith('/trips/') && url.searchParams.get('confirmed') === '1');
+    await expect(page.getByTestId('booking-success')).toHaveCount(0);
     await expect(page.getByTestId('trip-confirmed')).toBeVisible();
     await expect(page.getByRole('heading', { level: 1, name: 'See you in Lisbon.' })).toBeVisible();
     await expect(page.getByText('Total paid').locator('..')).toContainText('€395');
@@ -69,5 +74,17 @@ test.describe('Booking flow (/book/[flightId]/[step])', () => {
     await page.getByRole('dialog').getByRole('button', { name: 'Cancel trip' }).click();
     await page.waitForURL(url => url.pathname === '/trips');
     await expect(page.getByTestId('trip-card')).toHaveCount(2);
+  });
+
+  test('validation failures return to the form without a success animation', async ({ page }) => {
+    await page.goto('/book/wp-41/review?date=2026-12-03&fare=Basic');
+    await page.getByLabel('First name').fill(' ');
+    await page.getByLabel('Last name').fill('Traveler');
+    await page.getByTestId('booking-confirm').filter({ visible: true }).click();
+    await expect(page.getByRole('alert')).toHaveText('Enter the passenger first name.');
+    await expect(page.getByTestId('booking-success')).toHaveCount(0);
+    await expect(page.locator('[inert]')).toHaveCount(0);
+    await expect(page.getByTestId('booking-confirm').filter({ visible: true })).toBeEnabled();
+    await expect(page).toHaveURL(url => url.pathname === '/book/wp-41/review');
   });
 });
