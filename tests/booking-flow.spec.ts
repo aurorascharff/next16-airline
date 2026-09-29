@@ -81,7 +81,7 @@ test.describe('Booking flow (/book/[flightId]/[step])', () => {
     await page.getByLabel('First name').fill(' ');
     await page.getByLabel('Last name').fill('Traveler');
     await page.getByTestId('booking-confirm').filter({ visible: true }).click();
-    await expect(page.getByRole('alert')).toHaveText('Enter the passenger first name.');
+    await expect(page.locator('form').getByRole('alert')).toHaveText('Enter the passenger first name.');
     await expect(page.getByTestId('booking-success')).toHaveCount(0);
     await expect(page.locator('[inert]')).toHaveCount(0);
     await expect(page.getByTestId('booking-confirm').filter({ visible: true })).toBeEnabled();
