@@ -2,12 +2,12 @@ import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { GeistMono } from 'geist/font/mono';
 import { GeistSans } from 'geist/font/sans';
-import { Suspense } from 'react';
 import { BoundaryProvider } from '@/components/internal/boundary';
 import { OfflineIndicator } from '@/components/offline-indicator';
 import { NavLinkScript } from '@/components/scripts/nav-link-script';
 import { ThemeProvider } from '@/components/theme/theme-provider';
 import { Toaster } from '@/components/toaster';
+import { AnimatedSuspense } from '@/components/ui/animated-suspense';
 import { DemoToolbar } from '@/features/demo/components/demo-toolbar';
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
@@ -55,9 +55,9 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
           <BoundaryProvider>
             {children}
             <div className="demo-toggles fixed right-4 bottom-4 z-50 hidden items-end sm:flex">
-              <Suspense>
+              <AnimatedSuspense>
                 <DemoToolbar />
-              </Suspense>
+              </AnimatedSuspense>
             </div>
             <Toaster />
             <OfflineIndicator />
