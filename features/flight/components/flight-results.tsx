@@ -1,6 +1,6 @@
 import { Armchair, Plane } from 'lucide-react';
 import { unstable_navigation } from 'next/cache';
-import { Suspense } from 'react';
+import { AnimatedSuspense } from '@/components/ui/animated-suspense';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -66,9 +66,9 @@ export async function FlightResults({ date, from, to }: { date: string; from: st
                 {!date && <span>{formatOperatingDays(flight.operatingDays)}</span>}
               </span>
             </div>
-            <Suspense fallback={<FareColumnSkeleton />}>
+            <AnimatedSuspense fallback={<FareColumnSkeleton />}>
               <FareColumn date={date} flight={flight} />
-            </Suspense>
+            </AnimatedSuspense>
           </li>
         ))}
       </ul>

@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Suspense } from 'react';
 import { Boundary } from '@/components/internal/boundary';
+import { AnimatedSuspense } from '@/components/ui/animated-suspense';
 import { usePrefetchDefault } from '@/features/demo/hooks/use-prefetch-default';
 import type { Route } from 'next';
 
@@ -17,9 +17,9 @@ function isActivePath(pathname: string, target: string) {
 export function NavLink<T extends string>(props: Props<T>) {
   return (
     <Boundary label="NavLink">
-      <Suspense fallback={<NavLinkShell {...props} isActive={false} />}>
+      <AnimatedSuspense fallback={<NavLinkShell {...props} isActive={false} />}>
         <NavLinkInner {...props} />
-      </Suspense>
+      </AnimatedSuspense>
     </Boundary>
   );
 }

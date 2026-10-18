@@ -1,7 +1,8 @@
 'use client';
 
 import { Armchair } from 'lucide-react';
-import { Suspense, use } from 'react';
+import { use } from 'react';
+import { AnimatedSuspense } from '@/components/ui/animated-suspense';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { FlightOffer, SeatHolds } from '@/features/flight/types/flight';
 import { cn } from '@/lib/utils';
@@ -42,9 +43,9 @@ export function SeatMap({
       </div>
       <div className="border-divider/70 bg-card/40 dark:border-divider-dark/70 dark:bg-card-dark/40 rounded-lg border px-7 pt-10 pb-7">
         <div className="border-divider dark:border-divider-dark mx-auto mb-8 h-7 w-3/4 rounded-t-[50%] border-t" />
-        <Suspense fallback={<SeatGridSkeleton count={offer.seats.length} />}>
+        <AnimatedSuspense fallback={<SeatGridSkeleton count={offer.seats.length} />}>
           <LiveSeatGrid draft={draft} holds={holds} offer={offer} onSelect={onSelect} pendingSeat={pendingSeat} />
-        </Suspense>
+        </AnimatedSuspense>
       </div>
       <p
         aria-live="polite"

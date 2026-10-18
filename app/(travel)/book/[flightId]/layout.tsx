@@ -1,5 +1,5 @@
 import { ArrowLeft } from 'lucide-react';
-import { Suspense } from 'react';
+import { AnimatedSuspense } from '@/components/ui/animated-suspense';
 import ErrorBoundary from '@/components/ui/error-boundary';
 import { PrefetchLink } from '@/components/ui/prefetch-link';
 import { BookingHold, BookingHoldSkeleton } from '@/features/booking/components/booking-hold';
@@ -20,24 +20,24 @@ export default function BookingLayout({ children, params }: LayoutProps<'/book/[
           <p className="text-muted text-sm font-medium">Booking</p>
           <h2 className="mt-1 text-xl">Book your flight</h2>
         </div>
-        <Suspense fallback={<BookingHoldSkeleton />}>
+        <AnimatedSuspense fallback={<BookingHoldSkeleton />}>
           {params.then(({ flightId }) => (
             <BookingHold flightId={flightId} />
           ))}
-        </Suspense>
+        </AnimatedSuspense>
       </div>
-      <Suspense fallback={<ProgressBar />}>
+      <AnimatedSuspense fallback={<ProgressBar />}>
         <CurrentProgressBar />
-      </Suspense>
+      </AnimatedSuspense>
       <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_19rem]" data-testid="booking-experience">
         <div className="min-w-0">{children}</div>
         <div className="lg:col-start-2 lg:row-start-1">
           <ErrorBoundary title="Flight details unavailable">
-            <Suspense fallback={<FlightSummarySkeleton />}>
+            <AnimatedSuspense fallback={<FlightSummarySkeleton />}>
               {params.then(({ flightId }) => (
                 <FlightSummary flightId={flightId} />
               ))}
-            </Suspense>
+            </AnimatedSuspense>
           </ErrorBoundary>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { Armchair, Clock3, MapPin } from 'lucide-react';
 import { unstable_prefetch } from 'next/cache';
-import { Suspense } from 'react';
+import { AnimatedSuspense } from '@/components/ui/animated-suspense';
 import { Skeleton } from '@/components/ui/skeleton';
 import { RouteLine, RouteLineSkeleton } from '@/features/flight/components/route-line';
 import { getFlight, getOwnSeatHold } from '@/features/flight/flight-queries';
@@ -35,9 +35,9 @@ export async function FlightSummary({ flightId }: { flightId: string }) {
         </div>
         <div className="flex items-start gap-3">
           <Armchair className="text-accent mt-0.5 size-4" />
-          <Suspense fallback={<DetailRowSkeleton />}>
+          <AnimatedSuspense fallback={<DetailRowSkeleton />}>
             <HeldSeat flightId={flightId} />
-          </Suspense>
+          </AnimatedSuspense>
         </div>
       </div>
     </aside>

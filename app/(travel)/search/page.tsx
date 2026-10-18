@@ -1,4 +1,3 @@
-import { Suspense } from 'react';
 import { AnimatedSuspense } from '@/components/ui/animated-suspense';
 import { FlightResults, FlightResultsSkeleton } from '@/features/flight/components/flight-results';
 import { FlightSearchForm, FlightSearchFormSkeleton } from '@/features/flight/components/flight-search-form';
@@ -24,12 +23,12 @@ export default function SearchPage({ searchParams }: PageProps<'/search'>) {
         <AnimatedSuspense fallback={<FlightSearchFormSkeleton />}>
           <FlightSearchForm>
             <div className="mt-8">
-              <Suspense fallback={<SearchHeadingSkeleton />}>
+              <AnimatedSuspense fallback={<SearchHeadingSkeleton />}>
                 {query.then(({ date, from, to }) => (
                   <SearchHeading date={date} from={from} to={to} />
                 ))}
-              </Suspense>
-              <Suspense fallback={<FlightResultsSkeleton />}>
+              </AnimatedSuspense>
+              <AnimatedSuspense fallback={<FlightResultsSkeleton />}>
                 {query.then(({ date, from, to }) =>
                   to ? (
                     <AnimatedSuspense fallback={<FlightResultsSkeleton />}>
@@ -41,7 +40,7 @@ export default function SearchPage({ searchParams }: PageProps<'/search'>) {
                     </AnimatedSuspense>
                   ),
                 )}
-              </Suspense>
+              </AnimatedSuspense>
             </div>
           </FlightSearchForm>
         </AnimatedSuspense>
